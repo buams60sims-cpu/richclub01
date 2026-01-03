@@ -25,9 +25,10 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
-// TODO: Add your routes here
-// Example: app.use('/api/users', require('./routes/userRoutes'));
-// Example: app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/coupons', require('./routes/couponRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/health', require('./routes/healthRoutes'));
 
 // Root route
 app.get('/', (req, res) => {
@@ -35,7 +36,35 @@ app.get('/', (req, res) => {
         message: 'Welcome to Rich Club eCommerce API',
         version: '1.0.0',
         endpoints: {
-            health: '/api/health'
+            health: '/api/health',
+            products: '/api/products',
+            coupons: '/api/coupons',
+            orders: '/api/orders'
+        },
+        documentation: {
+            products: {
+                create: 'POST /api/products',
+                getAll: 'GET /api/products',
+                getById: 'GET /api/products/:id',
+                update: 'PUT /api/products/:id',
+                delete: 'DELETE /api/products/:id',
+                checkStock: 'GET /api/products/:id/stock/:size'
+            },
+            coupons: {
+                create: 'POST /api/coupons',
+                getAll: 'GET /api/coupons',
+                validate: 'POST /api/coupons/validate',
+                update: 'PUT /api/coupons/:id',
+                delete: 'DELETE /api/coupons/:id'
+            },
+            orders: {
+                create: 'POST /api/orders',
+                getAll: 'GET /api/orders',
+                getById: 'GET /api/orders/:id',
+                getByInvoice: 'GET /api/orders/invoice/:invoiceNumber',
+                updateStatus: 'PUT /api/orders/:id/status',
+                cancel: 'PUT /api/orders/:id/cancel'
+            }
         }
     });
 });

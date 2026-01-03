@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 /**
  * User Model
  * Defines the schema for user authentication and profile
+ * Supports both regular users and admin users
  */
 const userSchema = new mongoose.Schema(
     {
@@ -30,8 +31,12 @@ const userSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ['user', 'admin'],
-            default: 'user'
+            enum: {
+                values: ['USER', 'ADMIN'],
+                message: '{VALUE} is not a valid role'
+            },
+            default: 'USER',
+            uppercase: true
         },
         isActive: {
             type: Boolean,
@@ -45,5 +50,7 @@ const userSchema = new mongoose.Schema(
 
 // Add indexes for better query performance
 userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
 
 module.exports = mongoose.model('User', userSchema);
+
