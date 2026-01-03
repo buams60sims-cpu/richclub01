@@ -29,7 +29,9 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
+
 
 
 // Root route
@@ -42,7 +44,8 @@ app.get('/', (req, res) => {
             health: '/api/health',
             products: '/api/products',
             coupons: '/api/coupons',
-            orders: '/api/orders'
+            orders: '/api/orders',
+            payments: '/api/payments'
         },
         documentation: {
             auth: {
@@ -71,6 +74,11 @@ app.get('/', (req, res) => {
                 getByInvoice: 'GET /api/orders/invoice/:invoiceNumber',
                 updateStatus: 'PUT /api/orders/:id/status (Protected)',
                 cancel: 'PUT /api/orders/:id/cancel (Protected)'
+            },
+            payments: {
+                createOrder: 'POST /api/payments/create-order',
+                verify: 'POST /api/payments/verify',
+                getKey: 'GET /api/payments/razorpay-key'
             }
         }
     });

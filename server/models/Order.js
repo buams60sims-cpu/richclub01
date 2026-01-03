@@ -124,6 +124,19 @@ const orderSchema = new mongoose.Schema(
                 message: '{VALUE} is not a valid order status'
             },
             default: 'PLACED'
+        },
+        // Razorpay payment tracking fields
+        razorpayOrderId: {
+            type: String,
+            trim: true
+        },
+        razorpayPaymentId: {
+            type: String,
+            trim: true
+        },
+        razorpaySignature: {
+            type: String,
+            trim: true
         }
     },
     {
