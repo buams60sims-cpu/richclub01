@@ -7,6 +7,7 @@ const {
     updateCoupon,
     deleteCoupon
 } = require('../controllers/couponController');
+const { verifyJWT, isAdmin } = require('../middlewares/auth');
 
 /**
  * Coupon Routes
@@ -16,12 +17,12 @@ const {
 // @route   POST /api/coupons
 // @desc    Create a new coupon
 // @access  Admin
-router.post('/', createCoupon);
+router.post('/', verifyJWT, isAdmin, createCoupon);
 
 // @route   GET /api/coupons
 // @desc    Get all coupons
 // @access  Admin
-router.get('/', getAllCoupons);
+router.get('/', verifyJWT, isAdmin, getAllCoupons);
 
 // @route   POST /api/coupons/validate
 // @desc    Validate a coupon code
@@ -31,11 +32,11 @@ router.post('/validate', validateCoupon);
 // @route   PUT /api/coupons/:id
 // @desc    Update coupon
 // @access  Admin
-router.put('/:id', updateCoupon);
+router.put('/:id', verifyJWT, isAdmin, updateCoupon);
 
 // @route   DELETE /api/coupons/:id
 // @desc    Delete coupon
 // @access  Admin
-router.delete('/:id', deleteCoupon);
+router.delete('/:id', verifyJWT, isAdmin, deleteCoupon);
 
 module.exports = router;

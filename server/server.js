@@ -25,10 +25,12 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
+
 
 // Root route
 app.get('/', (req, res) => {
@@ -36,34 +38,39 @@ app.get('/', (req, res) => {
         message: 'Welcome to Rich Club eCommerce API',
         version: '1.0.0',
         endpoints: {
+            auth: '/api/auth',
             health: '/api/health',
             products: '/api/products',
             coupons: '/api/coupons',
             orders: '/api/orders'
         },
         documentation: {
+            auth: {
+                login: 'POST /api/auth/login',
+                getMe: 'GET /api/auth/me (Protected)'
+            },
             products: {
-                create: 'POST /api/products',
+                create: 'POST /api/products (Protected)',
                 getAll: 'GET /api/products',
                 getById: 'GET /api/products/:id',
-                update: 'PUT /api/products/:id',
-                delete: 'DELETE /api/products/:id',
+                update: 'PUT /api/products/:id (Protected)',
+                delete: 'DELETE /api/products/:id (Protected)',
                 checkStock: 'GET /api/products/:id/stock/:size'
             },
             coupons: {
-                create: 'POST /api/coupons',
-                getAll: 'GET /api/coupons',
+                create: 'POST /api/coupons (Protected)',
+                getAll: 'GET /api/coupons (Protected)',
                 validate: 'POST /api/coupons/validate',
-                update: 'PUT /api/coupons/:id',
-                delete: 'DELETE /api/coupons/:id'
+                update: 'PUT /api/coupons/:id (Protected)',
+                delete: 'DELETE /api/coupons/:id (Protected)'
             },
             orders: {
                 create: 'POST /api/orders',
-                getAll: 'GET /api/orders',
-                getById: 'GET /api/orders/:id',
+                getAll: 'GET /api/orders (Protected)',
+                getById: 'GET /api/orders/:id (Protected)',
                 getByInvoice: 'GET /api/orders/invoice/:invoiceNumber',
-                updateStatus: 'PUT /api/orders/:id/status',
-                cancel: 'PUT /api/orders/:id/cancel'
+                updateStatus: 'PUT /api/orders/:id/status (Protected)',
+                cancel: 'PUT /api/orders/:id/cancel (Protected)'
             }
         }
     });
