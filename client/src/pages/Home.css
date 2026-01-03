@@ -1,0 +1,142 @@
+.home-page {
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: var(--spacing-2xl) 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+    color: white;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-xl);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Features Section */
+.features {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.features h2 {
+    margin-bottom: var(--spacing-xl);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.feature-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.feature-card h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* API Status Section */
+.api-status {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.api-status h2 {
+    margin-bottom: var(--spacing-xl);
+}
+
+.status-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+.status-loading {
+    text-align: center;
+}
+
+.status-loading .spinner {
+    margin: 0 auto var(--spacing-md);
+}
+
+.status-error {
+    text-align: center;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.error-hint {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.status-success {
+    text-align: center;
+}
+
+.status-success h3 {
+    color: var(--success-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.status-details {
+    text-align: left;
+    background-color: var(--bg-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--success-color);
+}
+
+.status-details p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.status-details strong {
+    color: var(--text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
