@@ -160,6 +160,15 @@ const verifyPayment = async (req, res, next) => {
             });
         }
 
+        // Replay Protection: Ensure payment ID hasn't been used by another order
+        const duplicatePayment = await Order.findOne({ razorpayPaymentId });
+        if (duplicatePayment && duplicatePayment._id.toString() !== orderId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Security Alert: Payment ID already used. Transaction rejected.'
+            });
+        }
+
         // Verify Razorpay signature
         const generatedSignature = crypto
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)

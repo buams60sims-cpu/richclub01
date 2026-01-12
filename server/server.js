@@ -4,18 +4,47 @@ const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 // Initialize Express app
 const app = express();
 
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Security Middleware
+app.use(helmet());
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
-// Health check route
+// Rate Limiters
+const authLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 10, // Increased slighty from 5 to 10 to prevent lockouts during normal use testing
+    message: { message: 'Too many login attempts, please try again later.' }
+});
+
+const checkoutLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 15,
+    message: { message: 'Too many checkout requests. Please wait a moment.' }
+});
+
+const adminLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 60, // 60/min for admin is safer for dashboards loading many resources
+    message: { message: 'Admin rate limit exceeded.' }
+});
+
+const uploadLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 10,
+    message: { message: 'Upload limit exceeded.' }
+});
+
+// App Health Check
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -25,16 +54,18 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// API Routes
-app.use('/api/auth', require('./routes/authRoutes'));
+// API Routes with Rate Limits
+app.use('/api/auth', authLimiter, require('./routes/authRoutes'));
+app.use('/api/coupons', checkoutLimiter, require('./routes/couponRoutes')); // Validation is checkout-related
+app.use('/api/orders', checkoutLimiter, require('./routes/orderRoutes'));
+app.use('/api/payments', checkoutLimiter, require('./routes/paymentRoutes'));
+app.use('/api/admin', adminLimiter, require('./routes/adminRoutes'));
+app.use('/api/upload', uploadLimiter, require('./routes/uploadRoutes'));
+
+// Public/Hybrid Routes (No strict global limit, handled internally or default)
 app.use('/api/products', require('./routes/productRoutes'));
-app.use('/api/coupons', require('./routes/couponRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/payments', require('./routes/paymentRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/upload', require('./routes/uploadRoutes'));
-app.use('/api/health', require('./routes/healthRoutes'));
 app.use('/api/home-content', require('./routes/homeContentRoutes'));
+app.use('/api/health', require('./routes/healthRoutes'));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
