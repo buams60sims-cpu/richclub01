@@ -148,6 +148,12 @@ const orderSchema = new mongoose.Schema(
     }
 );
 
+// Indexes for performance and security lookups
+orderSchema.index({ razorpayOrderId: 1 });
+orderSchema.index({ razorpayPaymentId: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'customer.phone': 1 });
+
 // Pre-save hook to validate items array
 orderSchema.pre('save', function (next) {
     if (!this.items || this.items.length === 0) {

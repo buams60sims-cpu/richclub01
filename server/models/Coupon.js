@@ -57,6 +57,11 @@ const couponSchema = new mongoose.Schema(
                 },
                 message: 'Expiry date must be in the future'
             }
+        },
+        minPurchaseAmount: {
+            type: Number,
+            default: 0,
+            min: [0, 'Minimum purchase amount cannot be negative']
         }
     },
     {
