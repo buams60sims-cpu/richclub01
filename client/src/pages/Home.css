@@ -27,7 +27,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
     z-index: 1;
 }
 
@@ -119,7 +119,7 @@
         height: 70vh;
         min-height: 500px;
     }
-    
+
     .hero-wrapper--left,
     .hero-wrapper--right {
         padding-left: 20px;
@@ -127,7 +127,7 @@
         justify-content: center;
         text-align: center;
     }
-    
+
     .hero-content {
         max-width: 100%;
     }
@@ -264,17 +264,18 @@
     .lookbook-section {
         padding: 60px 20px;
     }
-    
+
     .lookbook-grid {
         grid-template-columns: 1fr;
         gap: 40px;
         text-align: center;
     }
-    
+
     .lookbook-content {
         padding: 0;
     }
 }
+
 /* Trust Section - Black Premium */
 .trust-section.dark {
     background: #0b0b0b;
