@@ -47,18 +47,24 @@ const ProductSchema = new mongoose.Schema(
 
         images: {
             type: [String],
-            validate: {
-                validator: arr => Array.isArray(arr) && arr.length > 0,
-                message: "At least one product image is required"
-            }
+            validate: [
+                {
+                    validator: arr => Array.isArray(arr) && arr.length > 0,
+                    message: "At least one product image is required"
+                },
+                {
+                    validator: arr => arr.length <= 8,
+                    message: "Maximum 8 images allowed per product"
+                }
+            ]
         },
 
         sizes: {
-            S: { type: Number, default: 0 },
-            M: { type: Number, default: 0 },
-            L: { type: Number, default: 0 },
-            XL: { type: Number, default: 0 },
-            XXL: { type: Number, default: 0 }
+            S: { type: Number, default: 0, min: 0 },
+            M: { type: Number, default: 0, min: 0 },
+            L: { type: Number, default: 0, min: 0 },
+            XL: { type: Number, default: 0, min: 0 },
+            XXL: { type: Number, default: 0, min: 0 }
         },
 
         isActive: {
