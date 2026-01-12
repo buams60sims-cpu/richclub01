@@ -52,7 +52,7 @@ const orderSchema = new mongoose.Schema(
                 type: String,
                 required: [true, 'Size is required'],
                 enum: {
-                    values: ['S', 'M', 'L', 'XL'],
+                    values: ['S', 'M', 'L', 'XL', 'XXL'],
                     message: '{VALUE} is not a valid size'
                 }
             },
@@ -69,6 +69,10 @@ const orderSchema = new mongoose.Schema(
                 type: Number,
                 required: [true, 'Price is required'],
                 min: [0.01, 'Price must be greater than 0']
+            },
+            originalPrice: {
+                type: Number, // Optional: Snapshot of MRP at time of order
+                min: [0, 'Original price cannot be negative']
             }
         }],
         subtotal: {
@@ -102,28 +106,28 @@ const orderSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Payment method is required'],
             enum: {
-                values: ['COD', 'RAZORPAY'],
-                message: 'Payment method must be either COD or RAZORPAY'
+                values: ['RAZORPAY'],
+                message: 'Payment method must be RAZORPAY'
             },
-            default: 'COD'
+            default: 'RAZORPAY'
         },
         paymentStatus: {
             type: String,
             required: true,
             enum: {
-                values: ['PENDING', 'PAID', 'FAILED'],
+                values: ['INITIATED', 'PAID', 'FAILED'],
                 message: '{VALUE} is not a valid payment status'
             },
-            default: 'PENDING'
+            default: 'INITIATED'
         },
         orderStatus: {
             type: String,
             required: true,
             enum: {
-                values: ['PLACED', 'CANCELLED'],
+                values: ['INITIATED', 'CONFIRMED', 'CANCELLED'],
                 message: '{VALUE} is not a valid order status'
             },
-            default: 'PLACED'
+            default: 'INITIATED'
         },
         // Razorpay payment tracking fields
         razorpayOrderId: {
@@ -151,12 +155,5 @@ orderSchema.pre('save', function (next) {
     }
     next();
 });
-
-// Add indexes for better query performance
-orderSchema.index({ invoiceNumber: 1 });
-orderSchema.index({ 'customer.phone': 1 });
-orderSchema.index({ orderStatus: 1 });
-orderSchema.index({ paymentStatus: 1 });
-orderSchema.index({ createdAt: -1 }); // For sorting by date
 
 module.exports = mongoose.model('Order', orderSchema);

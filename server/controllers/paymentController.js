@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const razorpayInstance = require('../config/razorpay');
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 
 /**
  * Payment Controller
@@ -180,9 +181,18 @@ const verifyPayment = async (req, res, next) => {
 
         // Signature verified successfully - update order
         order.paymentStatus = 'PAID';
+        order.orderStatus = 'CONFIRMED';
         order.razorpayPaymentId = razorpayPaymentId;
         order.razorpaySignature = razorpaySignature;
         await order.save();
+
+        // Reduce stock for each item now that payment is confirmed
+        for (const item of order.items) {
+            await Product.findByIdAndUpdate(
+                item.productId,
+                { $inc: { [`sizes.${item.size}`]: -item.quantity } }
+            );
+        }
 
         res.status(200).json({
             success: true,
