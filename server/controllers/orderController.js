@@ -123,8 +123,8 @@ const createOrder = async (req, res, next) => {
             totalAmount: pricing.totalAmount,
             couponCode: couponCode ? couponCode.toUpperCase() : undefined,
             paymentMethod: paymentMethod || 'RAZORPAY',
-            paymentStatus: 'INITIATED',
-            orderStatus: 'INITIATED'
+            paymentStatus: 'PENDING',
+            orderStatus: 'PAYMENT_PENDING'
         });
 
         // NOTE: Stock is NOT reduced here. It is reduced only after payment verification in paymentController.js
@@ -155,7 +155,7 @@ const getAllOrders = async (req, res, next) => {
             query.orderStatus = orderStatus;
         } else {
             // Default: Hide initiated/abandoned orders
-            query.orderStatus = { $ne: 'INITIATED' };
+            query.orderStatus = { $ne: 'PAYMENT_PENDING' };
         }
 
         if (paymentStatus) {

@@ -169,6 +169,7 @@ const verifyPayment = async (req, res, next) => {
         if (generatedSignature !== razorpaySignature) {
             // Signature verification failed - mark payment as failed
             order.paymentStatus = 'FAILED';
+            order.orderStatus = 'CANCELLED';
             order.razorpayPaymentId = razorpayPaymentId;
             order.razorpaySignature = razorpaySignature;
             await order.save();

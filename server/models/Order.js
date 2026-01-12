@@ -115,19 +115,19 @@ const orderSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: {
-                values: ['INITIATED', 'PAID', 'FAILED'],
+                values: ['PENDING', 'PAID', 'FAILED'],
                 message: '{VALUE} is not a valid payment status'
             },
-            default: 'INITIATED'
+            default: 'PENDING'
         },
         orderStatus: {
             type: String,
             required: true,
             enum: {
-                values: ['INITIATED', 'CONFIRMED', 'CANCELLED'],
+                values: ['PAYMENT_PENDING', 'CONFIRMED', 'CANCELLED'],
                 message: '{VALUE} is not a valid order status'
             },
-            default: 'INITIATED'
+            default: 'PAYMENT_PENDING'
         },
         // Razorpay payment tracking fields
         razorpayOrderId: {
