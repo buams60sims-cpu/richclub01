@@ -83,9 +83,4 @@ couponSchema.methods.calculateDiscount = function (subtotal) {
     return Math.min(this.discountValue, subtotal);
 };
 
-// Add indexes
-couponSchema.index({ code: 1 });
-couponSchema.index({ isActive: 1 });
-couponSchema.index({ expiryDate: 1 });
-
 module.exports = mongoose.model('Coupon', couponSchema);

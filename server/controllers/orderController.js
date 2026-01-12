@@ -10,7 +10,7 @@ const { calculateOrderPricing, validateItemPrices } = require('../utils/priceCal
  */
 
 /**
- * @desc    Create a new order (COD)
+ * @desc    Create a new order (Online Payment)
  * @route   POST /api/orders
  * @access  Public
  */
@@ -55,7 +55,7 @@ const createOrder = async (req, res, next) => {
                 });
             }
 
-            if (!product.isActive) {
+            if (product.isActive === false) {
                 return res.status(400).json({
                     success: false,
                     message: `Product is not available: ${product.name}`
@@ -77,7 +77,8 @@ const createOrder = async (req, res, next) => {
                 name: product.name,
                 size: item.size,
                 quantity: item.quantity,
-                price: product.price
+                price: Number(product.price.selling), // Snapshot: Actual Selling Price
+                originalPrice: Number(product.price.original) // Snapshot: MRP
             });
         }
 
@@ -121,18 +122,12 @@ const createOrder = async (req, res, next) => {
             discount: pricing.discount,
             totalAmount: pricing.totalAmount,
             couponCode: couponCode ? couponCode.toUpperCase() : undefined,
-            paymentMethod: paymentMethod || 'COD',
-            paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
-            orderStatus: 'PLACED'
+            paymentMethod: paymentMethod || 'RAZORPAY',
+            paymentStatus: 'INITIATED',
+            orderStatus: 'INITIATED'
         });
 
-        // Reduce stock for each item
-        for (const item of orderItems) {
-            await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { [`sizes.${item.size}`]: -item.quantity } }
-            );
-        }
+        // NOTE: Stock is NOT reduced here. It is reduced only after payment verification in paymentController.js
 
         res.status(201).json({
             success: true,
@@ -158,6 +153,9 @@ const getAllOrders = async (req, res, next) => {
 
         if (orderStatus) {
             query.orderStatus = orderStatus;
+        } else {
+            // Default: Hide initiated/abandoned orders
+            query.orderStatus = { $ne: 'INITIATED' };
         }
 
         if (paymentStatus) {
@@ -183,7 +181,7 @@ const getAllOrders = async (req, res, next) => {
         const summary = {
             totalOrders: orders.length,
             totalRevenue: orders.reduce((sum, order) => sum + order.totalAmount, 0),
-            placedOrders: orders.filter(o => o.orderStatus === 'PLACED').length,
+            placedOrders: orders.filter(o => o.orderStatus === 'CONFIRMED').length,
             cancelledOrders: orders.filter(o => o.orderStatus === 'CANCELLED').length
         };
 
@@ -312,12 +310,14 @@ const cancelOrder = async (req, res, next) => {
             });
         }
 
-        // Restore stock
-        for (const item of order.items) {
-            await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { [`sizes.${item.size}`]: item.quantity } }
-            );
+        // Restore stock ONLY if it was previously reduced (i.e. if order was CONFIRMED)
+        if (order.orderStatus === 'CONFIRMED') {
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { [`sizes.${item.size}`]: item.quantity } }
+                );
+            }
         }
 
         order.orderStatus = 'CANCELLED';
@@ -333,11 +333,111 @@ const cancelOrder = async (req, res, next) => {
     }
 };
 
+/**
+ * @desc    Get order details formatted for WhatsApp
+ * @route   GET /api/orders/:id/whatsapp
+ * @access  Admin
+ */
+const getOrderWhatsAppMessage = async (req, res, next) => {
+    try {
+        const order = await Order.findById(req.params.id)
+            .populate('items.productId', 'name');
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        const date = new Date(order.createdAt).toLocaleDateString('en-IN');
+
+        let message = `━━━━ *RICH CLUB* ━━━━\n`;
+        message += `*Invoice:* #${order.invoiceNumber}\n`;
+        message += `*Date:* ${date}\n\n`;
+
+        message += `*CUSTOMER DETAILS*\n`;
+        message += `*Name:* ${order.customer.name}\n`;
+        message += `*Phone:* ${order.customer.phone}\n`;
+        message += `*Address:* ${order.customer.address}\n\n`;
+
+        message += `*ORDER ITEMS*\n`;
+        order.items.forEach(item => {
+            message += `- ${item.name} (${item.size}) x ${item.quantity} - ₹${(item.price * item.quantity).toLocaleString()}\n`;
+        });
+
+        message += `\n*TOTAL AMOUNT:* ₹${order.totalAmount.toLocaleString()}\n`;
+        message += `*PAYMENT:* ${order.paymentMethod} (${order.paymentStatus})\n`;
+        message += `*ORDER STATUS:* ${order.orderStatus}\n`;
+        message += `━━━━━━━━━━━━━━━━━`;
+
+        res.status(200).json({
+            success: true,
+            message
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Get daily summary formatted for WhatsApp
+ * @route   GET /api/admin/daily-summary/whatsapp
+ * @access  Admin
+ */
+const getDailySummaryWhatsAppMessage = async (req, res, next) => {
+    try {
+        // Get today's range (start of day to now)
+        const now = new Date();
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+
+        const orders = await Order.find({
+            createdAt: { $gte: startOfDay }
+        });
+
+        const totalOrders = orders.length;
+        const totalRevenue = orders
+            .filter(o => o.paymentStatus === 'PAID')
+            .reduce((sum, o) => sum + o.totalAmount, 0);
+
+        // Fetch remaining stock overview
+        const products = await Product.find({ isActive: true });
+        const lowStockProducts = products.filter(p => p.totalStock < 5);
+
+        let message = `━━━━ *RICH CLUB DAILY SUMMARY* ━━━━\n`;
+        message += `*Date:* ${new Date().toLocaleDateString('en-IN')}\n\n`;
+
+        message += `*METRICS*\n`;
+        message += `*Total Orders Today:* ${totalOrders}\n`;
+        message += `*Total Revenue (PAID):* ₹${totalRevenue.toLocaleString()}\n\n`;
+
+        if (lowStockProducts.length > 0) {
+            message += `*LOW STOCK ALERT*\n`;
+            lowStockProducts.forEach(p => {
+                message += `- ${p.name}: ${p.totalStock} left\n`;
+            });
+        } else {
+            message += `*STOCK:* All good! ✅\n`;
+        }
+
+        message += `━━━━━━━━━━━━━━━━━━━━━━━`;
+
+        res.status(200).json({
+            success: true,
+            message
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     getOrderByInvoice,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    getOrderWhatsAppMessage,
+    getDailySummaryWhatsAppMessage
 };

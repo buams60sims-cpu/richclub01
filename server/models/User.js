@@ -66,6 +66,7 @@ userSchema.pre('save', async function (next) {
     }
 });
 
+// Method to compare entered password with hashed password
 /**
  * Method to compare entered password with hashed password
  * @param {string} enteredPassword - Password to compare
@@ -74,10 +75,6 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
-
-// Add indexes for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ role: 1 });
 
 module.exports = mongoose.model('User', userSchema);
 

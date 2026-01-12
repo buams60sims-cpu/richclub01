@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import './MainLayout.css';
 
 /**
@@ -15,6 +16,7 @@ const MainLayout = ({ children }) => {
                 {children}
             </main>
             <Footer />
+            <FloatingWhatsApp />
         </div>
     );
 };

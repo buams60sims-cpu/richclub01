@@ -90,7 +90,10 @@ const validateItemPrices = async (items, ProductModel) => {
         }
 
         // Check if price matches (allow small floating point differences)
-        if (Math.abs(product.price - item.price) > 0.01) {
+        // Handle both old (number) and new (object) price structures for backward compatibility
+        const productPrice = typeof product.price === 'object' ? product.price.selling : product.price;
+
+        if (Math.abs(productPrice - item.price) > 0.01) {
             throw new Error(`Price mismatch for product: ${product.name}`);
         }
     }

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Initialize Express app
@@ -30,7 +31,13 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
+app.use('/api/home-content', require('./routes/homeContentRoutes'));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -106,10 +113,20 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+const server = app.listen(PORT, () => {
+    console.log(`🚀 Server RESTARTED in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`✅ CMS ROUTES LOADED`);
     console.log(`📡 API available at http://localhost:${PORT}`);
     console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
+});
+
+server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+        console.error(`❌ Port ${PORT} already in use`);
+        console.error(`💡 Kill the process: Task Manager → Details → End node.exe`);
+        process.exit(1);
+    }
+    console.error('Server error:', err);
 });
 
 module.exports = app;

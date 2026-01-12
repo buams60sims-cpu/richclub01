@@ -68,10 +68,33 @@ export const debounce = (func, wait = 300) => {
     };
 };
 
+/**
+ * Get display name for product category
+ * @param {string} category - Category value
+ * @returns {string} Display name
+ */
+export const getCategoryDisplayName = (category) => {
+    const categoryNames = {
+        'normal-tshirts': 'Normal T-Shirts',
+        'oversize-tshirts': 'Oversize T-Shirts',
+        'collar-tshirts': 'Collar T-Shirts',
+        'hoodies': 'Hoodies',
+        // Legacy categories for backward compatibility
+        'men': 'Men',
+        'women': 'Women',
+        'kids': 'Kids',
+        'accessories': 'Accessories',
+        'footwear': 'Footwear',
+        'other': 'Other'
+    };
+    return categoryNames[category] || category;
+};
+
 export default {
     formatPrice,
     truncateText,
     isValidEmail,
     formatDate,
     debounce,
+    getCategoryDisplayName,
 };

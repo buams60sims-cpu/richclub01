@@ -28,9 +28,8 @@ const createProduct = async (req, res, next) => {
             description,
             price,
             category,
-            sizes: sizes || { S: 0, M: 0, L: 0, XL: 0 },
-            images: images || [],
-            isActive: true
+            sizes: sizes || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
+            images: images || []
         });
 
         res.status(201).json({
@@ -50,25 +49,7 @@ const createProduct = async (req, res, next) => {
  */
 const getAllProducts = async (req, res, next) => {
     try {
-        const { category, isActive, search } = req.query;
-
-        // Build query
-        const query = {};
-
-        if (category) {
-            query.category = category;
-        }
-
-        if (isActive !== undefined) {
-            query.isActive = isActive === 'true';
-        }
-
-        // Text search if provided
-        if (search) {
-            query.$text = { $search: search };
-        }
-
-        const products = await Product.find(query).sort({ createdAt: -1 });
+        const products = await Product.find({}).sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
@@ -130,7 +111,6 @@ const updateProduct = async (req, res, next) => {
         if (category !== undefined) product.category = category;
         if (sizes !== undefined) product.sizes = sizes;
         if (images !== undefined) product.images = images;
-        if (isActive !== undefined) product.isActive = isActive;
 
         await product.save();
 
@@ -145,13 +125,13 @@ const updateProduct = async (req, res, next) => {
 };
 
 /**
- * @desc    Delete product (soft delete - set isActive to false)
+ * @desc    Delete product (hard delete - remove from database)
  * @route   DELETE /api/products/:id
  * @access  Admin
  */
 const deleteProduct = async (req, res, next) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findByIdAndDelete(req.params.id);
 
         if (!product) {
             return res.status(404).json({
@@ -160,13 +140,9 @@ const deleteProduct = async (req, res, next) => {
             });
         }
 
-        // Soft delete - set isActive to false
-        product.isActive = false;
-        await product.save();
-
         res.status(200).json({
             success: true,
-            message: 'Product deleted successfully'
+            message: 'Product deleted permanently'
         });
     } catch (error) {
         next(error);

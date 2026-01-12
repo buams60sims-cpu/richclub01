@@ -6,7 +6,8 @@ const {
     getOrderById,
     getOrderByInvoice,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    getOrderWhatsAppMessage
 } = require('../controllers/orderController');
 const { verifyJWT, isAdmin } = require('../middlewares/auth');
 
@@ -16,7 +17,7 @@ const { verifyJWT, isAdmin } = require('../middlewares/auth');
  */
 
 // @route   POST /api/orders
-// @desc    Create a new order (COD)
+// @desc    Create a new order (Online Payment)
 // @access  Public
 router.post('/', createOrder);
 
@@ -44,5 +45,10 @@ router.put('/:id/status', verifyJWT, isAdmin, updateOrderStatus);
 // @desc    Cancel order
 // @access  Admin
 router.put('/:id/cancel', verifyJWT, isAdmin, cancelOrder);
+
+// @route   GET /api/orders/:id/whatsapp
+// @desc    Get order details formatted for WhatsApp
+// @access  Admin
+router.get('/:id/whatsapp', verifyJWT, isAdmin, getOrderWhatsAppMessage);
 
 module.exports = router;
