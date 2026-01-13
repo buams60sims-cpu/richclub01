@@ -134,6 +134,14 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
 
+    // Mongoose Validation Error
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({
+            success: false,
+            message: Object.values(err.errors).map(val => val.message).join(', ')
+        });
+    }
+
     res.status(err.status || 500).json({
         success: false,
         message: err.message || 'Internal Server Error',
@@ -142,22 +150,25 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+// Start server only if run directly
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-    console.log(`🚀 Server RESTARTED in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    console.log(`✅ CMS ROUTES LOADED`);
-    console.log(`📡 API available at http://localhost:${PORT}`);
-    console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
-});
+    const server = app.listen(PORT, () => {
+        console.log(`🚀 Server RESTARTED in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+        console.log(`✅ CMS ROUTES LOADED`);
+        console.log(`📡 API available at http://localhost:${PORT}`);
+        console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
+    });
 
-server.on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-        console.error(`❌ Port ${PORT} already in use`);
-        console.error(`💡 Kill the process: Task Manager → Details → End node.exe`);
-        process.exit(1);
-    }
-    console.error('Server error:', err);
-});
+    server.on("error", (err) => {
+        if (err.code === "EADDRINUSE") {
+            console.error(`❌ Port ${PORT} already in use`);
+            console.error(`💡 Kill the process: Task Manager → Details → End node.exe`);
+            process.exit(1);
+        }
+        console.error('Server error:', err);
+    });
+}
 
 module.exports = app;

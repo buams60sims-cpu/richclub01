@@ -1,0 +1,222 @@
+/* ========================================
+   ADMIN PRODUCTS STYLES
+   Table and Form Layouts
+   ======================================== */
+
+/* Table Actions */
+.admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-24);
+    background-color: var(--white);
+    padding: var(--space-16);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+}
+
+.search-input {
+    width: 300px;
+}
+
+/* Data Table */
+.data-table-wrapper {
+    background-color: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: var(--space-16);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.data-table th {
+    background-color: var(--gray-100);
+    font-weight: 600;
+    color: var(--black);
+    white-space: nowrap;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+}
+
+.product-cell span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-24);
+}
+
+.product-thumb {
+    width: 48px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 2px;
+    background-color: var(--gray-100);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--space-8);
+}
+
+.icon-btn {
+    padding: var(--space-8);
+    border: 1px solid var(--gray-300);
+    background-color: var(--white);
+    color: var(--gray-600);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+    border-color: var(--black);
+    color: var(--black);
+}
+
+.btn-danger:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* Form Styles */
+.form-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-32);
+}
+
+.form-section {
+    background-color: var(--white);
+    padding: var(--space-24);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    margin-bottom: var(--space-24);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-24);
+}
+
+/* Image Upload */
+.image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-16);
+    margin-top: var(--space-16);
+}
+
+.image-upload-box {
+    aspect-ratio: 3 / 4;
+    border: 2px dashed var(--gray-300);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--gray-100);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.image-upload-box:hover {
+    border-color: var(--gold);
+    background-color: rgba(201, 164, 76, 0.05);
+}
+
+.upload-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    text-align: center;
+    padding: var(--space-8);
+}
+
+/* Stock Grid */
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-16);
+}
+
+.stock-item label {
+    display: block;
+    text-align: center;
+    margin-bottom: var(--space-8);
+    font-weight: 600;
+}
+
+.stock-item input {
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .form-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .cols-2,
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stock-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

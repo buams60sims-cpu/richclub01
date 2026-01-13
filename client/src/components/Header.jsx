@@ -1,36 +1,66 @@
-import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
-/**
- * Header Component
- * Navigation bar for the application
- */
 const Header = () => {
+    const { getCartCount } = useCart();
+    const { user, isAdmin, logout } = useAuth();
+    const navigate = useNavigate();
+    const cartCount = getCartCount();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
         <header className="header">
             <div className="container">
                 <div className="header-content">
-                    <div className="logo">
-                        <h2>Rich Club</h2>
-                    </div>
-                    <nav className="nav">
-                        <ul className="nav-list">
-                            <li className="nav-item">
-                                <a href="/" className="nav-link">Home</a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="/products" className="nav-link">Products</a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="/about" className="nav-link">About</a>
-                            </li>
-                            <li className="nav-item">
-                                <a href="/contact" className="nav-link">Contact</a>
-                            </li>
-                        </ul>
+                    {/* Logo */}
+                    <Link to="/" className="header-logo">
+                        <h1 className="logo-text">Rich Club</h1>
+                    </Link>
+
+                    {/* Navigation */}
+                    <nav className="header-nav">
+                        <Link to="/" className="nav-link">Home</Link>
+                        <Link to="/shop" className="nav-link">Shop</Link>
                     </nav>
+
+                    {/* Actions */}
                     <div className="header-actions">
-                        <button className="btn btn-outline">Login</button>
+                        {/* Cart */}
+                        <Link to="/cart" className="header-action-btn" aria-label="Shopping Cart">
+                            <ShoppingCart size={20} />
+                            {cartCount > 0 && (
+                                <span className="cart-badge">{cartCount}</span>
+                            )}
+                        </Link>
+
+                        {/* User Menu */}
+                        {user ? (
+                            <div className="user-menu">
+                                {isAdmin() && (
+                                    <Link to="/admin" className="header-action-btn" aria-label="Admin Dashboard">
+                                        <LayoutDashboard size={20} />
+                                    </Link>
+                                )}
+                                <button
+                                    onClick={handleLogout}
+                                    className="header-action-btn"
+                                    aria-label="Logout"
+                                >
+                                    <LogOut size={20} />
+                                </button>
+                            </div>
+                        ) : (
+                            <Link to="/login" className="header-action-btn" aria-label="Login">
+                                <User size={20} />
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

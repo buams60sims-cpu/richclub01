@@ -62,6 +62,16 @@ const couponSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: [0, 'Minimum purchase amount cannot be negative']
+        },
+        maxDiscountAmount: {
+            type: Number,
+            default: 0,
+            min: [0, 'Maximum discount amount cannot be negative']
+        },
+        usageCount: {
+            type: Number,
+            default: 0,
+            min: [0, 'Usage count cannot be negative']
         }
     },
     {
@@ -70,7 +80,10 @@ const couponSchema = new mongoose.Schema(
 );
 
 // Method to check if coupon is valid
-couponSchema.methods.isValid = function () {
+couponSchema.methods.isValid = function (purchaseAmount) {
+    if (this.minPurchaseAmount && purchaseAmount !== undefined && purchaseAmount < this.minPurchaseAmount) {
+        return false;
+    }
     return this.isActive && this.expiryDate > new Date();
 };
 
@@ -81,7 +94,11 @@ couponSchema.methods.calculateDiscount = function (subtotal) {
     }
 
     if (this.discountType === 'percentage') {
-        return (subtotal * this.discountValue) / 100;
+        let discount = (subtotal * this.discountValue) / 100;
+        if (this.maxDiscountAmount && this.maxDiscountAmount > 0) {
+            discount = Math.min(discount, this.maxDiscountAmount);
+        }
+        return discount;
     }
 
     // Flat discount - cannot exceed subtotal

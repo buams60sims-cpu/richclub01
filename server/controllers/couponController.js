@@ -12,7 +12,16 @@ const Coupon = require('../models/Coupon');
  */
 const createCoupon = async (req, res, next) => {
     try {
-        const { code, discountType, discountValue, expiryDate, isActive } = req.body;
+        let { code, discountType, discountValue, discountAmount, expiryDate, isActive, minOrderAmount, minPurchaseAmount, maxDiscountAmount } = req.body;
+
+        // Map frontend fields (if provided) to schema fields
+        discountValue = discountValue || discountAmount;
+        minPurchaseAmount = minPurchaseAmount || minOrderAmount || 0;
+        maxDiscountAmount = maxDiscountAmount || 0;
+
+        // Normalize discountType
+        if (discountType === 'PERCENTAGE' || discountType === 'Percentage') discountType = 'percentage';
+        if (discountType === 'FIXED' || discountType === 'Fixed') discountType = 'flat';
 
         // Validate required fields
         if (!code || !discountType || !discountValue || !expiryDate) {
@@ -37,7 +46,9 @@ const createCoupon = async (req, res, next) => {
             discountType,
             discountValue,
             expiryDate,
-            isActive: isActive !== undefined ? isActive : true
+            isActive: isActive !== undefined ? isActive : true,
+            minPurchaseAmount,
+            maxDiscountAmount
         });
 
         res.status(201).json({
@@ -103,8 +114,12 @@ const validateCoupon = async (req, res, next) => {
         }
 
         // Check if coupon is valid
-        if (!coupon.isValid()) {
-            const reason = !coupon.isActive ? 'Coupon is inactive' : 'Coupon has expired';
+        if (!coupon.isValid(subtotal)) {
+            let reason = 'Coupon is invalid';
+            if (!coupon.isActive) reason = 'Coupon is inactive';
+            else if (new Date() > coupon.expiryDate) reason = 'Coupon has expired';
+            else if (subtotal && subtotal < coupon.minPurchaseAmount) reason = `Minimum purchase of ₹${coupon.minPurchaseAmount} required`;
+
             return res.status(400).json({
                 success: false,
                 message: reason

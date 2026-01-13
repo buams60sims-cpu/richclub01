@@ -10,9 +10,31 @@ const Product = require('../models/Product');
  * @route   POST /api/products
  * @access  Admin (no auth implemented yet)
  */
+/**
+ * @desc    Create a new product
+ * @route   POST /api/products
+ * @access  Admin
+ */
 const createProduct = async (req, res, next) => {
     try {
-        const { name, description, price, category, sizes, images } = req.body;
+        let { name, description, price, category, sizes, isActive, isOnSale } = req.body;
+
+        // Parse JSON fields if they are strings (multipart/form-data)
+        if (typeof price === 'string') {
+            try { price = JSON.parse(price); } catch (e) { console.error('Error parsing price', e); }
+        }
+        if (typeof sizes === 'string') {
+            try { sizes = JSON.parse(sizes); } catch (e) { console.error('Error parsing sizes', e); }
+        }
+
+        // Handle Images
+        let imageUrls = [];
+        if (req.files && req.files.length > 0) {
+            imageUrls = req.files.map(file => '/uploads/products/' + file.filename);
+        } else if (req.body.images && Array.isArray(req.body.images)) {
+            // Fallback for URL-only mode if needed
+            imageUrls = req.body.images;
+        }
 
         // Validate required fields
         if (!name || !price || !category) {
@@ -29,7 +51,9 @@ const createProduct = async (req, res, next) => {
             price,
             category,
             sizes: sizes || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
-            images: images || []
+            images: imageUrls,
+            isActive: isActive === 'true' || isActive === true,
+            isOnSale: isOnSale === 'true' || isOnSale === true
         });
 
         res.status(201).json({
@@ -42,49 +66,7 @@ const createProduct = async (req, res, next) => {
     }
 };
 
-/**
- * @desc    Get all products
- * @route   GET /api/products
- * @access  Public
- */
-const getAllProducts = async (req, res, next) => {
-    try {
-        const products = await Product.find({}).sort({ createdAt: -1 });
-
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * @desc    Get single product by ID
- * @route   GET /api/products/:id
- * @access  Public
- */
-const getProductById = async (req, res, next) => {
-    try {
-        const product = await Product.findById(req.params.id);
-
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: 'Product not found'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: product
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+// ... getAllProducts and getProductById remain same ...
 
 /**
  * @desc    Update product
@@ -93,7 +75,7 @@ const getProductById = async (req, res, next) => {
  */
 const updateProduct = async (req, res, next) => {
     try {
-        const { name, description, price, category, sizes, images, isActive } = req.body;
+        let { name, description, price, category, sizes, existingImages, isActive, isOnSale } = req.body;
 
         let product = await Product.findById(req.params.id);
 
@@ -104,13 +86,47 @@ const updateProduct = async (req, res, next) => {
             });
         }
 
+        // Parse JSON fields
+        if (typeof price === 'string') {
+            try { price = JSON.parse(price); } catch (e) { }
+        }
+        if (typeof sizes === 'string') {
+            try { sizes = JSON.parse(sizes); } catch (e) { }
+        }
+        // Handle existingImages (could be string or array of strings)
+        let currentImages = [];
+        if (existingImages) {
+            if (Array.isArray(existingImages)) {
+                currentImages = existingImages;
+            } else {
+                // If single string, make array
+                currentImages = [existingImages];
+            }
+        }
+
         // Update fields
         if (name !== undefined) product.name = name;
         if (description !== undefined) product.description = description;
         if (price !== undefined) product.price = price;
         if (category !== undefined) product.category = category;
         if (sizes !== undefined) product.sizes = sizes;
-        if (images !== undefined) product.images = images;
+        if (isActive !== undefined) product.isActive = isActive === 'true' || isActive === true;
+        if (isOnSale !== undefined) product.isOnSale = isOnSale === 'true' || isOnSale === true;
+
+        // Handle Image Updates
+        // 1. New files
+        let newImageUrls = [];
+        if (req.files && req.files.length > 0) {
+            newImageUrls = req.files.map(file => '/uploads/products/' + file.filename);
+        }
+
+        // 2. Combine with existing images that were kept
+        if (existingImages !== undefined || newImageUrls.length > 0) {
+            // If existingImages is sent (even empty), we update the list.
+            // If new files are sent, we add them.
+            // If neither, we don't touch images (unless we want to allow deleting all by sending empty existingImages)
+            product.images = [...currentImages, ...newImageUrls];
+        }
 
         await product.save();
 

@@ -1,0 +1,202 @@
+/* ========================================
+   ADMIN LAYOUT STYLES
+   Sidebar navigation + main content area
+   ======================================== */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--gray-100);
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 260px;
+    background-color: var(--black);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    transition: transform var(--transition-base);
+}
+
+.admin-sidebar-header {
+    padding: var(--space-24);
+    background-color: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-brand {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--white);
+}
+
+.admin-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background-color: var(--gold);
+    color: var(--white);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+/* Navigation */
+.admin-nav {
+    flex: 1;
+    padding: var(--space-24) 0;
+    overflow-y: auto;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    padding: var(--space-16) var(--space-24);
+    color: var(--gray-300);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border-left: 3px solid transparent;
+}
+
+.admin-nav-link:hover {
+    color: var(--white);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.admin-nav-link.active {
+    color: var(--gold);
+    background-color: rgba(201, 164, 76, 0.1);
+    border-left-color: var(--gold);
+}
+
+/* Footer */
+.admin-sidebar-footer {
+    padding: var(--space-24);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    width: 100%;
+    padding: var(--space-16);
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-radius: 4px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.admin-logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    margin-left: 260px;
+    padding: var(--space-32);
+    width: calc(100% - 260px);
+}
+
+.admin-container {
+    max-width: var(--admin-container-max);
+    margin: 0 auto;
+}
+
+/* Mobile Header */
+.admin-mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: var(--black);
+    z-index: 90;
+    padding: 0 var(--space-16);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-menu-toggle {
+    background: none;
+    border: none;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.admin-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 95;
+}
+
+/* Common Admin Page Styles */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-32);
+}
+
+.admin-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0;
+}
+
+.admin-card {
+    background-color: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: var(--space-24);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .admin-main {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 60px;
+        padding: var(--space-16);
+    }
+
+    .admin-mobile-header {
+        display: flex;
+    }
+
+    .admin-overlay {
+        display: block;
+    }
+}

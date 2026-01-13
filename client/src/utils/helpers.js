@@ -1,100 +1,128 @@
-/**
- * Utility Functions
- * Common helper functions for the frontend
- */
-
-/**
- * Format price to currency
- * @param {number} price - Price value
- * @param {string} currency - Currency code
- * @returns {string} Formatted price
- */
-export const formatPrice = (price, currency = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
+// Format price in Indian Rupees
+export const formatPrice = (price) => {
+    if (price === null || price === undefined || isNaN(price)) return '₹0';
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: currency,
+        currency: 'INR',
+        maximumFractionDigits: 0,
     }).format(price);
 };
 
-/**
- * Truncate text to specified length
- * @param {string} text - Text to truncate
- * @param {number} maxLength - Maximum length
- * @returns {string} Truncated text
- */
-export const truncateText = (text, maxLength = 100) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+// Calculate discount percentage
+export const calculateDiscountPercent = (original, selling) => {
+    if (!original || !selling || original <= selling) return 0;
+    return Math.round(((original - selling) / original) * 100);
 };
 
-/**
- * Validate email format
- * @param {string} email - Email to validate
- * @returns {boolean} Is valid email
- */
-export const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-};
-
-/**
- * Format date to readable string
- * @param {string|Date} date - Date to format
- * @returns {string} Formatted date
- */
-export const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
+// Format date
+export const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
     });
 };
 
-/**
- * Debounce function
- * @param {Function} func - Function to debounce
- * @param {number} wait - Wait time in ms
- * @returns {Function} Debounced function
- */
-export const debounce = (func, wait = 300) => {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
+// Format date with time
+export const formatDateTime = (dateString) => {
+    return new Date(dateString).toLocaleString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 };
 
-/**
- * Get display name for product category
- * @param {string} category - Category value
- * @returns {string} Display name
- */
-export const getCategoryDisplayName = (category) => {
-    const categoryNames = {
+// Get human-readable order status
+export const getOrderStatusLabel = (status) => {
+    const labels = {
+        PAYMENT_PENDING: 'Payment Pending',
+        CONFIRMED: 'Confirmed',
+        CANCELLED: 'Cancelled',
+    };
+    return labels[status] || status;
+};
+
+// Get human-readable payment status
+export const getPaymentStatusLabel = (status) => {
+    const labels = {
+        PENDING: 'Pending',
+        PAID: 'Paid',
+        FAILED: 'Failed',
+    };
+    return labels[status] || status;
+};
+
+// Get status badge class
+export const getStatusBadgeClass = (status) => {
+    const classes = {
+        CONFIRMED: 'badge-success',
+        PAID: 'badge-success',
+        PAYMENT_PENDING: 'badge-warning',
+        PENDING: 'badge-warning',
+        CANCELLED: 'badge-danger',
+        FAILED: 'badge-danger',
+    };
+    return classes[status] || 'badge-info';
+};
+
+// Validate Indian phone number
+export const validatePhone = (phone) => {
+    return /^[6-9]\d{9}$/.test(phone);
+};
+
+// Validate email
+export const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// Get category display name
+export const getCategoryName = (category) => {
+    const names = {
         'normal-tshirts': 'Normal T-Shirts',
         'oversize-tshirts': 'Oversize T-Shirts',
         'collar-tshirts': 'Collar T-Shirts',
         'hoodies': 'Hoodies',
-        // Legacy categories for backward compatibility
-        'men': 'Men',
-        'women': 'Women',
-        'kids': 'Kids',
-        'accessories': 'Accessories',
-        'footwear': 'Footwear',
-        'other': 'Other'
     };
-    return categoryNames[category] || category;
+    return names[category] || category;
 };
 
-export default {
-    formatPrice,
-    truncateText,
-    isValidEmail,
-    formatDate,
-    debounce,
-    getCategoryDisplayName,
+// Calculate cart totals
+export const calculateCartTotals = (cartItems) => {
+    const subtotal = cartItems.reduce((sum, item) => {
+        return sum + item.price * item.quantity;
+    }, 0);
+
+    return {
+        subtotal,
+        itemCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    };
+};
+
+// Check if product is low stock
+export const isLowStock = (stock) => {
+    return stock > 0 && stock <= 5;
+};
+
+// Check if product is out of stock
+export const isOutOfStock = (stock) => {
+    return stock === 0;
+};
+
+// Truncate text
+export const truncateText = (text, maxLength) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+};
+
+// Load Razorpay script
+export const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
 };
