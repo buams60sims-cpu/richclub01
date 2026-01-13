@@ -18,6 +18,14 @@ const createOrder = async (req, res, next) => {
     try {
         const { customer, items, couponCode, paymentMethod } = req.body;
 
+        // Security: Prevent manually setting status
+        if (req.body.paymentStatus || req.body.orderStatus) {
+            return res.status(400).json({
+                success: false,
+                message: 'Security Violation: Cannot manually set order or payment status'
+            });
+        }
+
         // Validate required fields
         if (!customer || !customer.name || !customer.phone || !customer.address) {
             return res.status(400).json({
@@ -123,9 +131,20 @@ const createOrder = async (req, res, next) => {
             totalAmount: pricing.totalAmount,
             couponCode: couponCode ? couponCode.toUpperCase() : undefined,
             paymentMethod: paymentMethod || 'RAZORPAY',
-            paymentStatus: 'PENDING',
             orderStatus: 'PAYMENT_PENDING'
         });
+
+        // Increment coupon usage count if used
+        // Increment coupon usage count if used
+        if (coupon) {
+            console.log(`[DEBUG] Incrementing usage for coupon: ${coupon.code}`);
+            const updatedCoupon = await Coupon.findByIdAndUpdate(
+                coupon._id,
+                { $inc: { usageCount: 1 } },
+                { new: true }
+            );
+            console.log(`[DEBUG] Updated coupon usage:`, updatedCoupon);
+        }
 
         // NOTE: Stock is NOT reduced here. It is reduced only after payment verification in paymentController.js
 
@@ -255,7 +274,7 @@ const getOrderByInvoice = async (req, res, next) => {
  */
 const updateOrderStatus = async (req, res, next) => {
     try {
-        const { orderStatus, paymentStatus } = req.body;
+        const { orderStatus, paymentStatus, adminRemarks, status } = req.body;
 
         const order = await Order.findById(req.params.id);
 
@@ -266,13 +285,17 @@ const updateOrderStatus = async (req, res, next) => {
             });
         }
 
-        // Update status
-        if (orderStatus) {
-            order.orderStatus = orderStatus;
+        // Update status (handle legacy "status" field from frontend if present)
+        if (orderStatus || status) {
+            order.orderStatus = orderStatus || status;
         }
 
         if (paymentStatus) {
             order.paymentStatus = paymentStatus;
+        }
+
+        if (adminRemarks !== undefined) {
+            order.adminRemarks = adminRemarks;
         }
 
         await order.save();

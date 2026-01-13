@@ -1,0 +1,200 @@
+/* ========================================
+   ADMIN CMS PAGE STYLES
+   Tabbed interface for home page content
+   ======================================== */
+
+.admin-cms-page {
+    padding-bottom: 80px;
+    /* Space for fixed alerts if any */
+}
+
+.sticky-header {
+    position: sticky;
+    top: 60px;
+    /* Below admin header if fixed */
+    background-color: var(--gray-100);
+    z-index: 10;
+    padding-bottom: var(--space-16);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+/* Tabs */
+.cms-tabs {
+    display: flex;
+    gap: var(--space-8);
+    border-bottom: 1px solid var(--gray-300);
+    margin-bottom: var(--space-24);
+    overflow-x: auto;
+}
+
+.cms-tab {
+    padding: var(--space-16) var(--space-24);
+    background: none;
+    border: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.cms-tab:hover {
+    color: var(--black);
+    background-color: var(--white);
+}
+
+.cms-tab.active {
+    color: var(--black);
+    border-bottom-color: var(--black);
+    font-weight: 600;
+    background-color: var(--white);
+}
+
+/* CMS Content Area */
+.cms-content {
+    background-color: var(--white);
+    padding: var(--space-24);
+    border-radius: 4px;
+    border: 1px solid var(--gray-300);
+    min-height: 400px;
+}
+
+/* Hero Slides */
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-24);
+}
+
+.slides-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.slide-card {
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: var(--space-16);
+    background-color: var(--gray-100);
+}
+
+.slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-16);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.slide-number {
+    font-weight: 700;
+    color: var(--black);
+}
+
+.slide-actions {
+    display: flex;
+    gap: var(--space-8);
+}
+
+/* Featured Products Selector */
+.product-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-16);
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid var(--gray-300);
+    padding: var(--space-16);
+    border-radius: 4px;
+}
+
+.product-selector-card {
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--white);
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.product-selector-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.product-selector-card.selected {
+    border-color: var(--gold);
+}
+
+.product-selector-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.selected-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: var(--gold);
+    color: white;
+    font-size: 0.625rem;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight: 700;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Utilities */
+.mb-4 {
+    margin-bottom: var(--space-16);
+}
+
+.mt-4 {
+    margin-top: var(--space-16);
+}
+
+.mb-2 {
+    margin-bottom: var(--space-8);
+}
+
+.h-24 {
+    height: 96px;
+}
+
+.object-cover {
+    object-fit: cover;
+}
+
+.rounded {
+    border-radius: 4px;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.alert-box {
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: var(--space-16);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+}

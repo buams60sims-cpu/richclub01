@@ -1,0 +1,401 @@
+/* ========================================
+   ORDER CONFIRMATION PAGE STYLES
+   Success page with invoice details
+   ======================================== */
+
+.order-confirmation-page {
+    min-height: 60vh;
+}
+
+/* Loading State */
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--gray-300);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Order Not Found */
+.order-not-found {
+    text-align: center;
+    padding: var(--space-48);
+}
+
+.order-not-found h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--black);
+    margin-bottom: var(--space-16);
+}
+
+.order-not-found p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-32);
+}
+
+/* ========================================
+   CONFIRMATION HEADER
+   ======================================== */
+
+.confirmation-header {
+    text-align: center;
+    margin-bottom: var(--space-48);
+    padding: var(--space-48);
+    background-color: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+}
+
+.success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    margin-bottom: var(--space-24);
+    background-color: #d1fae5;
+    border-radius: 50%;
+    color: #10b981;
+}
+
+.confirmation-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3vw, 2.5rem);
+    font-weight: 600;
+    color: var(--black);
+    margin: 0 0 var(--space-16) 0;
+}
+
+.confirmation-subtitle {
+    font-size: 1.125rem;
+    color: var(--gray-600);
+    margin: 0 0 var(--space-24) 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.invoice-number {
+    display: inline-block;
+    padding: var(--space-16) var(--space-32);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--black);
+    background-color: var(--white);
+    border: 2px solid var(--black);
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   ORDER DETAILS GRID
+   ======================================== */
+
+.order-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: var(--space-32);
+    margin-bottom: var(--space-48);
+}
+
+/* ========================================
+   ORDER SECTION
+   ======================================== */
+
+.order-section {
+    background-color: var(--white);
+    padding: var(--space-32);
+    border: 1px solid var(--gray-300);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0 0 var(--space-24) 0;
+}
+
+/* Order Items */
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    margin-bottom: var(--space-24);
+    padding-bottom: var(--space-24);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-16);
+}
+
+.order-item-info {
+    flex: 1;
+}
+
+.order-item-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0 0 var(--space-8) 0;
+}
+
+.order-item-meta {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+.order-item-price {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+/* Order Totals */
+.order-totals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    color: var(--gray-600);
+}
+
+.total-row span:last-child {
+    font-weight: 600;
+    color: var(--black);
+}
+
+.discount-row {
+    color: #10b981;
+}
+
+.discount-row span:last-child {
+    color: #10b981;
+}
+
+.total-divider {
+    height: 1px;
+    background-color: var(--gray-300);
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.total-amount span {
+    color: var(--black);
+}
+
+/* ========================================
+   INFO SECTIONS
+   ======================================== */
+
+.info-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+}
+
+.info-card {
+    background-color: var(--white);
+    padding: var(--space-24);
+    border: 1px solid var(--gray-300);
+}
+
+.info-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0 0 var(--space-16) 0;
+    padding-bottom: var(--space-16);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+/* Customer Info */
+.customer-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0;
+}
+
+.customer-phone,
+.customer-address {
+    font-size: 0.9375rem;
+    color: var(--gray-600);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Info Rows */
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-8) 0;
+    font-size: 0.9375rem;
+}
+
+.info-row span:first-child {
+    color: var(--gray-600);
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--black);
+}
+
+.payment-id {
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: var(--gray-600);
+}
+
+/* Order Date */
+.order-date {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--black);
+    margin: 0;
+}
+
+/* ========================================
+   CONFIRMATION ACTIONS
+   ======================================== */
+
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-16);
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+
+    .header,
+    .footer,
+    .confirmation-actions {
+        display: none;
+    }
+
+    .order-confirmation-page {
+        padding: 0;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .confirmation-header {
+        background-color: white;
+        border: 1px solid #000;
+    }
+
+    .order-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 992px) {
+    .order-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .confirmation-header {
+        padding: var(--space-32);
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .success-icon svg {
+        width: 48px;
+        height: 48px;
+    }
+
+    .order-section,
+    .info-card {
+        padding: var(--space-24);
+    }
+
+    .section-heading {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .confirmation-header {
+        padding: var(--space-24);
+    }
+
+    .invoice-number {
+        font-size: 1rem;
+        padding: var(--space-16) var(--space-24);
+    }
+
+    .order-section,
+    .info-card {
+        padding: var(--space-16);
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+
+    .confirmation-actions .btn {
+        width: 100%;
+    }
+}

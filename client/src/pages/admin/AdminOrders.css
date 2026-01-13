@@ -1,0 +1,136 @@
+/* ========================================
+   ADMIN ORDERS STYLES
+   ======================================== */
+
+.text-secondary {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.p-32 {
+    padding: var(--space-32);
+}
+
+/* Modal Content */
+.order-status-bar {
+    display: flex;
+    gap: var(--space-32);
+    padding-bottom: var(--space-24);
+    margin-bottom: var(--space-24);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.status-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.status-label {
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+.payment-id {
+    font-family: monospace;
+    font-size: 0.8125rem;
+    color: var(--gray-600);
+}
+
+/* Grid Layout */
+.order-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--space-24);
+}
+
+.order-info-card {
+    background-color: var(--gray-100);
+    padding: var(--space-16);
+    border-radius: 4px;
+}
+
+.order-info-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-16) 0;
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.address-text {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* Order Items */
+.admin-order-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    margin-bottom: var(--space-16);
+}
+
+.admin-order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.item-meta {
+    font-size: 0.8125rem;
+    color: var(--gray-600);
+}
+
+/* Totals */
+.admin-order-totals {
+    border-top: 1px solid var(--gray-300);
+    padding-top: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9375rem;
+}
+
+.total-row.discount {
+    color: #10b981;
+}
+
+.total-row.final {
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-top: var(--space-8);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .order-status-bar {
+        flex-direction: column;
+        gap: var(--space-16);
+    }
+
+    .order-grid-layout {
+        grid-template-columns: 1fr;
+    }
+}

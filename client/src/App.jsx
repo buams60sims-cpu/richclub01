@@ -1,78 +1,70 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-
-// Context & Auth
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Layouts
-import PublicLayout from './layouts/PublicLayout';
-import AdminLayout from './layouts/AdminLayout';
+// Public Pages
+import HomePage from './pages/public/HomePage';
+import ShopPage from './pages/public/ShopPage';
+import ProductDetailsPage from './pages/public/ProductDetailsPage';
+import CartPage from './pages/public/CartPage';
+import CheckoutPage from './pages/public/CheckoutPage';
+import OrderConfirmationPage from './pages/public/OrderConfirmationPage';
 
-// Pages (Foundational Placeholders)
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetails from './pages/ProductDetails';
-import Checkout from './pages/Checkout';
-import OrderConfirmation from './pages/OrderConfirmation';
-import Cart from './pages/Cart';
+// Auth Pages
+import LoginPage from './pages/auth/LoginPage';
 
 // Admin Pages
+import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
-import AddProduct from './pages/admin/AddProduct';
-import EditProduct from './pages/admin/EditProduct';
+import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminHomeContent from './pages/admin/AdminHomeContent';
-import Login from './pages/Login';
 
 function App() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <AnimatePresence mode="wait">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<PublicLayout />}>
-                <Route index element={<Home />} />
-                <Route path="shop" element={<Shop />} />
-                <Route path="product/:id" element={<ProductDetails />} />
-                <Route path="cart" element={<Cart />} />
-                <Route path="checkout" element={<Checkout />} />
-                <Route path="confirmation" element={<OrderConfirmation />} />
-                <Route path="login" element={<Login />} />
-              </Route>
+    return (
+        <AuthProvider>
+            <CartProvider>
+                <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                    <Routes>
+                        {/* Public Routes */}
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/shop" element={<ShopPage />} />
+                        <Route path="/product/:id" element={<ProductDetailsPage />} />
+                        <Route path="/cart" element={<CartPage />} />
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/order/:id" element={<OrderConfirmationPage />} />
 
-              {/* Admin Routes (Protected) */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute adminOnly>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<AdminDashboard />} />
-                <Route path="products" element={<AdminProducts />} />
-                <Route path="products/new" element={<AddProduct />} />
-                <Route path="products/edit/:id" element={<EditProduct />} />
-                <Route path="orders" element={<AdminOrders />} />
-                <Route path="coupons" element={<AdminCoupons />} />
-                <Route path="content" element={<AdminHomeContent />} />
-              </Route>
+                        {/* Auth Routes */}
+                        <Route path="/login" element={<LoginPage />} />
 
-              {/* Fallback Route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </AnimatePresence>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
-  );
+                        {/* Admin Routes - Protected */}
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminLayout />
+                                </ProtectedRoute>
+                            }
+                        >
+                            <Route index element={<AdminDashboard />} />
+                            <Route path="products" element={<AdminProducts />} />
+                            <Route path="products/new" element={<AdminProductForm />} />
+                            <Route path="products/:id" element={<AdminProductForm />} />
+                            <Route path="orders" element={<AdminOrders />} />
+                            <Route path="coupons" element={<AdminCoupons />} />
+                            <Route path="home-content" element={<AdminHomeContent />} />
+                        </Route>
+
+                        {/* Fallback */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </Router>
+            </CartProvider>
+        </AuthProvider>
+    );
 }
 
 export default App;

@@ -1,75 +1,154 @@
+/* ========================================
+   FOOTER COMPONENT STYLES
+   Desktop-first luxury brand footer
+   ======================================== */
+
 .footer {
-    background-color: #0a0a0a;
+    background-color: var(--black);
     color: var(--white);
-    padding: var(--spacing-2xl) 0 var(--spacing-lg);
-    margin-top: auto;
+    padding-top: var(--space-48);
+    padding-bottom: var(--space-32);
+    margin-top: var(--space-48);
 }
 
 .footer-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-48);
+    padding-bottom: var(--space-48);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.footer-section h3,
-.footer-section h4 {
-    font-family: var(--font-serif);
-    color: var(--white);
-    font-size: var(--fs-sm);
+/* Brand Section */
+.footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.footer-brand {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
     font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    letter-spacing: 0.02em;
+    color: var(--white);
+    margin: 0;
+    letter-spacing: 0.5px;
 }
 
-.footer-section p {
-    color: #888;
-    font-size: var(--fs-xs);
+.footer-tagline {
+    color: var(--gray-300);
+    font-size: 0.9375rem;
     line-height: 1.6;
     margin: 0;
+    max-width: 300px;
 }
 
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    margin-top: var(--space-8);
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    color: var(--gray-300);
+    font-size: 0.875rem;
+}
+
+.contact-item svg {
+    color: var(--gold);
+    flex-shrink: 0;
+}
+
+/* Footer Headings */
+.footer-heading {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white);
+    margin: 0 0 var(--space-16) 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Footer Links */
 .footer-links {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.footer-links li {
-    margin-bottom: var(--spacing-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
 }
 
 .footer-links a {
-    color: #888;
-    font-size: var(--fs-xs);
+    color: var(--gray-300);
+    font-size: 0.9375rem;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color var(--transition-fast);
+    display: inline-block;
 }
 
 .footer-links a:hover {
-    color: #C9A24D;
+    color: var(--gold);
 }
 
+/* Bottom Bar */
 .footer-bottom {
-    border-top: 1px solid #222;
-    padding-top: var(--spacing-md);
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-24);
+    gap: var(--space-24);
 }
 
-.footer-bottom p {
-    color: #C9A24D;
-    font-size: var(--fs-xs);
-    font-weight: 700;
+.footer-copyright,
+.footer-credit {
+    color: var(--gray-300);
+    font-size: 0.875rem;
     margin: 0;
 }
 
+/* Responsive */
+@media (max-width: 992px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-32);
+    }
+}
+
 @media (max-width: 768px) {
+    .footer {
+        padding-top: var(--space-32);
+        margin-top: var(--space-32);
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
-        gap: var(--spacing-lg);
+        gap: var(--space-32);
+        padding-bottom: var(--space-32);
     }
 
     .footer-bottom {
+        flex-direction: column;
         text-align: center;
+        gap: var(--space-8);
+    }
+
+    .footer-tagline {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-heading {
+        font-size: 0.9375rem;
+    }
+
+    .footer-links a {
+        font-size: 0.875rem;
     }
 }

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Club - Manual Testing Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #C9A24D;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            background: #1a1a1a;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #C9A24D, #D4AF37);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .section {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #C9A24D;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #C9A24D;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-count {
+            background: #2a2a2a;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: #333;
+        }
+
+        .checklist-item.checked {
+            opacity: 0.6;
+            background: #1a3a1a;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid #C9A24D;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox.checked {
+            background: #C9A24D;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .item-text {
+            flex: 1;
+            color: #ddd;
+        }
+
+        .item-priority {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: #FF6B35;
+            color: white;
+        }
+
+        .priority-medium {
+            background: #FFA500;
+            color: white;
+        }
+
+        .priority-low {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .test-case {
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #C9A24D;
+            border-left: 3px solid #C9A24D;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #C9A24D;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #C9A24D, #D4AF37);
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 162, 77, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #C9A24D;
+            border: 2px solid #C9A24D;
+        }
+
+        .btn-secondary:hover {
+            background: #C9A24D;
+            color: #1a1a1a;
+        }
+
+        .collapsed .checklist-item {
+            display: none;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .collapsed .expand-icon {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎯 Rich Club - Final Delivery Checklist</h1>
+        <p class="subtitle">Manual Testing & Verification Tool</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedItems">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="remainingItems">0</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="progressPercent">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="exportResults()">📥 Export Results</button>
+            <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset All</button>
+            <button class="btn btn-secondary" onclick="expandAll()">📖 Expand All</button>
+            <button class="btn btn-secondary" onclick="collapseAll()">📕 Collapse All</button>
+        </div>
+
+        <div id="checklistContainer"></div>
+    </div>
+
+    <script>
+        const checklistData = {
+            "1️⃣ Functional Testing - Shop/Product Flow": {
+                priority: "high",
+                items: [
+                    { text: "Product list loads correctly", test: "Navigate to /shop and verify products display" },
+                    { text: "No empty UI when switching filters", test: "Click different categories, verify products show" },
+                    { text: "ALL category always restores products", test: "Filter by category, then click ALL" },
+                    { text: "Category slug matches backend (normal-tshirts, oversized-tshirts, hoodies, sweatshirts)", test: "Check URL and API calls" },
+                    { text: "Product image always displays (fallback if missing)", test: "Check products with/without images" },
+                    { text: "Multiple product images work (1 main + 3 extra)", test: "Verify 4 images can be uploaded" },
+                    { text: "Product click navigates correctly to /product/:id", test: "Click product card, verify URL" },
+                    { text: "No [object Object] anywhere in UI", test: "Scan entire page for this text" },
+                    { text: "Discount badge shows when isOnSale = true", test: "Check product with discount" },
+                    { text: "Original price shows with strikethrough", test: "Verify CSS strikethrough on original price" },
+                    { text: "Selling price displays prominently", test: "Verify selling price is bold/larger" },
+                    { text: "Price formatting correct (₹ symbol, decimals)", test: "Check ₹1,299 format" },
+                    { text: "'Only few left' badge shows when stock ≤ 5", test: "Create product with stock = 3" },
+                    { text: "'Sold Out' badge shows when stock = 0", test: "Create product with stock = 0" }
+                ]
+            },
+            "2️⃣ Functional Testing - Cart Flow": {
+                priority: "high",
+                items: [
+                    { text: "Add to cart works", test: "Click 'Add to Bag', verify cart updates" },
+                    { text: "Quantity increment/decrement works", test: "Use +/- buttons in cart" },
+                    { text: "Quantity never goes below 1", test: "Try to decrement below 1" },
+                    { text: "Out-of-stock item cannot be added", test: "Try adding sold-out product" },
+                    { text: "Cart persists on refresh (localStorage)", test: "Add item, refresh page, verify cart" },
+                    { text: "Cart clears after successful order", test: "Complete order, verify cart empty" },
+                    { text: "Cart total recalculates correctly", test: "Add multiple items, verify total" },
+                    { text: "Discount applied correctly (uses price.selling)", test: "Verify cart shows selling price" }
+                ]
+            },
+            "3️⃣ Functional Testing - Order Flow": {
+                priority: "high",
+                items: [
+                    { text: "Order submission works", test: "Complete full checkout flow" },
+                    { text: "Phone number validation (10 digits)", test: "Try invalid phone numbers" },
+                    { text: "Address required validation", test: "Try submitting without address" },
+                    { text: "Payment method selection works", test: "Select Razorpay" },
+                    { text: "COD removed (only Razorpay)", test: "Verify no COD option" },
+                    { text: "Razorpay disabled if keys missing", test: "Check .env for keys" },
+                    { text: "Order saved correctly in DB", test: "Check MongoDB after order" },
+                    { text: "Order ID generated (ORD-XXXXXX format)", test: "Verify order ID format" },
+                    { text: "Order status default is 'pending'", test: "Check order status in DB" },
+                    { text: "Stock reduces after order", test: "Check product stock before/after" },
+                    { text: "Order visible in admin panel", test: "Login to admin, check orders" }
+                ]
+            },
+            "4️⃣ Admin Panel - Product Management": {
+                priority: "high",
+                items: [
+                    { text: "Create product works", test: "Add new product via admin" },
+                    { text: "Upload 1 main + 3 extra images", test: "Upload 4 images total" },
+                    { text: "Images do NOT replace each other", test: "Verify all 4 images saved" },
+                    { text: "Edit product works", test: "Edit existing product" },
+                    { text: "Delete product permanently removes from DB", test: "Delete product, check DB" },
+                    { text: "Deleted product not shown in shop", test: "Verify deleted product gone" },
+                    { text: "No INACTIVE ghost products", test: "Check for orphaned products" },
+                    { text: "Stock never goes negative", test: "Try creating negative stock" },
+                    { text: "Category update reflects immediately", test: "Change category, verify update" },
+                    { text: "Original price > 0 validation", test: "Try price = 0" },
+                    { text: "Selling price ≤ original price validation", test: "Try selling > original" },
+                    { text: "Discount auto-calculated correctly", test: "Enter prices, verify discount %" }
+                ]
+            },
+            "5️⃣ Admin Panel - Inventory": {
+                priority: "medium",
+                items: [
+                    { text: "Size-based stock calculation correct", test: "Add stock for S,M,L,XL,XXL, verify total" },
+                    { text: "Total stock = sum of all sizes", test: "Verify totalStock field" },
+                    { text: "Zero stock disables Add to Cart", test: "Set stock = 0, verify button disabled" },
+                    { text: "Admin stock edit updates live", test: "Edit stock, verify immediate update" }
+                ]
+            },
+            "6️⃣ Admin Panel - Orders": {
+                priority: "medium",
+                items: [
+                    { text: "Orders list loads", test: "Navigate to admin orders page" },
+                    { text: "Order details visible", test: "Click order, verify details" },
+                    { text: "Customer details correct", test: "Verify name, phone, address" },
+                    { text: "Payment status correct", test: "Check payment status field" },
+                    { text: "No crash when order list empty", test: "Delete all orders, verify no crash" }
+                ]
+            },
+            "7️⃣ UI/UX - User Experience": {
+                priority: "medium",
+                items: [
+                    { text: "Clear hierarchy (Headings → Cards → CTAs)", test: "Visual inspection" },
+                    { text: "Consistent spacing throughout", test: "Check margins/padding" },
+                    { text: "No layout shift on hover", test: "Hover over elements" },
+                    { text: "Hover effects smooth (transitions)", test: "Check CSS transitions" },
+                    { text: "Buttons clickable on mobile", test: "Test on mobile device" },
+                    { text: "Loading states present", test: "Check for spinners during API calls" },
+                    { text: "Empty states handled", test: "Check 'No products found' message" }
+                ]
+            },
+            "8️⃣ UI/UX - Design Consistency": {
+                priority: "medium",
+                items: [
+                    { text: "Same font across app", test: "Inspect font-family in DevTools" },
+                    { text: "Same button style everywhere", test: "Check all buttons" },
+                    { text: "Gold color consistent (#C9A24D)", test: "Inspect color values" },
+                    { text: "Badges consistent style", test: "Check OFF, Only few left, Sold Out" },
+                    { text: "Cards same height in grid", test: "Visual inspection of shop page" },
+                    { text: "Image aspect ratio consistent", test: "Check product images" }
+                ]
+            },
+            "9️⃣ Edge Cases - Products": {
+                priority: "high",
+                items: [
+                    { text: "Product without images (fallback shows)", test: "Create product with no images" },
+                    { text: "Product with only 1 image", test: "Upload 1 image only" },
+                    { text: "Product with missing discount", test: "Create product with 0% discount" },
+                    { text: "Product with 0 stock", test: "Set all sizes to 0" },
+                    { text: "Product price = 0 blocked", test: "Try creating price = 0" },
+                    { text: "Long product name (UI doesn't break)", test: "Create 200 character name" },
+                    { text: "Special characters in name", test: "Use é, ñ, ™ symbols" }
+                ]
+            },
+            "🔟 Edge Cases - Cart": {
+                priority: "high",
+                items: [
+                    { text: "Add same product twice (quantity increases)", test: "Add same product 2x" },
+                    { text: "Refresh page mid-checkout (cart persists)", test: "Refresh during checkout" },
+                    { text: "Change quantity rapidly", test: "Click +/- buttons quickly" },
+                    { text: "Remove last cart item (empty state)", test: "Remove all items" },
+                    { text: "Cart empty checkout blocked", test: "Try checkout with empty cart" }
+                ]
+            },
+            "1️⃣1️⃣ Security": {
+                priority: "high",
+                items: [
+                    { text: "Admin routes protected (JWT required)", test: "Try accessing /admin without login" },
+                    { text: "No admin API exposed publicly", test: "Try POST /api/products without token" },
+                    { text: "JWT expiration handled", test: "Wait for token expiry, verify re-login" },
+                    { text: "CORS configured correctly", test: "Check CORS headers" },
+                    { text: "No sensitive keys in frontend", test: "Inspect frontend code" },
+                    { text: "Razorpay keys only in .env", test: "Check .env file" },
+                    { text: "File upload restricted to images", test: "Try uploading .exe file" },
+                    { text: "File size limit enforced (5MB)", test: "Try uploading 10MB image" }
+                ]
+            },
+            "1️⃣2️⃣ Performance": {
+                priority: "low",
+                items: [
+                    { text: "Images optimized (< 500KB each)", test: "Check image file sizes" },
+                    { text: "Lazy loading enabled", test: "Check Network tab for lazy load" },
+                    { text: "API calls not duplicated", test: "Monitor Network tab" },
+                    { text: "useEffect dependencies correct", test: "Check React DevTools" },
+                    { text: "No infinite re-render", test: "Monitor console for warnings" },
+                    { text: "Console clean (no logs)", test: "Open DevTools console" },
+                    { text: "React keys unique", test: "Check for key warnings" }
+                ]
+            },
+            "1️⃣3️⃣ Deployment": {
+                priority: "high",
+                items: [
+                    { text: ".env configured (all keys present)", test: "Check .env file" },
+                    { text: "Build runs without error (npm run build)", test: "Run build command" },
+                    { text: "API base URL correct", test: "Check axios baseURL" },
+                    { text: "Image paths correct", test: "Verify images load in production" },
+                    { text: "Server restarts cleanly", test: "Restart server, verify no errors" },
+                    { text: "Logs disabled in production", test: "Check for console.log" },
+                    { text: "Favicon + title set", test: "Check browser tab" }
+                ]
+            },
+            "1️⃣4️⃣ Client Handover": {
+                priority: "medium",
+                items: [
+                    { text: "Admin login credentials provided", test: "Document admin email/password" },
+                    { text: "Product upload guide written", test: "Create step-by-step guide" },
+                    { text: "Order flow explained", test: "Document order management" },
+                    { text: "Payment setup instructions (Razorpay)", test: "Document Razorpay setup" },
+                    { text: "Hosting details shared", test: "Provide server details" },
+                    { text: "Domain connected", test: "Verify domain points to server" },
+                    { text: "Backup instructions provided", test: "Document backup process" },
+                    { text: "Source code zipped", test: "Create ZIP file" }
+                ]
+            }
+        };
+
+        let checkedItems = JSON.parse(localStorage.getItem('richClubChecklist')) || {};
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = '';
+
+            Object.entries(checklistData).forEach(([section, data]) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section';
+
+                const checkedCount = data.items.filter(item => checkedItems[`${section}-${item.text}`]).length;
+                const totalCount = data.items.length;
+
+                sectionDiv.innerHTML = `
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="expand-icon">▼</span>
+              ${section}
+            </div>
+            <div class="section-count">${checkedCount}/${totalCount}</div>
+          </div>
+        `;
+
+                data.items.forEach(item => {
+                    const itemKey = `${section}-${item.text}`;
+                    const isChecked = checkedItems[itemKey] || false;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `checklist-item ${isChecked ? 'checked' : ''}`;
+                    itemDiv.innerHTML = `
+            <div class="checkbox ${isChecked ? 'checked' : ''}" onclick="toggleItem('${itemKey}', this)"></div>
+            <div class="item-text">
+              ${item.text}
+              ${item.test ? `<div class="test-case">🧪 Test: ${item.test}</div>` : ''}
+            </div>
+            <div class="item-priority priority-${data.priority}">${data.priority}</div>
+          `;
+
+                    sectionDiv.appendChild(itemDiv);
+                });
+
+                container.appendChild(sectionDiv);
+            });
+
+            updateStats();
+        }
+
+        function toggleItem(key, element) {
+            checkedItems[key] = !checkedItems[key];
+            localStorage.setItem('richClubChecklist', JSON.stringify(checkedItems));
+            renderChecklist();
+        }
+
+        function toggleSection(header) {
+            header.parentElement.classList.toggle('collapsed');
+        }
+
+        function updateStats() {
+            let total = 0;
+            let completed = 0;
+
+            Object.values(checklistData).forEach(section => {
+                total += section.items.length;
+                section.items.forEach(item => {
+                    const key = `${Object.keys(checklistData).find(k => checklistData[k] === section)}-${item.text}`;
+                    if (checkedItems[key]) completed++;
+                });
+            });
+
+            const remaining = total - completed;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('completedItems').textContent = completed;
+            document.getElementById('remainingItems').textContent = remaining;
+            document.getElementById('progressPercent').textContent = percent + '%';
+
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent + '%';
+        }
+
+        function exportResults() {
+            let report = '# Rich Club - Final Delivery Checklist Report\n\n';
+            report += `Generated: ${new Date().toLocaleString()}\n\n`;
+
+            let totalCompleted = 0;
+            let totalItems = 0;
+
+            Object.entries(checklistData).forEach(([section, data]) => {
+                report += `## ${section}\n\n`;
+                data.items.forEach(item => {
+                    const key = `${section}-${item.text}`;
+                    const status = checkedItems[key] ? '✅' : '❌';
+                    report += `${status} ${item.text}\n`;
+                    totalItems++;
+                    if (checkedItems[key]) totalCompleted++;
+                });
+                report += '\n';
+            });
+
+            const percent = Math.round((totalCompleted / totalItems) * 100);
+            report += `\n---\n\n**Progress: ${totalCompleted}/${totalItems} (${percent}%)**\n`;
+
+            const blob = new Blob([report], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rich-club-checklist-${Date.now()}.md`;
+            a.click();
+        }
+
+        function resetAll() {
+            if (confirm('Are you sure you want to reset all checkboxes?')) {
+                checkedItems = {};
+                localStorage.removeItem('richClubChecklist');
+                renderChecklist();
+            }
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('collapsed');
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('collapsed');
+            });
+        }
+
+        // Initialize
+        renderChecklist();
+    </script>
+</body>
+
+</html>

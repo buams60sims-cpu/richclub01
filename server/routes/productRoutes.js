@@ -9,6 +9,7 @@ const {
     checkStock
 } = require('../controllers/productController');
 const { verifyJWT, isAdmin } = require('../middlewares/auth');
+const upload = require('../middlewares/upload');
 
 /**
  * Product Routes
@@ -18,7 +19,7 @@ const { verifyJWT, isAdmin } = require('../middlewares/auth');
 // @route   POST /api/products
 // @desc    Create a new product
 // @access  Admin
-router.post('/', verifyJWT, isAdmin, createProduct);
+router.post('/', verifyJWT, isAdmin, upload.array('images', 8), createProduct);
 
 // @route   GET /api/products
 // @desc    Get all products (with optional filters)
@@ -33,7 +34,7 @@ router.get('/:id', getProductById);
 // @route   PUT /api/products/:id
 // @desc    Update product
 // @access  Admin
-router.put('/:id', verifyJWT, isAdmin, updateProduct);
+router.put('/:id', verifyJWT, isAdmin, upload.array('images', 8), updateProduct);
 
 // @route   DELETE /api/products/:id
 // @desc    Delete product (soft delete)

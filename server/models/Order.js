@@ -124,10 +124,14 @@ const orderSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: {
-                values: ['PAYMENT_PENDING', 'CONFIRMED', 'CANCELLED'],
+                values: ['PAYMENT_PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
                 message: '{VALUE} is not a valid order status'
             },
             default: 'PAYMENT_PENDING'
+        },
+        adminRemarks: {
+            type: String,
+            default: ''
         },
         // Razorpay payment tracking fields
         razorpayOrderId: {

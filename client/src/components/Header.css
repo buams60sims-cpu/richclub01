@@ -1,53 +1,163 @@
+/* ========================================
+   HEADER COMPONENT STYLES
+   Desktop-first luxury brand header
+   ======================================== */
+
 .header {
-    background-color: var(--bg-primary);
-    box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
+    z-index: var(--z-sticky);
+    background-color: var(--white);
+    border-bottom: 1px solid var(--gray-300);
+    transition: box-shadow var(--transition-base);
 }
 
 .header-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md) 0;
+    justify-content: space-between;
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-24);
+    gap: var(--space-32);
 }
 
-.logo h2 {
+/* Logo */
+.header-logo {
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+}
+
+.header-logo:hover {
+    opacity: 0.7;
+}
+
+.logo-text {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--black);
     margin: 0;
-    color: var(--primary-color);
-    font-size: 1.5rem;
+    letter-spacing: 0.5px;
 }
 
-.nav-list {
+/* Navigation */
+.header-nav {
     display: flex;
-    list-style: none;
-    gap: var(--spacing-lg);
-    margin: 0;
+    align-items: center;
+    gap: var(--space-32);
+    flex: 1;
+    justify-content: center;
 }
 
 .nav-link {
-    color: var(--text-primary);
+    font-size: 0.9375rem;
     font-weight: 500;
-    transition: color var(--transition-fast);
+    color: var(--black);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: var(--space-8) 0;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition-fast);
 }
 
 .nav-link:hover {
-    color: var(--primary-color);
+    color: var(--gold);
+    border-bottom-color: var(--gold);
 }
 
+/* Actions */
 .header-actions {
     display: flex;
-    gap: var(--spacing-md);
+    align-items: center;
+    gap: var(--space-16);
 }
 
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+}
+
+.header-action-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--black);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-radius: 50%;
+}
+
+.header-action-btn:hover {
+    background-color: var(--gray-100);
+    color: var(--gold);
+}
+
+/* Cart Badge */
+.cart-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background-color: var(--gold);
+    color: var(--white);
+    font-size: 0.625rem;
+    font-weight: 700;
+    border-radius: 9px;
+    line-height: 1;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .nav-list {
-        gap: var(--spacing-md);
+    .header-content {
+        padding-top: var(--space-16);
+        padding-bottom: var(--space-16);
+        gap: var(--space-16);
     }
 
-    .header-content {
-        flex-wrap: wrap;
+    .logo-text {
+        font-size: 1.5rem;
+    }
+
+    .header-nav {
+        gap: var(--space-24);
+    }
+
+    .nav-link {
+        font-size: 0.875rem;
+    }
+
+    .header-actions {
+        gap: var(--space-8);
+    }
+
+    .user-menu {
+        gap: var(--space-8);
+    }
+
+    .header-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-nav {
+        display: none;
+    }
+
+    .logo-text {
+        font-size: 1.25rem;
     }
 }
