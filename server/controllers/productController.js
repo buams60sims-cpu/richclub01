@@ -80,12 +80,16 @@ const getAllProducts = async (req, res, next) => {
         if (search) {
             query.name = { $regex: search, $options: 'i' };
         }
-        // Only show active products in public routes
-        if (isActive !== undefined) {
-            query.isActive = isActive === 'true';
-        } else {
-            query.isActive = true; // Default to showing only active products
+
+        // Strict boolean parsing for isActive
+        if (isActive === 'true') {
+            query.isActive = true;
+        } else if (isActive === 'false') {
+            query.isActive = false;
+        } else if (isActive === undefined) {
+            query.isActive = true; // Default to showing only active products if not specified
         }
+        // If isActive is present but not 'true'/'false', ignore it (or treat as undefined)
 
         const products = await Product.find(query).sort({ createdAt: -1 });
 
