@@ -17,27 +17,15 @@ connectDB();
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
-// CORS Configuration - Production-ready
-const allowedOrigins = [
-    'https://richclub01.com',
-    'https://www.richclub01.com'
-];
 
-if (process.env.NODE_ENV === 'development') {
-    allowedOrigins.push('http://localhost:5173', 'http://127.0.0.1:5173');
-}
-
+// CORS Configuration - Production-safe
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: [
+        'https://richclub01.com',
+        'https://www.richclub01.com',
+        'https://richclub02.vercel.app'
+    ],
+    credentials: true
 }));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
