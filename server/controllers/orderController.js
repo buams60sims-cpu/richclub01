@@ -445,9 +445,15 @@ const getDailySummaryWhatsAppMessage = async (req, res, next) => {
 
         message += `━━━━━━━━━━━━━━━━━━━━━━━`;
 
+        // Get WhatsApp number from environment
+        const whatsappNumber = process.env.WHATSAPP_DAILY_SUMMARY || '916362145668';
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
         res.status(200).json({
             success: true,
-            message
+            message,
+            whatsappUrl,
+            whatsappNumber
         });
     } catch (error) {
         next(error);

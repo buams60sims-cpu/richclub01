@@ -18,15 +18,15 @@ const Footer = () => {
                         <div className="footer-contact">
                             <div className="contact-item">
                                 <Mail size={16} />
-                                <span>support@richclub.com</span>
+                                <span>richclubcustomiseprinting@gmail.com</span>
                             </div>
                             <div className="contact-item">
                                 <Phone size={16} />
-                                <span>+91 98765 43210</span>
+                                <span>+91 8660538107</span>
                             </div>
                             <div className="contact-item">
                                 <MapPin size={16} />
-                                <span>Mumbai, India</span>
+                                <span>Bangalore, Karnataka, India</span>
                             </div>
                         </div>
                     </div>
@@ -49,17 +49,6 @@ const Footer = () => {
                             <li><Link to="/shop?category=oversize-tshirts">Oversize T-Shirts</Link></li>
                             <li><Link to="/shop?category=collar-tshirts">Collar T-Shirts</Link></li>
                             <li><Link to="/shop?category=hoodies">Hoodies</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Customer Service */}
-                    <div className="footer-section">
-                        <h4 className="footer-heading">Customer Service</h4>
-                        <ul className="footer-links">
-                            <li><a href="#shipping">Shipping Policy</a></li>
-                            <li><a href="#returns">Returns & Exchanges</a></li>
-                            <li><a href="#privacy">Privacy Policy</a></li>
-                            <li><a href="#terms">Terms & Conditions</a></li>
                         </ul>
                     </div>
                 </div>
