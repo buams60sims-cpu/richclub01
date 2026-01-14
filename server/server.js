@@ -46,26 +46,28 @@ const uploadLimiter = rateLimit({
     message: { message: 'Upload limit exceeded.' }
 });
 
-// App Health Check
-app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'Server is running smoothly',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
-    });
-});
+// ============================================
+// API v1 ROUTES (VERSIONED)
+// ============================================
 
-// API Routes with Rate Limits
+app.use('/api/v1/auth', authLimiter, require('./routes/authRoutes'));
+app.use('/api/v1/products', require('./routes/productRoutes'));
+app.use('/api/v1/coupons', checkoutLimiter, require('./routes/couponRoutes'));
+app.use('/api/v1/orders', checkoutLimiter, require('./routes/orderRoutes'));
+app.use('/api/v1/payments', checkoutLimiter, require('./routes/paymentRoutes'));
+app.use('/api/v1/admin', adminLimiter, require('./routes/adminRoutes'));
+app.use('/api/v1/upload', uploadLimiter, require('./routes/uploadRoutes'));
+app.use('/api/v1/home-content', require('./routes/homeContentRoutes'));
+app.use('/api/v1/health', require('./routes/healthRoutes'));
+
+// LEGACY ROUTES (Backward compatibility - remove after frontend migration)
 app.use('/api/auth', authLimiter, require('./routes/authRoutes'));
-app.use('/api/coupons', checkoutLimiter, require('./routes/couponRoutes')); // Validation is checkout-related
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/coupons', checkoutLimiter, require('./routes/couponRoutes'));
 app.use('/api/orders', checkoutLimiter, require('./routes/orderRoutes'));
 app.use('/api/payments', checkoutLimiter, require('./routes/paymentRoutes'));
 app.use('/api/admin', adminLimiter, require('./routes/adminRoutes'));
 app.use('/api/upload', uploadLimiter, require('./routes/uploadRoutes'));
-
-// Public/Hybrid Routes (No strict global limit, handled internally or default)
-app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/home-content', require('./routes/homeContentRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
 
@@ -77,50 +79,19 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Root route
 app.get('/', (req, res) => {
     res.json({
-        message: 'Welcome to Rich Club eCommerce API',
+        name: 'Rich Club eCommerce API',
         version: '1.0.0',
+        apiVersion: 'v1',
+        status: 'active',
+        baseUrl: '/api/v1',
         endpoints: {
-            auth: '/api/auth',
-            health: '/api/health',
-            products: '/api/products',
-            coupons: '/api/coupons',
-            orders: '/api/orders',
-            payments: '/api/payments'
+            health: 'GET /api/v1/health',
+            auth: 'POST /api/v1/auth/login',
+            products: 'GET /api/v1/products',
+            orders: 'POST /api/v1/orders',
+            payments: 'POST /api/v1/payments/create-order'
         },
-        documentation: {
-            auth: {
-                login: 'POST /api/auth/login',
-                getMe: 'GET /api/auth/me (Protected)'
-            },
-            products: {
-                create: 'POST /api/products (Protected)',
-                getAll: 'GET /api/products',
-                getById: 'GET /api/products/:id',
-                update: 'PUT /api/products/:id (Protected)',
-                delete: 'DELETE /api/products/:id (Protected)',
-                checkStock: 'GET /api/products/:id/stock/:size'
-            },
-            coupons: {
-                create: 'POST /api/coupons (Protected)',
-                getAll: 'GET /api/coupons (Protected)',
-                validate: 'POST /api/coupons/validate',
-                update: 'PUT /api/coupons/:id (Protected)',
-                delete: 'DELETE /api/coupons/:id (Protected)'
-            },
-            orders: {
-                create: 'POST /api/orders',
-                getAll: 'GET /api/orders (Protected)',
-                getById: 'GET /api/orders/:id (Protected)',
-                getByInvoice: 'GET /api/orders/invoice/:invoiceNumber',
-                updateStatus: 'PUT /api/orders/:id/status (Protected)',
-                cancel: 'PUT /api/orders/:id/cancel (Protected)'
-            },
-            payments: {
-                createOrder: 'POST /api/payments/create-order',
-                verify: 'POST /api/payments/verify',
-                getKey: 'GET /api/payments/razorpay-key'
-            }
-        }
+        documentation: 'See API_CONTRACT.md'
     });
 });
 
@@ -128,7 +99,9 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
     res.status(404).json({
         success: false,
-        message: 'Route not found'
+        message: 'Route not found',
+        path: req.originalUrl,
+        method: req.method
     });
 });
 
