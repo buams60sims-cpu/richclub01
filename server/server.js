@@ -19,10 +19,8 @@ app.use(helmet({
 }));
 // CORS Configuration - Production-ready
 const allowedOrigins = [
-    'http://localhost:5173', // Vite dev
-    'http://localhost:3000', // React dev
-    'https://richclub.in',
-    'https://www.richclub.com'
+    'https://richclub01.com',
+    'https://www.richclub01.com'
 ];
 
 if (process.env.NODE_ENV === 'development') {
