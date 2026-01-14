@@ -13,11 +13,34 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Security Middleware - Configure Helmet for cross-origin resource access
+// Security Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
-app.use(cors()); // Enable CORS for all routes
+// CORS Configuration - Production-ready
+const allowedOrigins = [
+    'http://localhost:5173', // Vite dev
+    'http://localhost:3000', // React dev
+    'https://richclub.in',
+    'https://www.richclub.com'
+];
+
+if (process.env.NODE_ENV === 'development') {
+    allowedOrigins.push('http://localhost:5173', 'http://127.0.0.1:5173');
+}
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 

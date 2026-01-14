@@ -7,6 +7,7 @@ const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
 // Create axios instance with base configuration
 const api = axios.create({
     baseURL: API_BASE_URL,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
