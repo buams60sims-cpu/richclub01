@@ -92,16 +92,12 @@ const AdminDashboard = () => {
     const handleWhatsAppSummary = async () => {
         try {
             setWhatsappLoading(true);
-            // Dynamic import to avoid circular dependency issues if any, though regular import is fine
             const { getDailySummaryWhatsAppMessage } = await import('../../services/apiService');
             const response = await getDailySummaryWhatsAppMessage();
 
-            if (response.success) {
-                // Copy to clipboard
-                await navigator.clipboard.writeText(response.message);
-                alert('Daily summary copied to clipboard! Open WhatsApp to paste.');
-                // Optional: Open WhatsApp Web
-                // window.open('https://web.whatsapp.com/', '_blank');
+            if (response.success && response.whatsappUrl) {
+                // Open WhatsApp with pre-filled message
+                window.open(response.whatsappUrl, '_blank');
             }
         } catch (error) {
             console.error('Failed to get WhatsApp summary:', error);
