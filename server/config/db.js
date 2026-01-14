@@ -4,18 +4,32 @@ const mongoose = require('mongoose');
  * Connect to MongoDB database
  * Uses connection string from environment variables
  */
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // These options are no longer needed in Mongoose 6+
-      // but included for compatibility
-    });
+/**
+ * Connect to MongoDB with retry logic
+ * Critical for production reliability
+ */
+const connectDB = async (retries = 5) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const conn = await mongoose.connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+      });
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database: ${conn.connection.name}`);
-  } catch (error) {
-    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    process.exit(1); // Exit process with failure
+      console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+      console.log(`📊 Database: ${conn.connection.name}`);
+      return; // Connection successful
+    } catch (error) {
+      console.error(`❌ MongoDB connection attempt ${i + 1}/${retries} failed:`, error.message);
+
+      if (i === retries - 1) {
+        console.error('❌ FATAL: Failed to connect to MongoDB after maximum retries');
+        process.exit(1);
+      }
+
+      console.log(`⏳ Retrying in 5 seconds...`);
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
   }
 };
 

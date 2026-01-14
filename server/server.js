@@ -7,6 +7,50 @@ const connectDB = require('./config/db');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+// ============================================
+// ENVIRONMENT VALIDATION (FAIL FAST)
+// ============================================
+const requiredEnvVars = [
+    'MONGO_URI',
+    'JWT_SECRET',
+    'NODE_ENV'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+    console.error('❌ FATAL: Missing required environment variables:');
+    missingVars.forEach(varName => console.error(`   - ${varName}`));
+    console.error('\n💡 Set these in your deployment platform or .env file');
+    process.exit(1);
+}
+
+// Validate JWT_SECRET strength (production-grade requirement)
+if (process.env.JWT_SECRET.length < 32) {
+    console.error('❌ FATAL: JWT_SECRET must be at least 32 characters long');
+    console.error('   Current length:', process.env.JWT_SECRET.length);
+    console.error('\n💡 Generate strong secret: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"');
+    process.exit(1);
+}
+
+// Validate MONGO_URI format
+if (!process.env.MONGO_URI.includes('mongodb')) {
+    console.error('❌ FATAL: MONGO_URI appears invalid (must start with mongodb:// or mongodb+srv://)');
+    console.error('   Current value:', process.env.MONGO_URI.substring(0, 20) + '...');
+    process.exit(1);
+}
+
+// Warn if optional but recommended vars are missing
+const recommendedVars = ['CLIENT_URL', 'RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'];
+const missingRecommended = recommendedVars.filter(varName => !process.env[varName]);
+
+if (missingRecommended.length > 0) {
+    console.warn('⚠️  WARNING: Missing recommended environment variables:');
+    missingRecommended.forEach(varName => console.warn(`   - ${varName}`));
+}
+
+console.log('✅ Environment validation passed');
+
 // Initialize Express app
 const app = express();
 
@@ -18,14 +62,46 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// CORS Configuration - Production-safe
+// CORS Configuration - Production Ready
+const allowedOrigins = [
+    'https://richclub01.com',
+    'https://www.richclub01.com',
+    'https://richclub02.vercel.app',
+    process.env.CLIENT_URL // Allow explicitly defined client URL
+].filter(Boolean); // Remove empty values
+
+// Allow Vercel preview deployments (dynamic subdomains)
+const vercelPreviewRegex = /https:\/\/.*-.*\.vercel\.app$/;
+
+// Add local development URLs if not in production
+if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:3000');
+    allowedOrigins.push('http://localhost:3001');
+    allowedOrigins.push('http://localhost:5173');
+    allowedOrigins.push('http://localhost:4173');
+}
+
 app.use(cors({
-    origin: [
-        'https://richclub01.com',
-        'https://www.richclub01.com',
-        'https://richclub02.vercel.app'
-    ],
-    credentials: true
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Check if origin is in the allowed list
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        // Check against Vercel preview regex
+        if (vercelPreviewRegex.test(origin)) {
+            return callback(null, true);
+        }
+
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies

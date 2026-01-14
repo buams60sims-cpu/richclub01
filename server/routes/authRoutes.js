@@ -8,10 +8,21 @@ const { verifyJWT, isAdmin } = require('../middlewares/auth');
  * Handles admin login and authentication
  */
 
+const { body } = require('express-validator');
+const validate = require('../middlewares/validate');
+
 // @route   POST /api/auth/login
 // @desc    Admin login
 // @access  Public
-router.post('/login', login);
+router.post(
+    '/login',
+    [
+        body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+        body('password').notEmpty().withMessage('Password is required').trim(),
+    ],
+    validate,
+    login
+);
 
 // @route   GET /api/auth/me
 // @desc    Get current logged-in admin details

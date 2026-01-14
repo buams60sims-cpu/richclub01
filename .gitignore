@@ -13,12 +13,17 @@ dist/
 .agent/
 server/uploads/
 
-# Environment Variables
+# Environment Variables (ALL env files must be gitignored)
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+*.env
+*.env.*
 
 # Logs
 npm-debug.log*
