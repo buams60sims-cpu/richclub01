@@ -74,7 +74,7 @@ const AdminHomeContent = () => {
         try {
             setUploadingSlide(index);
             const token = localStorage.getItem('token');
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/upload/cms`, {
                 method: 'POST',
                 headers: {
@@ -182,7 +182,7 @@ const AdminHomeContent = () => {
         try {
             setUploadingCustom(index);
             const token = localStorage.getItem('token');
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/upload/cms`, {
                 method: 'POST',
                 headers: {
@@ -308,7 +308,7 @@ const AdminHomeContent = () => {
                                     <div className="slide-form">
                                         <div className="form-group">
                                             <label>Hero Image <span className="required">*</span></label>
-                                            
+
                                             {!slide.image ? (
                                                 <>
                                                     <input
