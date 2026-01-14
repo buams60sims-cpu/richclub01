@@ -74,22 +74,26 @@ const createProduct = async (req, res, next) => {
 const getAllProducts = async (req, res, next) => {
     try {
         const { category, search, isActive } = req.query;
-        let query = {};
+        const query = {};
 
-        if (category) query.category = category;
-        if (search) {
-            query.name = { $regex: search, $options: 'i' };
+        const allowedCategories = [
+            "normal-tshirts",
+            "oversize-tshirts",
+            "collar-tshirts",
+            "hoodies"
+        ];
+
+        if (category && allowedCategories.includes(category)) {
+            query.category = category;
         }
 
-        // Strict boolean parsing for isActive
-        if (isActive === 'true') {
-            query.isActive = true;
-        } else if (isActive === 'false') {
-            query.isActive = false;
-        } else if (isActive === undefined) {
-            query.isActive = true; // Default to showing only active products if not specified
+        if (typeof search === 'string' && search.trim().length > 0) {
+            query.name = { $regex: search.trim(), $options: 'i' };
         }
-        // If isActive is present but not 'true'/'false', ignore it (or treat as undefined)
+
+        if (isActive === 'true') query.isActive = true;
+        else if (isActive === 'false') query.isActive = false;
+        else query.isActive = true;
 
         const products = await Product.find(query).sort({ createdAt: -1 });
 
