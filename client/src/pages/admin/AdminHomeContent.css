@@ -138,6 +138,13 @@
     object-fit: cover;
 }
 
+.product-selector-card .flex img {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
 .selected-badge {
     position: absolute;
     top: 4px;
@@ -197,4 +204,94 @@
     display: flex;
     align-items: center;
     gap: var(--space-16);
+}
+
+/* Image Upload & Preview */
+.required {
+    color: #d32f2f;
+    font-weight: 700;
+}
+
+.form-help {
+    font-size: 0.8125rem;
+    color: var(--gray-600);
+    margin-top: var(--space-8);
+    margin-bottom: 0;
+}
+
+.image-preview-box {
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: var(--space-16);
+    background-color: var(--gray-100);
+}
+
+.image-preview-box img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: var(--space-16);
+}
+
+.image-actions {
+    display: flex;
+    gap: var(--space-8);
+    justify-content: flex-start;
+}
+
+.btn-sm {
+    padding: var(--space-8) var(--space-16);
+    font-size: 0.875rem;
+}
+
+.btn-outline {
+    background-color: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--black);
+}
+
+.btn-outline:hover {
+    background-color: var(--gray-100);
+}
+
+.text-secondary {
+    color: var(--gray-600);
+}
+
+/* Custom Design Image Upload Grid */
+.custom-image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.image-upload-card {
+    border: 1px dashed #ddd;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fafafa;
+}
+
+.image-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.image-file-input {
+    width: 100%;
+    font-size: 13px;
+}
+
+.image-preview {
+    margin-top: 10px;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
 }

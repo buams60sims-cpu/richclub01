@@ -5,7 +5,21 @@ import { formatPrice } from '../../utils/helpers';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
+    const [loading, setLoading] = useState(false);
+    const [stats, setStats] = useState({
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        ordersByStatus: {
+            PAYMENT_PENDING: 0,
+            CONFIRMED: 0,
+            SHIPPED: 0,
+            DELIVERED: 0,
+            CANCELLED: 0
+        }
+    });
     const [lowStockProducts, setLowStockProducts] = useState([]);
+    const [topProducts, setTopProducts] = useState([]);
     const [whatsappLoading, setWhatsappLoading] = useState(false);
 
     useEffect(() => {
@@ -23,32 +37,49 @@ const AdminDashboard = () => {
             let totalProducts = 0;
             let totalOrders = 0;
             let totalRevenue = 0;
-            let pendingOrders = 0;
             let lowStock = [];
+            let ordersByStatus = {
+                PAYMENT_PENDING: 0,
+                CONFIRMED: 0,
+                SHIPPED: 0,
+                DELIVERED: 0,
+                CANCELLED: 0
+            };
 
             if (productsRes.success) {
                 const products = productsRes.data;
                 totalProducts = products.length;
-                // Identify low stock products (Total stock <= 5)
-                lowStock = products.filter(p => p.totalStock <= 5);
+                lowStock = products
+                    .filter(p => p.totalStock <= 5)
+                    .map(p => ({
+                        ...p,
+                        imagesCount: p.images?.length || 0
+                    }))
+                    .slice(0, 10);
             }
 
             if (ordersRes.success) {
                 const orders = ordersRes.data;
                 totalOrders = orders.length;
 
+                // Count by status
+                orders.forEach(order => {
+                    if (ordersByStatus.hasOwnProperty(order.orderStatus)) {
+                        ordersByStatus[order.orderStatus]++;
+                    }
+                });
+
                 const paidOrders = orders.filter(
                     o => o.paymentStatus === 'PAID' && o.orderStatus !== 'CANCELLED'
                 );
                 totalRevenue = paidOrders.reduce((sum, order) => sum + order.totalAmount, 0);
-                pendingOrders = orders.filter(o => o.orderStatus === 'CONFIRMED').length;
             }
 
             setStats({
                 totalRevenue,
                 totalOrders,
                 totalProducts,
-                pendingOrders
+                ordersByStatus
             });
             setLowStockProducts(lowStock);
         } catch (error) {
@@ -133,14 +164,31 @@ const AdminDashboard = () => {
                         <p className="stat-value">{stats.totalProducts}</p>
                     </div>
                 </div>
+            </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon pending-icon">
-                        <Users size={24} />
+            {/* Order Status Breakdown */}
+            <div className="dashboard-section mt-8">
+                <h2 className="section-title mb-4">Order Status Breakdown</h2>
+                <div className="order-status-grid">
+                    <div className="status-card pending">
+                        <div className="status-count">{stats.ordersByStatus.PAYMENT_PENDING}</div>
+                        <div className="status-label">Pending Payment</div>
                     </div>
-                    <div className="stat-info">
-                        <h3 className="stat-label">Processing Orders</h3>
-                        <p className="stat-value">{stats.pendingOrders}</p>
+                    <div className="status-card confirmed">
+                        <div className="status-count">{stats.ordersByStatus.CONFIRMED}</div>
+                        <div className="status-label">Confirmed</div>
+                    </div>
+                    <div className="status-card shipped">
+                        <div className="status-count">{stats.ordersByStatus.SHIPPED}</div>
+                        <div className="status-label">Shipped</div>
+                    </div>
+                    <div className="status-card delivered">
+                        <div className="status-count">{stats.ordersByStatus.DELIVERED}</div>
+                        <div className="status-label">Delivered</div>
+                    </div>
+                    <div className="status-card cancelled">
+                        <div className="status-count">{stats.ordersByStatus.CANCELLED}</div>
+                        <div className="status-label">Cancelled</div>
                     </div>
                 </div>
             </div>
@@ -154,6 +202,7 @@ const AdminDashboard = () => {
                             <thead>
                                 <tr>
                                     <th>Product</th>
+                                    <th>Images</th>
                                     <th>Stock Left</th>
                                     <th>Status</th>
                                     <th>Action Required</th>
@@ -163,24 +212,22 @@ const AdminDashboard = () => {
                                 {lowStockProducts.map(product => (
                                     <tr key={product._id}>
                                         <td>
-                                            <div className="flex items-center gap-3">
+                                            <div className="product-cell">
                                                 <img
                                                     src={product.images[0]}
                                                     alt={product.name}
-                                                    className="w-10 h-10 object-cover rounded"
                                                 />
-                                                <span className="font-medium">{product.name}</span>
+                                                <span>{product.name}</span>
                                             </div>
                                         </td>
-                                        <td className="font-bold text-danger">{product.totalStock}</td>
+                                        <td>{product.imagesCount}</td>
+                                        <td className="stock-low">{product.totalStock}</td>
                                         <td>
-                                            <span className={`badge ${product.totalStock === 0 ? 'badge-danger' : 'badge-warning'}`}>
+                                            <span className={`status-badge ${product.totalStock === 0 ? 'out' : 'low'}`}>
                                                 {product.totalStock === 0 ? 'Out of Stock' : 'Low Stock'}
                                             </span>
                                         </td>
-                                        <td>
-                                            <span className="text-sm text-secondary">Restock Immediately</span>
-                                        </td>
+                                        <td className="action-text">Restock immediately</td>
                                     </tr>
                                 ))}
                             </tbody>

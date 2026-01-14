@@ -9,6 +9,8 @@ const AdminHomeContent = () => {
     const [activeTab, setActiveTab] = useState('hero');
     const [products, setProducts] = useState([]);
     const [saving, setSaving] = useState(false);
+    const [uploadingSlide, setUploadingSlide] = useState(null);
+    const [uploadingCustom, setUploadingCustom] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -38,10 +40,15 @@ const AdminHomeContent = () => {
     const handleSave = async () => {
         try {
             setSaving(true);
-            await updateHomeContent(content);
-            alert('Content updated successfully!');
+            const response = await updateHomeContent(content);
+            if (response.success) {
+                alert('Content updated successfully!');
+            } else {
+                alert(response.message || 'Failed to update content');
+            }
         } catch (error) {
-            alert('Failed to update content');
+            console.error('Save error:', error);
+            alert(error.message || 'Failed to update content');
         } finally {
             setSaving(false);
         }
@@ -57,7 +64,40 @@ const AdminHomeContent = () => {
         }));
     };
 
-    /* ==================== HERO SLIDES HANDLERS ==================== */
+    const handleSlideImageUpload = async (index, file) => {
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('section', 'hero');
+
+        try {
+            setUploadingSlide(index);
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/upload/cms', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                handleSlideChange(index, 'image', data.imageUrl);
+            } else {
+                alert(data.message || 'Failed to upload image');
+            }
+        } catch (error) {
+            alert('Failed to upload image');
+        } finally {
+            setUploadingSlide(null);
+        }
+    };
+
+    const handleRemoveSlideImage = (index) => {
+        handleSlideChange(index, 'image', '');
+    };
     const handleSlideChange = (index, field, value) => {
         setContent(prev => {
             const newSlides = [...prev.heroSlides];
@@ -131,6 +171,41 @@ const AdminHomeContent = () => {
     };
 
     /* ==================== CUSTOM DESIGN IMAGES HANDLERS ==================== */
+    const handleCustomImageUpload = async (index, file) => {
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('section', 'cms');
+
+        try {
+            setUploadingCustom(index);
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/upload/cms', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                handleCustomImageChange(index, data.imageUrl);
+            } else {
+                alert(data.message || 'Failed to upload image');
+            }
+        } catch (error) {
+            alert('Failed to upload image');
+        } finally {
+            setUploadingCustom(null);
+        }
+    };
+
+    const handleRemoveCustomImage = (index) => {
+        handleCustomImageChange(index, '');
+    };
+
     const handleCustomImageChange = (index, value) => {
         setContent(prev => {
             const newImages = [...prev.customDesignSection.images];
@@ -230,13 +305,47 @@ const AdminHomeContent = () => {
 
                                     <div className="slide-form">
                                         <div className="form-group">
-                                            <label>Image URL</label>
-                                            <input
-                                                type="text"
-                                                className="form-input"
-                                                value={slide.image}
-                                                onChange={(e) => handleSlideChange(index, 'image', e.target.value)}
-                                            />
+                                            <label>Hero Image <span className="required">*</span></label>
+                                            
+                                            {!slide.image ? (
+                                                <>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                        className="form-input"
+                                                        onChange={(e) => handleSlideImageUpload(index, e.target.files[0])}
+                                                        disabled={uploadingSlide === index}
+                                                    />
+                                                    <p className="form-help">
+                                                        Recommended: 1920×1080 • JPG / PNG / WebP • Max 2MB
+                                                    </p>
+                                                    {uploadingSlide === index && <p className="text-sm text-secondary">Uploading...</p>}
+                                                </>
+                                            ) : (
+                                                <div className="image-preview-box">
+                                                    <img src={slide.image} alt="Hero Slide Preview" />
+                                                    <div className="image-actions">
+                                                        <label className="btn btn-sm btn-outline">
+                                                            Replace
+                                                            <input
+                                                                type="file"
+                                                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                                style={{ display: 'none' }}
+                                                                onChange={(e) => handleSlideImageUpload(index, e.target.files[0])}
+                                                                disabled={uploadingSlide === index}
+                                                            />
+                                                        </label>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-danger"
+                                                            onClick={() => handleRemoveSlideImage(index)}
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                    {uploadingSlide === index && <p className="text-sm text-secondary">Uploading...</p>}
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="form-row">
@@ -440,22 +549,48 @@ const AdminHomeContent = () => {
                         </div>
 
                         <h4 className="mt-4 mb-2">Display Images (3 needed)</h4>
-                        <div className="image-inputs">
+                        <div className="custom-image-upload-grid">
                             {[0, 1, 2].map(i => (
-                                <div key={i} className="form-group">
-                                    <label>Image {i + 1} URL</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
-                                        value={content.customDesignSection.images[i] || ''}
-                                        onChange={(e) => handleCustomImageChange(i, e.target.value)}
-                                    />
-                                    {content.customDesignSection.images[i] && (
-                                        <img
-                                            src={content.customDesignSection.images[i]}
-                                            alt="Preview"
-                                            className="mt-2 h-24 object-cover rounded"
-                                        />
+                                <div key={i} className="image-upload-card">
+                                    <label className="image-label">Image {i + 1}</label>
+
+                                    {!content.customDesignSection.images[i] ? (
+                                        <>
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                className="image-file-input"
+                                                onChange={(e) => handleCustomImageUpload(i, e.target.files[0])}
+                                                disabled={uploadingCustom === i}
+                                            />
+                                            {uploadingCustom === i && <p className="text-sm text-secondary">Uploading...</p>}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="image-preview">
+                                                <img src={content.customDesignSection.images[i]} alt={`Preview ${i + 1}`} />
+                                            </div>
+                                            <div className="image-actions">
+                                                <label className="btn btn-sm btn-outline">
+                                                    Replace
+                                                    <input
+                                                        type="file"
+                                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                        style={{ display: 'none' }}
+                                                        onChange={(e) => handleCustomImageUpload(i, e.target.files[0])}
+                                                        disabled={uploadingCustom === i}
+                                                    />
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-danger"
+                                                    onClick={() => handleRemoveCustomImage(i)}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                            {uploadingCustom === i && <p className="text-sm text-secondary">Uploading...</p>}
+                                        </>
                                     )}
                                 </div>
                             ))}
