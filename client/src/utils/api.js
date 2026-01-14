@@ -1,7 +1,12 @@
 import axios from 'axios';
 
-// API Configuration - Single source of truth
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+// 🚨 DO NOT USE localhost fallback in production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE_URL) {
+    throw new Error('❌ VITE_API_BASE_URL is not defined');
+}
+
 const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
 
 // Create axios instance with base configuration
