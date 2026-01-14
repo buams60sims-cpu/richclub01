@@ -74,7 +74,8 @@ const AdminHomeContent = () => {
         try {
             setUploadingSlide(index);
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/upload/cms', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+            const response = await fetch(`${API_BASE_URL}/upload/cms`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -181,7 +182,8 @@ const AdminHomeContent = () => {
         try {
             setUploadingCustom(index);
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/upload/cms', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+            const response = await fetch(`${API_BASE_URL}/upload/cms`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
