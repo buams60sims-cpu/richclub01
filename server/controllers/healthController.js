@@ -1,31 +1,33 @@
-/**
- * Health Controller
- * Handles health check and system status endpoints
- */
+const mongoose = require('mongoose');
 
 /**
- * @desc    Get server health status
- * @route   GET /api/health
- * @access  Public
+ * Health Controller
+ * PRODUCTION-GRADE health check with DB status
  */
+
 const getHealthStatus = (req, res) => {
     try {
+        const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+        const isHealthy = dbStatus === 'connected';
+
         const healthData = {
-            success: true,
-            message: 'Server is healthy',
+            status: isHealthy ? 'ok' : 'degraded',
             timestamp: new Date().toISOString(),
-            uptime: process.uptime(),
+            uptime: Math.floor(process.uptime()),
             environment: process.env.NODE_ENV || 'development',
+            version: '1.0.0',
+            db: dbStatus,
             memory: {
-                used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
-                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+                used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+                unit: 'MB'
             }
         };
 
-        res.status(200).json(healthData);
+        res.status(isHealthy ? 200 : 503).json(healthData);
     } catch (error) {
         res.status(500).json({
-            success: false,
+            status: 'error',
             message: 'Health check failed',
             error: error.message
         });

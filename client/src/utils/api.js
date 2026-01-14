@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+// API Configuration - Single source of truth
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
+
 // Create axios instance with base configuration
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -43,4 +47,5 @@ api.interceptors.response.use(
     }
 );
 
+export { API_BASE_URL, API_VERSION };
 export default api;
