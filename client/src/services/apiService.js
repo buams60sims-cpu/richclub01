@@ -127,5 +127,5 @@ export const getHomeContent = () => {
 };
 
 export const updateHomeContent = (data) => {
-    return api.put('/home-content', data);
+    return api.put('/home-content/admin', data);
 };

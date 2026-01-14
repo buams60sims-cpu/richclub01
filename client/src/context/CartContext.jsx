@@ -11,20 +11,17 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
-
-    // Load cart from localStorage on mount
-    useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            try {
-                setCartItems(JSON.parse(savedCart));
-            } catch (error) {
-                console.error('Failed to parse cart data:', error);
-                localStorage.removeItem('cart');
-            }
+    // Initialize cart state directly from localStorage (lazy initialization)
+    const [cartItems, setCartItems] = useState(() => {
+        try {
+            const savedCart = localStorage.getItem('cart');
+            return savedCart ? JSON.parse(savedCart) : [];
+        } catch (error) {
+            console.error('Failed to parse cart data:', error);
+            localStorage.removeItem('cart');
+            return [];
         }
-    }, []);
+    });
 
     // Save cart to localStorage whenever it changes
     useEffect(() => {

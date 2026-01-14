@@ -107,3 +107,172 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Inventory Table */
+.table-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px 0;
+    overflow-x: auto;
+    border: 1px solid var(--gray-300);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table thead th {
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-table tbody tr {
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.admin-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.admin-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-cell img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.stock-low {
+    font-weight: 700;
+    color: #d32f2f;
+}
+
+.status-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.status-badge.low {
+    background: #fff3cd;
+    color: #b26a00;
+}
+
+.status-badge.out {
+    background: #fee;
+    color: #c00;
+}
+
+.action-text {
+    font-size: 13px;
+    color: #777;
+}
+
+/* Order Status Grid */
+.order-status-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.status-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.status-count {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.status-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.status-card.pending {
+    border-color: #fbbf24;
+}
+
+.status-card.pending .status-count {
+    color: #f59e0b;
+}
+
+.status-card.confirmed {
+    border-color: #60a5fa;
+}
+
+.status-card.confirmed .status-count {
+    color: #3b82f6;
+}
+
+.status-card.shipped {
+    border-color: #a78bfa;
+}
+
+.status-card.shipped .status-count {
+    color: #8b5cf6;
+}
+
+.status-card.delivered {
+    border-color: #34d399;
+}
+
+.status-card.delivered .status-count {
+    color: #10b981;
+}
+
+.status-card.cancelled {
+    border-color: #f87171;
+}
+
+.status-card.cancelled .status-count {
+    color: #ef4444;
+}
+
+.dashboard-section {
+    margin-top: 32px;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.mb-4 {
+    margin-bottom: 16px;
+}
+
+.mt-8 {
+    margin-top: 32px;
+}

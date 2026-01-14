@@ -13,8 +13,10 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Security Middleware
-app.use(helmet());
+// Security Middleware - Configure Helmet for cross-origin resource access
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies

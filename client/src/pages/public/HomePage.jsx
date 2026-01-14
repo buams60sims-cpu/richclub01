@@ -23,15 +23,20 @@ const HomePage = () => {
 
             if (contentResponse.success) {
                 setHomeContent(contentResponse.data);
+                console.log('Home content:', contentResponse.data);
 
                 // Load featured products
                 if (contentResponse.data.featuredSection?.productIds?.length > 0) {
                     const productsResponse = await getAllProducts({ isActive: true });
+                    console.log('All products:', productsResponse.data);
+                    console.log('Featured IDs:', contentResponse.data.featuredSection.productIds);
+                    
                     if (productsResponse.success) {
                         // Filter featured products
                         const featured = productsResponse.data.filter(p =>
                             contentResponse.data.featuredSection.productIds.includes(p._id)
                         ).slice(0, contentResponse.data.featuredSection.maxProducts || 10);
+                        console.log('Featured products:', featured);
                         setFeaturedProducts(featured);
                     }
                 }
@@ -127,73 +132,18 @@ const HomePage = () => {
                 </section>
             )}
 
-            {/* Custom Design Banner */}
-            {homeContent?.customDesignSection?.isActive && (
-                <section className="custom-design-section py-48">
-                    <div className="container">
-                        <div className="custom-design-content">
-                            <div className="custom-design-text">
-                                <span className="section-badge">{homeContent.customDesignSection.badge}</span>
-                                <h2 className="section-title">{homeContent.customDesignSection.title}</h2>
-                                <p className="custom-design-description">
-                                    {homeContent.customDesignSection.description}
-                                </p>
-                                <a
-                                    href={`https://wa.me/${homeContent.customDesignSection.whatsappNumber}?text=Hi, I'm interested in custom t-shirt designs`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-primary btn-lg"
-                                >
-                                    {homeContent.customDesignSection.ctaText}
-                                    <ArrowRight size={20} />
-                                </a>
-                            </div>
-
-                            {homeContent.customDesignSection.images?.length > 0 && (
-                                <div className="custom-design-images">
-                                    {homeContent.customDesignSection.images.slice(0, 3).map((img, idx) => (
-                                        <div key={idx} className="custom-design-image">
-                                            <img src={img} alt={`Custom design ${idx + 1}`} loading="lazy" />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </section>
-            )}
-
             {/* Product Categories */}
             <section className="categories-section py-48">
                 <div className="container">
                     <div className="section-header">
-                        <span className="section-badge">Explore Collections</span>
-                        <h2 className="section-title">Shop by Category</h2>
+                        <span className="section-badge">Explore</span>
+                        <h2 className="section-title">Shop All Products</h2>
                     </div>
 
-                    <div className="categories-grid">
-                        <Link to="/shop?category=normal-tshirts" className="category-card">
-                            <div className="category-overlay"></div>
-                            <h3 className="category-name">Normal T-Shirts</h3>
-                            <span className="category-cta">Shop Now <ArrowRight size={16} /></span>
-                        </Link>
-
-                        <Link to="/shop?category=oversize-tshirts" className="category-card">
-                            <div className="category-overlay"></div>
-                            <h3 className="category-name">Oversize T-Shirts</h3>
-                            <span className="category-cta">Shop Now <ArrowRight size={16} /></span>
-                        </Link>
-
-                        <Link to="/shop?category=collar-tshirts" className="category-card">
-                            <div className="category-overlay"></div>
-                            <h3 className="category-name">Collar T-Shirts</h3>
-                            <span className="category-cta">Shop Now <ArrowRight size={16} /></span>
-                        </Link>
-
-                        <Link to="/shop?category=hoodies" className="category-card">
-                            <div className="category-overlay"></div>
-                            <h3 className="category-name">Hoodies</h3>
-                            <span className="category-cta">Shop Now <ArrowRight size={16} /></span>
+                    <div className="section-cta" style={{ textAlign: 'center' }}>
+                        <Link to="/shop" className="btn btn-gold btn-lg">
+                            View All Products
+                            <ArrowRight size={20} />
                         </Link>
                     </div>
                 </div>
@@ -234,15 +184,43 @@ const HomePage = () => {
                                 </p>
                             </div>
 
-                            <div className="trust-item">
-                                <div className="trust-icon">
-                                    <Package size={32} />
-                                </div>
-                                <h3 className="trust-title">Easy Returns</h3>
-                                <p className="trust-description">
-                                    Hassle-free returns within 7 days
+
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* Custom Design Banner */}
+            {homeContent?.customDesignSection?.isActive && (
+                <section className="custom-design-section py-48">
+                    <div className="container">
+                        <div className="custom-design-content">
+                            <div className="custom-design-text">
+                                <span className="section-badge">{homeContent.customDesignSection.badge}</span>
+                                <h2 className="section-title">{homeContent.customDesignSection.title}</h2>
+                                <p className="custom-design-description">
+                                    {homeContent.customDesignSection.description}
                                 </p>
+                                <a
+                                    href={`https://wa.me/${homeContent.customDesignSection.whatsappNumber}?text=Hi, I'm interested in custom t-shirt designs`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-primary btn-lg"
+                                >
+                                    {homeContent.customDesignSection.ctaText}
+                                    <ArrowRight size={20} />
+                                </a>
                             </div>
+
+                            {homeContent.customDesignSection.images?.length > 0 && (
+                                <div className="custom-design-images">
+                                    {homeContent.customDesignSection.images.slice(0, 3).map((img, idx) => (
+                                        <div key={idx} className="custom-design-image">
+                                            <img src={img} alt={`Custom design ${idx + 1}`} loading="lazy" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
