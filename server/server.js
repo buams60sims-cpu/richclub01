@@ -62,16 +62,13 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// CORS Configuration - Production Ready
+// CORS Configuration - Production Safe (Final Fix)
 const allowedOrigins = [
-    'https://richclub01.com',
-    'https://www.richclub01.com',
-    'https://richclub02.vercel.app',
-    process.env.CLIENT_URL // Allow explicitly defined client URL
-].filter(Boolean); // Remove empty values
-
-// Allow Vercel preview deployments (dynamic subdomains)
-const vercelPreviewRegex = /https:\/\/.*-.*\.vercel\.app$/;
+    "https://richclub01.vercel.app",
+    "https://www.richclub01.vercel.app",
+    "https://richclub01.com",
+    "https://www.richclub01.com"
+];
 
 // Add local development URLs if not in production
 if (process.env.NODE_ENV !== 'production') {
@@ -81,28 +78,31 @@ if (process.env.NODE_ENV !== 'production') {
     allowedOrigins.push('http://localhost:4173');
 }
 
-app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow requests with no origin (Postman, server-to-server, health checks)
+        if (!origin) {
+            return callback(null, true);
+        }
 
-        // Check if origin is in the allowed list
+        // Allow Vercel preview deployments
+        if (origin.endsWith(".vercel.app")) {
+            return callback(null, true);
+        }
+
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
 
-        // Check against Vercel preview regex
-        if (vercelPreviewRegex.test(origin)) {
-            return callback(null, true);
-        }
-
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
+        return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-}));
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
