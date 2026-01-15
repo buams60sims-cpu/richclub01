@@ -1,9 +1,27 @@
 import axios from 'axios';
-import { API_BASE } from '../config/api';
+
+// 🚨 DO NOT USE localhost fallback in production
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+if (!envBaseUrl) {
+    throw new Error('❌ VITE_API_BASE_URL is not defined');
+}
+
+// Ensure URL always ends with /api/v1
+// Handles: https://richclub01.onrender.com -> adds /api/v1
+// Handles: https://richclub01.onrender.com/ -> adds api/v1
+// Handles: https://richclub01.onrender.com/api/v1 -> keeps as is
+const API_BASE_URL = envBaseUrl.endsWith('/api/v1')
+    ? envBaseUrl
+    : envBaseUrl.endsWith('/')
+        ? `${envBaseUrl}api/v1`
+        : `${envBaseUrl}/api/v1`;
+
+console.log('🔌 Axios Base URL (Final):', API_BASE_URL);
 
 // Create axios instance with centralized base configuration
 const api = axios.create({
-    baseURL: API_BASE,
+    baseURL: API_BASE_URL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
