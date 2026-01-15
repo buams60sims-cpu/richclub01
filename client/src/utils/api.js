@@ -1,13 +1,27 @@
 import axios from 'axios';
 
 // 🚨 DO NOT USE localhost fallback in production
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// 🚨 DO NOT USE localhost fallback in production
+let envBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-if (!API_BASE_URL) {
+if (!envBaseUrl) {
     throw new Error('❌ VITE_API_BASE_URL is not defined');
 }
 
+// Remove trailing slash if present
+if (envBaseUrl.endsWith('/')) {
+    envBaseUrl = envBaseUrl.slice(0, -1);
+}
+
+// Ensure URL ends with /api/v1
+// This handles cases where user sets Env Var to just domain (https://richclub01.onrender.com)
+// OR sets it correctly (https://richclub01.onrender.com/api/v1)
 const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
+const API_BASE_URL = envBaseUrl.includes(`/api/${API_VERSION}`)
+    ? envBaseUrl
+    : `${envBaseUrl}/api/${API_VERSION}`;
+
+console.log('🔌 API Base URL:', API_BASE_URL);
 
 // Create axios instance with base configuration
 const api = axios.create({
