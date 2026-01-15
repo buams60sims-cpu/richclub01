@@ -82,7 +82,10 @@ router.post('/cms', verifyJWT, isAdmin, upload.single('image'), async (req, res)
         await transformer.toFile(filePath);
 
         // Construct full URL
-        const protocol = req.protocol;
+        let protocol = req.protocol;
+        if (process.env.NODE_ENV === 'production') {
+            protocol = 'https';
+        }
         const host = req.get('host');
         const imageUrl = `${protocol}://${host}/uploads/cms/${fileName}`;
 
@@ -140,7 +143,10 @@ router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 4), as
                 .rotate()
                 .toFile(filePath);
 
-            const protocol = req.protocol;
+            let protocol = req.protocol;
+            if (process.env.NODE_ENV === 'production') {
+                protocol = 'https';
+            }
             const host = req.get('host');
             const imageUrl = `${protocol}://${host}/uploads/products/${productId || 'temp'}/${fileName}`;
 
@@ -195,7 +201,10 @@ router.post('/product-image', verifyJWT, isAdmin, legacyUpload.single('image'), 
             });
         }
 
-        const protocol = req.protocol;
+        let protocol = req.protocol;
+        if (process.env.NODE_ENV === 'production') {
+            protocol = 'https';
+        }
         const host = req.get('host');
         const imageUrl = `${protocol}://${host}/uploads/products/${req.file.filename}`;
 
