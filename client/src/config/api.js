@@ -14,7 +14,14 @@ if (envBaseUrl.endsWith('/')) {
 }
 
 // Ensure URL ends with /api/v1
-const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
+// Ensure URL ends with /api/v1
+const API_VERSION = 'v1';
+
+// If the env var ALREADY includes /api/v1, we keep it (backward compatibility)
+// Otherwise we append it. This supports both:
+// VITE_API_BASE_URL=https://richclub01.onrender.com (Standard)
+// VITE_API_BASE_URL=https://richclub01.onrender.com/api/v1 (Legacy/Error)
+
 const API_BASE = envBaseUrl.includes(`/api/${API_VERSION}`)
     ? envBaseUrl
     : `${envBaseUrl}/api/${API_VERSION}`;
