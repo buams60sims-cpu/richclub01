@@ -81,8 +81,10 @@ app.use((req, res, next) => {
     // Check if path starts with any legacy path (but NOT already versioned)
     const isLegacyPath = legacyPaths.some(path => req.path.startsWith(path));
     const isAlreadyVersioned = req.path.startsWith('/api/v1/');
+    // 🔥 CRITICAL: Do NOT rewrite static files (images in /uploads)
+    const isStaticFile = req.path.startsWith('/uploads/');
 
-    if (isLegacyPath && !isAlreadyVersioned) {
+    if (isLegacyPath && !isAlreadyVersioned && !isStaticFile) {
         const originalUrl = req.url;
         req.url = `/api/v1${req.url}`;
         console.log(`⚠️  Auto-corrected: ${originalUrl} → ${req.url}`);
