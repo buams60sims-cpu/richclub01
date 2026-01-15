@@ -21,7 +21,7 @@ const API_BASE_URL = envBaseUrl.includes(`/api/${API_VERSION}`)
     ? envBaseUrl
     : `${envBaseUrl}/api/${API_VERSION}`;
 
-console.log('🔌 API Base URL:', API_BASE_URL);
+console.log('🔌 API Base URL (v2-fixed):', API_BASE_URL);
 
 // Create axios instance with base configuration
 const api = axios.create({
