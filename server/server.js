@@ -135,6 +135,10 @@ app.options("*", cors(corsOptions));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
+// Trust Proxy (Required for Render/Vercel/Heroku)
+// This fixes the 'X-Forwarded-For' rate limit error and allows https detection
+app.set('trust proxy', 1);
+
 // Rate Limiters
 const authLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
