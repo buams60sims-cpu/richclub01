@@ -62,11 +62,32 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// FORCE redirect /products -> /api/v1/products (temporary safety net)
+// 🔥 COMPREHENSIVE SAFETY NET - Force /api/v1 prefix on all API routes
+// This middleware catches ANY request to legacy paths and rewrites them to versioned endpoints
+// Prevents 404s even if frontend has bugs or uses old cached builds
 app.use((req, res, next) => {
-    if (req.path.startsWith("/products")) {
-        req.url = req.url.replace("/products", "/api/v1/products");
+    const legacyPaths = [
+        '/auth',
+        '/products',
+        '/orders',
+        '/payments',
+        '/home-content',
+        '/admin',
+        '/coupons',
+        '/health',
+        '/upload'
+    ];
+
+    // Check if path starts with any legacy path (but NOT already versioned)
+    const isLegacyPath = legacyPaths.some(path => req.path.startsWith(path));
+    const isAlreadyVersioned = req.path.startsWith('/api/v1/');
+
+    if (isLegacyPath && !isAlreadyVersioned) {
+        const originalUrl = req.url;
+        req.url = `/api/v1${req.url}`;
+        console.log(`⚠️  Auto-corrected: ${originalUrl} → ${req.url}`);
     }
+
     next();
 });
 
