@@ -62,6 +62,14 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
+// FORCE redirect /products -> /api/v1/products (temporary safety net)
+app.use((req, res, next) => {
+    if (req.path.startsWith("/products")) {
+        req.url = req.url.replace("/products", "/api/v1/products");
+    }
+    next();
+});
+
 // CORS Configuration - Production Safe (Final Fix)
 const allowedOrigins = [
     "https://richclub01.vercel.app",
