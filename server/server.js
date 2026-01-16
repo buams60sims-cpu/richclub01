@@ -104,7 +104,8 @@ const allowedOrigins = [
     "https://richclub01.vercel.app",
     "https://www.richclub01.vercel.app",
     "https://richclub01.com",
-    "https://www.richclub01.com"
+    "https://www.richclub01.com",
+    "https://api.richclub01.com"
 ];
 
 // Add local development URLs if not in production
