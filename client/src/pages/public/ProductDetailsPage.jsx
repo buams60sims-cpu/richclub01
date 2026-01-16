@@ -113,7 +113,9 @@ const ProductDetailsPage = () => {
                             {/* Main Image */}
                             <div className="main-image-wrapper">
                                 <img
-                                    src={product.images?.[selectedImage] || 'https://via.placeholder.com/800x1000?text=No+Image'}
+                                    src={(product.images?.[selectedImage] && product.images[selectedImage].startsWith('http'))
+                                        ? product.images[selectedImage]
+                                        : 'https://via.placeholder.com/800x1000?text=No+Image'}
                                     alt={product.name}
                                     className="main-image"
                                     onError={(e) => {
@@ -137,7 +139,9 @@ const ProductDetailsPage = () => {
                                             onClick={() => setSelectedImage(idx)}
                                         >
                                             <img
-                                                src={img || 'https://via.placeholder.com/100x120?text=No+Image'}
+                                                src={(img && img.startsWith('http'))
+                                                    ? img
+                                                    : 'https://via.placeholder.com/100x120?text=No+Image'}
                                                 alt={`${product.name} ${idx + 1}`}
                                                 onError={(e) => {
                                                     e.target.src = 'https://via.placeholder.com/100x120?text=No+Image';
