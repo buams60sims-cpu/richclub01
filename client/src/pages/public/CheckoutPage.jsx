@@ -159,6 +159,8 @@ const CheckoutPage = () => {
                 order_id: razorpayOrderId,
                 handler: async function (response) {
                     try {
+                        console.log('✅ Razorpay success callback triggered', response);
+
                         // Step 5: Verify payment
                         const verifyResponse = await verifyPayment({
                             orderId: order._id,
@@ -167,25 +169,33 @@ const CheckoutPage = () => {
                             razorpaySignature: response.razorpay_signature,
                         });
 
-                        if (verifyResponse.success) {
-                            // Extract order details from response for the thank you page
+                        console.log('✅ Payment Verification Response:', verifyResponse);
+
+                        if (verifyResponse && verifyResponse.success) {
+                            // Extract order details
                             const orderDetails = verifyResponse.data;
 
-                            // Clear cart and redirect to thank you page
+                            // Clear cart
+                            console.log('🧹 Clearing cart...');
                             clearCart();
-                            navigate('/thank-you', {
+
+                            // Redirect with multiple fallbacks if state is lost
+                            const targetPath = `/order/${orderDetails.orderId || order._id}`;
+                            console.log('🚚 Redirecting to:', targetPath);
+
+                            navigate(targetPath, {
                                 state: {
-                                    orderId: orderDetails.orderId,
-                                    invoiceNumber: orderDetails.invoiceNumber
+                                    invoiceNumber: orderDetails.invoiceNumber,
+                                    justPaid: true
                                 },
                                 replace: true
                             });
                         } else {
-                            throw new Error('Payment verification failed');
+                            throw new Error(verifyResponse?.message || 'Payment verification failed');
                         }
                     } catch (error) {
-                        console.error('Payment verification error:', error);
-                        alert('Payment verification failed. Please contact support with your order ID: ' + order.invoiceNumber);
+                        console.error('❌ Payment verification error:', error);
+                        alert('Payment verification failed. Please contact support. ' + (error.message || ''));
                     }
                 },
                 prefill: {
