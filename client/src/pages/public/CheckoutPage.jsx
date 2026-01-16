@@ -111,6 +111,7 @@ const CheckoutPage = () => {
             setProcessing(true);
 
             // Step 1: Create order in backend
+            // ... (previous code)
             const orderData = {
                 customer: {
                     name: formData.name,
@@ -118,7 +119,7 @@ const CheckoutPage = () => {
                     address: formData.address,
                 },
                 items: cartItems.map(item => ({
-                    productId: item.productId,
+                    productId: item.productId || item._id, // Fallback for legacy cart items
                     size: item.size,
                     quantity: Number(item.quantity),
                 })),
@@ -127,79 +128,14 @@ const CheckoutPage = () => {
             };
 
             const orderResponse = await createOrder(orderData);
-
-            if (!orderResponse.success) {
-                throw new Error(orderResponse.message || 'Failed to create order');
-            }
-
-            const order = orderResponse.data;
-
-            // Step 2: Load Razorpay script
-            const scriptLoaded = await loadRazorpayScript();
-            if (!scriptLoaded) {
-                throw new Error('Failed to load payment gateway. Please try again.');
-            }
-
-            // Step 3: Create Razorpay order
-            const razorpayOrderResponse = await createRazorpayOrder(order._id);
-
-            if (!razorpayOrderResponse.success) {
-                throw new Error(razorpayOrderResponse.message || 'Failed to initialize payment');
-            }
-
-            const { razorpayOrderId, amount, currency, keyId } = razorpayOrderResponse.data;
-
-            // Step 4: Open Razorpay checkout
-            const options = {
-                key: keyId,
-                amount: amount,
-                currency: currency,
-                name: 'Rich Club',
-                description: `Order #${order.invoiceNumber}`,
-                order_id: razorpayOrderId,
-                handler: async function (response) {
-                    try {
-                        // Step 5: Verify payment
-                        const verifyResponse = await verifyPayment({
-                            orderId: order._id,
-                            razorpayOrderId: response.razorpay_order_id,
-                            razorpayPaymentId: response.razorpay_payment_id,
-                            razorpaySignature: response.razorpay_signature,
-                        });
-
-                        if (verifyResponse.success) {
-                            // Clear cart and redirect to order confirmation
-                            clearCart();
-                            navigate(`/order/${order._id}`);
-                        } else {
-                            throw new Error('Payment verification failed');
-                        }
-                    } catch (error) {
-                        console.error('Payment verification error:', error);
-                        alert('Payment verification failed. Please contact support with your order ID: ' + order.invoiceNumber);
-                    }
-                },
-                prefill: {
-                    name: formData.name,
-                    contact: formData.phone,
-                },
-                theme: {
-                    color: '#c9a44c', // Gold color
-                },
-                modal: {
-                    ondismiss: function () {
-                        setProcessing(false);
-                        alert('Payment cancelled. Your order has been created but not paid. You can complete payment later.');
-                    }
-                }
-            };
-
-            const razorpay = new window.Razorpay(options);
-            razorpay.open();
+            // ... (rest of try block)
 
         } catch (error) {
-            console.error('Checkout error:', error);
-            alert(error.message || 'Failed to process checkout. Please try again.');
+            console.error('Checkout error detail:', error);
+            // Extract the specific backend validation message if available
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to process checkout';
+            console.error('Validation failure:', errorMessage);
+            alert(`Unable to proceed: ${errorMessage}`);
             setProcessing(false);
         }
     };
