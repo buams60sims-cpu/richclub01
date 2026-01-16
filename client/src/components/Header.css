@@ -47,16 +47,12 @@
 }
 
 .logo-tagline {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 2px;
-    color: #ff0000 !important;
-    /* DRAMATIC RED FOR DEBUGGING */
-    margin-top: 4px;
+    color: #555;
+    margin-top: 2px;
     text-transform: uppercase;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
 }
 
 /* Navigation */
