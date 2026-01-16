@@ -5,11 +5,13 @@ const cloudinary = require('../config/cloudinary');
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'richclub/products',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        folder: "richclub/products",
     },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
 
 module.exports = upload;
