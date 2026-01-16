@@ -1,23 +1,15 @@
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 
-// Use Memory Storage to get buffer
-const storage = multer.memoryStorage();
-
-// File filter (images only)
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Not an image! Please upload only images.'), false);
-    }
-};
-
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB limit (Cloudinary handles large files)
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'richclub/products',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     },
-    fileFilter: fileFilter
 });
+
+const upload = multer({ storage: storage });
 
 module.exports = upload;

@@ -15,13 +15,6 @@ const Product = require('../models/Product');
  * @route   POST /api/products
  * @access  Admin
  */
-const { uploadToCloudinary } = require('../utils/cloudinaryHelper');
-
-/**
- * @desc    Create a new product
- * @route   POST /api/products
- * @access  Admin
- */
 const createProduct = async (req, res, next) => {
     try {
         let { name, description, price, category, sizes, isActive, isOnSale } = req.body;
@@ -34,15 +27,10 @@ const createProduct = async (req, res, next) => {
             try { sizes = JSON.parse(sizes); } catch (e) { console.error('Error parsing sizes', e); }
         }
 
-        // Handle Images (Upload to Cloudinary)
+        // Handle Images (Multer-Cloudinary puts URL in file.path)
         let imageUrls = [];
         if (req.files && req.files.length > 0) {
-            // Upload buffers to Cloudinary
-            const uploadPromises = req.files.map(file =>
-                uploadToCloudinary(file.buffer, 'richclub/products')
-            );
-            const uploadResults = await Promise.all(uploadPromises);
-            imageUrls = uploadResults.map(r => r.secure_url);
+            imageUrls = req.files.map(file => file.path);
         } else if (req.body.images && Array.isArray(req.body.images)) {
             // Fallback for URL-only mode
             imageUrls = req.body.images;
@@ -207,14 +195,10 @@ const updateProduct = async (req, res, next) => {
         if (isOnSale !== undefined) product.isOnSale = isOnSale === 'true' || isOnSale === true;
 
         // Handle Image Updates
-        // 1. New files (Upload to Cloudinary)
+        // 1. New files (CloudinaryStorage puts URL in file.path)
         let newImageUrls = [];
         if (req.files && req.files.length > 0) {
-            const uploadPromises = req.files.map(file =>
-                uploadToCloudinary(file.buffer, 'richclub/products')
-            );
-            const uploadResults = await Promise.all(uploadPromises);
-            newImageUrls = uploadResults.map(r => r.secure_url);
+            newImageUrls = req.files.map(file => file.path);
         }
 
         // 2. Combine with existing images that were kept
