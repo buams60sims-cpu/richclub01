@@ -113,9 +113,12 @@ const ProductDetailsPage = () => {
                             {/* Main Image */}
                             <div className="main-image-wrapper">
                                 <img
-                                    src={product.images?.[selectedImage]}
+                                    src={product.images?.[selectedImage] || 'https://via.placeholder.com/800x1000?text=No+Image'}
                                     alt={product.name}
                                     className="main-image"
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/800x1000?text=No+Image';
+                                    }}
                                 />
                                 {discountPercent > 0 && (
                                     <span className="product-badge badge-discount">
@@ -133,7 +136,13 @@ const ProductDetailsPage = () => {
                                             className={`thumbnail ${idx === selectedImage ? 'active' : ''}`}
                                             onClick={() => setSelectedImage(idx)}
                                         >
-                                            <img src={img} alt={`${product.name} ${idx + 1}`} />
+                                            <img
+                                                src={img || 'https://via.placeholder.com/100x120?text=No+Image'}
+                                                alt={`${product.name} ${idx + 1}`}
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/100x120?text=No+Image';
+                                                }}
+                                            />
                                         </button>
                                     ))}
                                 </div>

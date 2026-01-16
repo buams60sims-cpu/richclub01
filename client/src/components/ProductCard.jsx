@@ -31,10 +31,13 @@ const ProductCard = ({ product }) => {
             {/* Image */}
             <div className="product-image-wrapper">
                 <img
-                    src={product.images?.[0]}
+                    src={product.images?.[0] || 'https://via.placeholder.com/400x500?text=No+Image'}
                     alt={product.name}
                     className="product-image"
                     loading="lazy"
+                    onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/400x500?text=No+Image';
+                    }}
                 />
 
                 {/* Badges */}

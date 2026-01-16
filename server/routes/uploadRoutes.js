@@ -1,29 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const sharp = require('sharp');
+const { uploadToCloudinary } = require('../utils/cloudinaryHelper');
 const { verifyJWT, isAdmin } = require('../middlewares/auth');
 
-/**
- * Professional Image Optimization Logic
- * - Memory storage (process before saving)
- * - 25MB Limit
- * - Sharp optimization (WebP, resizing, compression)
- */
-
-// Memory storage for Sharp processing
+// Memory storage for direct upload
 const storage = multer.memoryStorage();
 
 // File filter for images
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
 
-    if (extname && mimetype) {
-        return cb(null, true);
+    if (mimetype) {
+        cb(null, true);
     } else {
         cb(new Error('Only images (jpg, jpeg, png, webp) are allowed!'), false);
     }
@@ -31,13 +21,14 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB limit
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit (Cloudinary handles large files well)
     fileFilter: fileFilter
 });
 
+
 /**
  * @route   POST /api/upload/cms
- * @desc    Upload & Optimize CMS images (Hero, Lookbook)
+ * @desc    Upload CMS images (Hero, Lookbook) to Cloudinary
  * @access  Admin
  */
 router.post('/cms', verifyJWT, isAdmin, upload.single('image'), async (req, res) => {
@@ -50,66 +41,31 @@ router.post('/cms', verifyJWT, isAdmin, upload.single('image'), async (req, res)
         }
 
         const { section } = req.body; // 'hero' or 'lookbook'
-        const uploadDir = 'uploads/cms/';
+        const folder = `richclub/cms/${section || 'general'}`;
 
-        // Ensure directory exists
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const fileName = `${section || 'cms'}-${uniqueSuffix}.webp`;
-        const filePath = path.join(uploadDir, fileName);
-
-        // Professional Optimization with Sharp
-        let transformer = sharp(req.file.buffer)
-            .webp({ quality: 85 }) // Convert to WebP with good quality
-            .rotate(); // Auto-rotate based on EXIF
-
-        // Conditional Resizing based on section
-        if (section === 'hero') {
-            transformer = transformer.resize(1920, 1080, {
-                fit: 'cover',
-                withoutEnlargement: true
-            });
-        } else if (section === 'lookbook') {
-            transformer = transformer.resize(1200, 1500, {
-                fit: 'cover',
-                withoutEnlargement: true
-            });
-        }
-
-        await transformer.toFile(filePath);
-
-        // Construct full URL
-        let protocol = req.protocol;
-        if (process.env.NODE_ENV === 'production') {
-            protocol = 'https';
-        }
-        const host = req.get('host');
-        const imageUrl = `${protocol}://${host}/uploads/cms/${fileName}`;
+        const result = await uploadToCloudinary(req.file.buffer, folder);
 
         res.status(200).json({
             success: true,
-            message: 'Image uploaded and optimized successfully',
-            imageUrl: imageUrl,
-            size: fs.statSync(filePath).size
+            message: 'Image uploaded successfully',
+            imageUrl: result.secure_url,
+            publicId: result.public_id
         });
     } catch (error) {
         console.error('Upload Error:', error);
         res.status(500).json({
             success: false,
-            message: error.message || 'Error processing image'
+            message: error.message || 'Error uploading image'
         });
     }
 });
 
 /**
  * @route   POST /api/upload/product-images
- * @desc    Upload multiple product images (max 4) with optimization
+ * @desc    Upload multiple product images to Cloudinary
  * @access  Admin
  */
-router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 4), async (req, res) => {
+router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 8), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({
@@ -119,107 +75,26 @@ router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 4), as
         }
 
         const { productId } = req.body;
-        const uploadDir = `uploads/products/${productId || 'temp'}/`;
+        const folder = `richclub/products/${productId || 'temp'}`;
 
-        // Ensure directory exists
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        const uploadPromises = req.files.map(file => uploadToCloudinary(file.buffer, folder));
+        const results = await Promise.all(uploadPromises);
 
-        const processedImages = [];
-
-        for (let i = 0; i < req.files.length; i++) {
-            const file = req.files[i];
-            const fileName = i === 0 ? 'main.webp' : `${i}.webp`;
-            const filePath = path.join(uploadDir, fileName);
-
-            // Professional optimization with Sharp
-            await sharp(file.buffer)
-                .resize(1200, null, {
-                    withoutEnlargement: true,
-                    fit: 'contain'
-                })
-                .webp({ quality: 80 })
-                .rotate()
-                .toFile(filePath);
-
-            let protocol = req.protocol;
-            if (process.env.NODE_ENV === 'production') {
-                protocol = 'https';
-            }
-            const host = req.get('host');
-            const imageUrl = `${protocol}://${host}/uploads/products/${productId || 'temp'}/${fileName}`;
-
-            processedImages.push(imageUrl);
-        }
+        const imageUrls = results.map(r => r.secure_url);
 
         res.status(200).json({
             success: true,
-            message: 'Images uploaded and optimized successfully',
-            mainImage: processedImages[0],
-            images: processedImages
+            message: 'Images uploaded successfully',
+            mainImage: imageUrls[0],
+            images: imageUrls
         });
     } catch (error) {
         console.error('Upload Error:', error);
         res.status(500).json({
             success: false,
-            message: error.message || 'Error processing images'
-        });
-    }
-});
-
-/**
- * @route   POST /api/upload/product-image
- * @desc    Upload product image (legacy/existing for backward compatibility or simple uploads)
- */
-const legacyStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = 'uploads/products/';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, 'product-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
-const legacyUpload = multer({
-    storage: legacyStorage,
-    limits: { fileSize: 500 * 1024 }, // Strict 500KB limit
-    fileFilter: fileFilter
-});
-
-router.post('/product-image', verifyJWT, isAdmin, legacyUpload.single('image'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please upload an image'
-            });
-        }
-
-        let protocol = req.protocol;
-        if (process.env.NODE_ENV === 'production') {
-            protocol = 'https';
-        }
-        const host = req.get('host');
-        const imageUrl = `${protocol}://${host}/uploads/products/${req.file.filename}`;
-
-        res.status(200).json({
-            success: true,
-            message: 'Image uploaded successfully',
-            imageUrl: imageUrl
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message || 'Internal Server Error'
+            message: error.message || 'Error uploading images'
         });
     }
 });
 
 module.exports = router;
-
