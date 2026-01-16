@@ -59,7 +59,13 @@ connectDB();
 
 // Security Middleware
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "img-src": ["'self'", "data:", "res.cloudinary.com"],
+        },
+    },
 }));
 
 // 🔥 COMPREHENSIVE SAFETY NET - Force /api/v1 prefix on all API routes
