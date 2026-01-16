@@ -1,30 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const { uploadToCloudinary } = require('../utils/cloudinaryHelper');
+const upload = require('../middlewares/upload');
 const { verifyJWT, isAdmin } = require('../middlewares/auth');
-
-// Memory storage for direct upload
-const storage = multer.memoryStorage();
-
-// File filter for images
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype) {
-        cb(null, true);
-    } else {
-        cb(new Error('Only images (jpg, jpeg, png, webp) are allowed!'), false);
-    }
-};
-
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit (Cloudinary handles large files well)
-    fileFilter: fileFilter
-});
-
 
 /**
  * @route   POST /api/upload/cms
@@ -40,16 +17,11 @@ router.post('/cms', verifyJWT, isAdmin, upload.single('image'), async (req, res)
             });
         }
 
-        const { section } = req.body; // 'hero' or 'lookbook'
-        const folder = `richclub/cms/${section || 'general'}`;
-
-        const result = await uploadToCloudinary(req.file.buffer, folder);
-
+        // CloudinaryStorage puts the URL in req.file.path
         res.status(200).json({
             success: true,
             message: 'Image uploaded successfully',
-            imageUrl: result.secure_url,
-            publicId: result.public_id
+            imageUrl: req.file.path
         });
     } catch (error) {
         console.error('Upload Error:', error);
@@ -74,13 +46,8 @@ router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 8), as
             });
         }
 
-        const { productId } = req.body;
-        const folder = `richclub/products/${productId || 'temp'}`;
-
-        const uploadPromises = req.files.map(file => uploadToCloudinary(file.buffer, folder));
-        const results = await Promise.all(uploadPromises);
-
-        const imageUrls = results.map(r => r.secure_url);
+        // CloudinaryStorage puts the URL in file.path for each file
+        const imageUrls = req.files.map(file => file.path);
 
         res.status(200).json({
             success: true,
