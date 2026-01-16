@@ -111,7 +111,6 @@ const CheckoutPage = () => {
             setProcessing(true);
 
             // Step 1: Create order in backend
-            // ... (previous code)
             const orderData = {
                 customer: {
                     name: formData.name,
@@ -128,12 +127,87 @@ const CheckoutPage = () => {
             };
 
             const orderResponse = await createOrder(orderData);
-            // ... (rest of try block)
+
+            if (!orderResponse.success) {
+                throw new Error(orderResponse.message || 'Failed to create order');
+            }
+
+            const order = orderResponse.data;
+
+            // Step 2: Load Razorpay script
+            const scriptLoaded = await loadRazorpayScript();
+            if (!scriptLoaded) {
+                throw new Error('Failed to load payment gateway. Please try again.');
+            }
+
+            // Step 3: Create Razorpay order
+            const razorpayOrderResponse = await createRazorpayOrder(order._id);
+
+            if (!razorpayOrderResponse.success) {
+                throw new Error(razorpayOrderResponse.message || 'Failed to initialize payment');
+            }
+
+            const { razorpayOrderId, amount, currency, keyId } = razorpayOrderResponse.data;
+
+            // Step 4: Open Razorpay checkout
+            const options = {
+                key: keyId,
+                amount: amount,
+                currency: currency,
+                name: 'Rich Club',
+                description: `Order #${order.invoiceNumber}`,
+                order_id: razorpayOrderId,
+                handler: async function (response) {
+                    try {
+                        // Step 5: Verify payment
+                        const verifyResponse = await verifyPayment({
+                            orderId: order._id,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpaySignature: response.razorpay_signature,
+                        });
+
+                        if (verifyResponse.success) {
+                            // Extract order details from response for the thank you page
+                            const orderDetails = verifyResponse.data;
+
+                            // Clear cart and redirect to thank you page
+                            clearCart();
+                            navigate('/thank-you', {
+                                state: {
+                                    orderId: orderDetails.orderId,
+                                    invoiceNumber: orderDetails.invoiceNumber
+                                },
+                                replace: true
+                            });
+                        } else {
+                            throw new Error('Payment verification failed');
+                        }
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        alert('Payment verification failed. Please contact support with your order ID: ' + order.invoiceNumber);
+                    }
+                },
+                prefill: {
+                    name: formData.name,
+                    contact: formData.phone,
+                },
+                theme: {
+                    color: '#c9a44c', // Gold color
+                },
+                modal: {
+                    ondismiss: function () {
+                        setProcessing(false);
+                    }
+                }
+            };
+
+            const razorpay = new window.Razorpay(options);
+            razorpay.open();
 
         } catch (error) {
             console.error('Checkout error detail:', error);
-            // Extract the specific backend validation message if available
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to process checkout';
+            const errorMessage = error.response?.data?.message || (typeof error === 'string' ? error : error.message) || 'Failed to process checkout';
             console.error('Validation failure:', errorMessage);
             alert(`Unable to proceed: ${errorMessage}`);
             setProcessing(false);

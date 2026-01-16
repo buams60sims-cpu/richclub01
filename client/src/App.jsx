@@ -9,6 +9,7 @@ import ShopPage from './pages/public/ShopPage';
 import ProductDetailsPage from './pages/public/ProductDetailsPage';
 import CartPage from './pages/public/CartPage';
 import CheckoutPage from './pages/public/CheckoutPage';
+import ThankYouPage from './pages/public/ThankYouPage';
 import OrderConfirmationPage from './pages/public/OrderConfirmationPage';
 
 // Auth Pages
@@ -35,6 +36,7 @@ function App() {
                         <Route path="/product/:id" element={<ProductDetailsPage />} />
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/thank-you" element={<ThankYouPage />} />
                         <Route path="/order/:id" element={<OrderConfirmationPage />} />
 
                         {/* Auth Routes */}
