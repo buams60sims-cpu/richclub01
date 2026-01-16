@@ -21,7 +21,7 @@ const Header = () => {
                 <div className="header-content">
                     {/* Logo */}
                     <Link to="/" className="header-logo">
-                        <div className="logo-wrapper">
+                        <div className="logo-wrapper" data-header-id="v1-tagline">
                             <h1 className="logo-text">Rich Club</h1>
                             <span className="logo-tagline">MADE IN KARNATAKA</span>
                         </div>
