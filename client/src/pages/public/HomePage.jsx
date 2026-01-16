@@ -30,7 +30,7 @@ const HomePage = () => {
                     const productsResponse = await getAllProducts({ isActive: true });
                     console.log('All products:', productsResponse.data);
                     console.log('Featured IDs:', contentResponse.data.featuredSection.productIds);
-                    
+
                     if (productsResponse.success) {
                         // Filter featured products
                         const featured = productsResponse.data.filter(p =>
@@ -60,6 +60,21 @@ const HomePage = () => {
 
         return () => clearInterval(interval);
     }, [homeContent]);
+
+    const [currentCustomSlide, setCurrentCustomSlide] = useState(0);
+    const customDesignImages = [
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2080&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=2127&auto=format&fit=crop"
+    ];
+
+    // Auto-rotate custom design slides
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentCustomSlide(prev => (prev + 1) % customDesignImages.length);
+        }, 3500);
+        return () => clearInterval(interval);
+    }, []);
 
     if (loading) {
         return (
@@ -212,15 +227,18 @@ const HomePage = () => {
                                 </a>
                             </div>
 
-                            {homeContent.customDesignSection.images?.length > 0 && (
-                                <div className="custom-design-images">
-                                    {homeContent.customDesignSection.images.slice(0, 3).map((img, idx) => (
-                                        <div key={idx} className="custom-design-image">
-                                            <img src={img} alt={`Custom design ${idx + 1}`} loading="lazy" />
-                                        </div>
+                            <div className="custom-design-images">
+                                <div className="custom-design-slider">
+                                    {customDesignImages.map((img, idx) => (
+                                        <img
+                                            key={idx}
+                                            src={img}
+                                            alt="Custom design"
+                                            className={idx === currentCustomSlide ? 'active' : ''}
+                                        />
                                     ))}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </section>
