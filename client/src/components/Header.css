@@ -31,13 +31,29 @@
     opacity: 0.7;
 }
 
+.logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
 .logo-text {
     font-family: var(--font-heading);
-    font-size: 1.75rem;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     color: var(--black);
     margin: 0;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+}
+
+.logo-tagline {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--gray-600);
+    /* Premium subtle gray for light background */
+    margin-top: 4px;
+    text-transform: uppercase;
 }
 
 /* Navigation */
