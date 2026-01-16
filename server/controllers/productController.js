@@ -15,6 +15,13 @@ const Product = require('../models/Product');
  * @route   POST /api/products
  * @access  Admin
  */
+const { uploadToCloudinary } = require('../utils/cloudinaryHelper');
+
+/**
+ * @desc    Create a new product
+ * @route   POST /api/products
+ * @access  Admin
+ */
 const createProduct = async (req, res, next) => {
     try {
         let { name, description, price, category, sizes, isActive, isOnSale } = req.body;
@@ -27,12 +34,17 @@ const createProduct = async (req, res, next) => {
             try { sizes = JSON.parse(sizes); } catch (e) { console.error('Error parsing sizes', e); }
         }
 
-        // Handle Images
+        // Handle Images (Upload to Cloudinary)
         let imageUrls = [];
         if (req.files && req.files.length > 0) {
-            imageUrls = req.files.map(file => '/uploads/products/' + file.filename);
+            // Upload buffers to Cloudinary
+            const uploadPromises = req.files.map(file =>
+                uploadToCloudinary(file.buffer, 'richclub/products')
+            );
+            const uploadResults = await Promise.all(uploadPromises);
+            imageUrls = uploadResults.map(r => r.secure_url);
         } else if (req.body.images && Array.isArray(req.body.images)) {
-            // Fallback for URL-only mode if needed
+            // Fallback for URL-only mode
             imageUrls = req.body.images;
         }
 
@@ -178,17 +190,20 @@ const updateProduct = async (req, res, next) => {
         if (isOnSale !== undefined) product.isOnSale = isOnSale === 'true' || isOnSale === true;
 
         // Handle Image Updates
-        // 1. New files
+        // 1. New files (Upload to Cloudinary)
         let newImageUrls = [];
         if (req.files && req.files.length > 0) {
-            newImageUrls = req.files.map(file => '/uploads/products/' + file.filename);
+            const uploadPromises = req.files.map(file =>
+                uploadToCloudinary(file.buffer, 'richclub/products')
+            );
+            const uploadResults = await Promise.all(uploadPromises);
+            newImageUrls = uploadResults.map(r => r.secure_url);
         }
 
         // 2. Combine with existing images that were kept
         if (existingImages !== undefined || newImageUrls.length > 0) {
             // If existingImages is sent (even empty), we update the list.
             // If new files are sent, we add them.
-            // If neither, we don't touch images (unless we want to allow deleting all by sending empty existingImages)
             product.images = [...currentImages, ...newImageUrls];
         }
 
