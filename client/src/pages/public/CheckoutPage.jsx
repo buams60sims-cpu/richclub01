@@ -120,7 +120,7 @@ const CheckoutPage = () => {
                 items: cartItems.map(item => ({
                     productId: item.productId,
                     size: item.size,
-                    quantity: item.quantity,
+                    quantity: Number(item.quantity),
                 })),
                 couponCode: appliedCoupon?.code || undefined,
                 paymentMethod: 'RAZORPAY',

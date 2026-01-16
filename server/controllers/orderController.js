@@ -16,6 +16,7 @@ const { calculateOrderPricing, validateItemPrices } = require('../utils/priceCal
  */
 const createOrder = async (req, res, next) => {
     try {
+        console.log('📦 [ORDER DEBUG] Incoming Body:', JSON.stringify(req.body, null, 2));
         const { customer, items, couponCode, paymentMethod } = req.body;
 
         // Security: Prevent manually setting status
