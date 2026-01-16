@@ -25,21 +25,13 @@ const validate = require('../middlewares/validate');
 router.post(
     '/',
     [
-        body('products').isArray({ min: 1 }).withMessage('Order must have at least one product'),
-        body('products.*.product').isMongoId().withMessage('Invalid product ID'),
-        body('products.*.size').notEmpty().withMessage('Size is required'),
-        body('products.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
-        body('totalAmount').isFloat({ min: 0 }).withMessage('Invalid total amount'),
-        body('shippingAddress.name').notEmpty().withMessage('Name is required').trim().escape(),
-        body('shippingAddress.email').isEmail().withMessage('Valid email is required').normalizeEmail(),
-        body('shippingAddress.phone').matches(/^[0-9]{10}$/).withMessage('Valid 10-digit phone number is required'),
-        body('shippingAddress.address').notEmpty().withMessage('Address is required').trim().escape(),
-        body('shippingAddress.city').notEmpty().withMessage('City is required').trim().escape(),
-        body('shippingAddress.state').notEmpty().withMessage('State is required').trim().escape(),
-        body('shippingAddress.pincode').matches(/^[0-9]{6}$/).withMessage('Valid 6-digit pincode is required'),
-        body('payment.razorpayOrderId').notEmpty().withMessage('Razorpay Order ID is required'),
-        body('payment.razorpayPaymentId').notEmpty().withMessage('Razorpay Payment ID is required'),
-        body('payment.razorpaySignature').notEmpty().withMessage('Razorpay Signature is required'),
+        body('items').isArray({ min: 1 }).withMessage('Order must have at least one item'),
+        body('items.*.productId').isMongoId().withMessage('Invalid product ID'),
+        body('items.*.size').notEmpty().withMessage('Size is required'),
+        body('items.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+        body('customer.name').notEmpty().withMessage('Name is required').trim().escape(),
+        body('customer.phone').matches(/^[0-9]{10}$/).withMessage('Valid 10-digit phone number is required'),
+        body('customer.address').notEmpty().withMessage('Address is required').trim().escape()
     ],
     validate,
     createOrder
