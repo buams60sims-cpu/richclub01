@@ -135,11 +135,28 @@ const getProductById = async (req, res, next) => {
             });
         }
 
+        // Safety check: Ensure images is always an array
+        // and filter out any potentially undefined/null values
+        if (product.images) {
+            product.images = Array.isArray(product.images)
+                ? product.images.filter(Boolean)
+                : [];
+        } else {
+            product.images = [];
+        }
+
         res.status(200).json({
             success: true,
             data: product
         });
     } catch (error) {
+        // If ID is invalid format
+        if (error.name === 'CastError') {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
         next(error);
     }
 };
