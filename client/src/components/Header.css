@@ -47,13 +47,16 @@
 }
 
 .logo-tagline {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 800;
     letter-spacing: 2px;
-    color: var(--gray-600);
-    /* Premium subtle gray for light background */
+    color: #ff0000 !important;
+    /* DRAMATIC RED FOR DEBUGGING */
     margin-top: 4px;
     text-transform: uppercase;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Navigation */
