@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { formatPrice, calculateDiscountPercent, isLowStock, isOutOfStock } from '../utils/helpers';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
+    const navigate = useNavigate();
     const { addToCart } = useCart();
     const totalStock = product.totalStock || 0;
     const discountPercent = product.discountPercent || calculateDiscountPercent(
@@ -23,6 +24,22 @@ const ProductCard = ({ product }) => {
         if (availableSizes.length > 0) {
             addToCart(product, availableSizes[0], 1);
             // You could add a toast notification here
+        }
+    };
+
+    const handleBuyNow = (e) => {
+        e.preventDefault();
+
+        // Find first available size
+        const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'].filter(
+            size => product.sizes?.[size] > 0
+        );
+
+        if (availableSizes.length > 0) {
+            // Add to cart
+            addToCart(product, availableSizes[0], 1);
+            // Immediately redirect to checkout
+            navigate('/checkout');
         }
     };
 
@@ -61,16 +78,26 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
 
-                {/* Add to Cart Button - ALWAYS VISIBLE */}
+                {/* Dual Action Buttons */}
                 {!isOutOfStock(totalStock) && (
-                    <button
-                        className="product-add-to-cart"
-                        onClick={handleAddToCart}
-                        aria-label={`Add ${product.name} to cart`}
-                    >
-                        <ShoppingCart size={18} />
-                        <span>Add to Cart</span>
-                    </button>
+                    <div className="product-actions">
+                        <button
+                            className="product-action-btn btn-add-to-cart"
+                            onClick={handleAddToCart}
+                            aria-label={`Add ${product.name} to cart`}
+                        >
+                            <ShoppingCart size={18} />
+                            <span>Add to Cart</span>
+                        </button>
+                        <button
+                            className="product-action-btn btn-buy-now"
+                            onClick={handleBuyNow}
+                            aria-label={`Buy ${product.name} now`}
+                        >
+                            <Zap size={18} />
+                            <span>Buy Now</span>
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -100,3 +127,4 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
+

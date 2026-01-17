@@ -204,7 +204,7 @@
 
 .status-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .status-count {
@@ -275,4 +275,70 @@
 
 .mt-8 {
     margin-top: 32px;
+}
+
+/* Mobile Responsiveness for Order Status and Tables */
+@media (max-width: 992px) {
+    .order-status-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-table {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .order-status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-count {
+        font-size: 1.5rem;
+    }
+
+    .status-label {
+        font-size: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .order-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .status-card {
+        padding: var(--space-16);
+    }
+
+    .stat-card {
+        padding: var(--space-16);
+    }
+
+    .welcome-card {
+        padding: var(--space-16);
+    }
+
+    .welcome-card h2 {
+        font-size: 1.125rem;
+    }
+
+    .admin-table thead th,
+    .admin-table td {
+        padding: var(--space-8);
+        font-size: 0.8125rem;
+    }
 }

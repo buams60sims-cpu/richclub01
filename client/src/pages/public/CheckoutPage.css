@@ -313,9 +313,21 @@
 
 @media (max-width: 576px) {
 
+    /* Reduce oversized title */
+    .checkout-title {
+        font-size: 1.75rem;
+        margin-bottom: var(--space-24);
+    }
+
     .checkout-form-section,
     .order-summary {
         padding: var(--space-16);
+    }
+
+    /* Reduce section title size */
+    .section-title {
+        font-size: 1.125rem;
+        margin-bottom: var(--space-16);
     }
 
     .summary-item {
@@ -336,11 +348,28 @@
         font-size: 0.75rem;
     }
 
+    .summary-item-price {
+        font-size: 0.9375rem;
+    }
+
     .coupon-input-group {
         flex-direction: column;
     }
 
     .coupon-input-group .btn {
         width: 100%;
+    }
+
+    /* Reduce summary font sizes */
+    .summary-title {
+        font-size: 1.125rem;
+    }
+
+    .price-row {
+        font-size: 0.9375rem;
+    }
+
+    .total-row {
+        font-size: 1.125rem;
     }
 }

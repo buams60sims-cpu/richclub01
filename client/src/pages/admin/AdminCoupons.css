@@ -34,3 +34,21 @@
     flex-direction: column;
     gap: var(--space-16);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .coupon-code-badge {
+        font-size: 0.6875rem;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .text-xs {
+        font-size: 0.6875rem;
+    }
+
+    .coupon-form {
+        gap: var(--space-12);
+    }
+}

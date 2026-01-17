@@ -212,9 +212,73 @@
     .form-container {
         grid-template-columns: 1fr;
     }
+
+    /* Fix overlapping title/button */
+    .admin-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-16);
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .image-upload-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Reduce admin title size */
+    .admin-title {
+        font-size: 1.5rem;
+    }
+
+    /* Stack action buttons */
+    .admin-actions {
+        padding: var(--space-12);
+    }
+
+    .admin-actions h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Make table scrollable */
+    .data-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+        min-width: 600px;
+    }
+
+    /* Ensure proper touch targets for action buttons */
+    .icon-btn {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-upload-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 576px) {
+
+    /* Further reduce title size */
+    .admin-title {
+        font-size: 1.25rem;
+    }
+
+    .admin-actions h2 {
+        font-size: 1.125rem;
+    }
 
     .cols-2,
     .form-row {
@@ -223,5 +287,31 @@
 
     .stock-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Reduce table padding for mobile */
+    .data-table th,
+    .data-table td {
+        padding: var(--space-8);
+        font-size: 0.875rem;
+    }
+
+    /* Stack product cell vertically */
+    .product-cell {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .product-cell span {
+        max-width: 100%;
+    }
+
+    /* Ensure action buttons are accessible */
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .image-upload-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }

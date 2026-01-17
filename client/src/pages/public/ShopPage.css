@@ -27,6 +27,70 @@
     margin: 0;
 }
 
+/* Search Bar */
+.shop-search-wrapper {
+    margin-bottom: var(--space-32);
+}
+
+.shop-search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.shop-search-icon {
+    position: absolute;
+    left: var(--space-16);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-600);
+    pointer-events: none;
+}
+
+.shop-search-input {
+    width: 100%;
+    padding: var(--space-16) var(--space-48) var(--space-16) var(--space-48);
+    font-size: 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    background-color: var(--white);
+    transition: all var(--transition-fast);
+}
+
+.shop-search-input:focus {
+    outline: none;
+    border-color: var(--black);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.shop-search-input::placeholder {
+    color: var(--gray-600);
+}
+
+.shop-search-clear {
+    position: absolute;
+    right: var(--space-12);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--gray-300);
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.shop-search-clear:hover {
+    background-color: var(--black);
+    color: var(--white);
+}
+
 /* Category Tabs - NOT DROPDOWN */
 .category-tabs {
     display: flex;

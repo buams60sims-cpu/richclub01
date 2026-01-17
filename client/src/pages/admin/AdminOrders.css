@@ -133,4 +133,34 @@
     .order-grid-layout {
         grid-template-columns: 1fr;
     }
+
+    .order-info-card {
+        padding: var(--space-12);
+    }
+
+    .order-info-card h3 {
+        font-size: 0.9375rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .p-32 {
+        padding: var(--space-16);
+    }
+
+    .item-name {
+        font-size: 0.875rem;
+    }
+
+    .item-meta {
+        font-size: 0.75rem;
+    }
+
+    .total-row {
+        font-size: 0.875rem;
+    }
+
+    .total-row.final {
+        font-size: 1rem;
+    }
 }
