@@ -92,9 +92,6 @@ const HomePage = () => {
 
     return (
         <PublicLayout>
-            <div data-diagnostic="home-source-v1" style={{ background: 'red', color: 'white', padding: '10px', textAlign: 'center' }}>
-                DIAGNOSTIC: HOME PAGE SOURCE V1
-            </div>
             {/* Hero Banner */}
             {currentHeroSlide && (
                 <section className="hero-banner">
