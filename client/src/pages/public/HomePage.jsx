@@ -171,31 +171,31 @@ const HomePage = () => {
                         <div className="trust-grid">
                             <div className="trust-item">
                                 <div className="trust-icon">
-                                    <Truck size={32} />
+                                    <Truck size={28} />
                                 </div>
                                 <h3 className="trust-title">Fast Delivery</h3>
                                 <p className="trust-description">
-                                    Quick and reliable shipping across India
+                                    3–5 days pan-India shipping
                                 </p>
                             </div>
 
                             <div className="trust-item">
                                 <div className="trust-icon">
-                                    <CreditCard size={32} />
+                                    <CreditCard size={28} />
                                 </div>
                                 <h3 className="trust-title">Secure Payment</h3>
                                 <p className="trust-description">
-                                    Safe and encrypted payment processing
+                                    Razorpay protected checkout
                                 </p>
                             </div>
 
                             <div className="trust-item">
                                 <div className="trust-icon">
-                                    <Award size={32} />
+                                    <Award size={28} />
                                 </div>
                                 <h3 className="trust-title">Premium Quality</h3>
                                 <p className="trust-description">
-                                    Finest fabrics and craftsmanship guaranteed
+                                    Hand-checked fabrics
                                 </p>
                             </div>
 

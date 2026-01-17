@@ -7,15 +7,17 @@
     display: flex;
     flex-direction: column;
     background-color: var(--white);
-    border: 1px solid var(--gray-300);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     transition: all var(--transition-base);
     text-decoration: none;
     color: inherit;
 }
 
 .product-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 /* Product Image */
@@ -34,7 +36,44 @@
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.05);
+    transform: scale(1.03);
+}
+
+/* Out of Stock State */
+.product-card.out-of-stock .product-image {
+    filter: blur(4px);
+}
+
+.product-card.out-of-stock .product-image-wrapper::after {
+    content: "OUT OF STOCK";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--white);
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 16px 32px;
+    border-radius: 8px;
+    z-index: 15;
+}
+
+.product-card.out-of-stock .product-image-wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 14;
+}
+
+.product-card.out-of-stock {
+    pointer-events: none;
+    opacity: 0.9;
 }
 
 /* Badges */
@@ -50,12 +89,11 @@
 
 .product-badge {
     display: inline-block;
-    padding: var(--space-8) var(--space-16);
-    font-size: 0.75rem;
+    padding: 6px 14px;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border-radius: 2px;
+    border-radius: 20px;
 }
 
 .badge-discount {
@@ -64,12 +102,12 @@
 }
 
 .badge-sold-out {
-    background-color: #ef4444;
+    background-color: #dc2626;
     color: var(--white);
 }
 
 .badge-low-stock {
-    background-color: #f59e0b;
+    background-color: #ea580c;
     color: var(--white);
 }
 
@@ -149,13 +187,13 @@
 }
 
 .product-price-selling {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--black);
 }
 
 .product-price-original {
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 400;
     color: var(--gray-600);
     text-decoration: line-through;

@@ -351,7 +351,7 @@
 .trust-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-48);
+    gap: var(--space-32);
     justify-items: center;
 }
 
@@ -360,41 +360,41 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-16);
+    gap: 12px;
 }
 
 .trust-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     background-color: var(--white);
     border-radius: 50%;
     color: var(--gold);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all var(--transition-base);
 }
 
 .trust-item:hover .trust-icon {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .trust-title {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: var(--white);
     margin: 0;
 }
 
 .trust-description {
-    font-size: 0.9375rem;
-    line-height: 1.6;
+    font-size: 0.875rem;
+    line-height: 1.5;
     color: var(--gray-300);
     margin: 0;
-    max-width: 250px;
+    max-width: 220px;
 }
 
 /* ========================================

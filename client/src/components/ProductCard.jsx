@@ -44,7 +44,10 @@ const ProductCard = ({ product }) => {
     };
 
     return (
-        <Link to={`/product/${product._id}`} className="product-card">
+        <Link
+            to={`/product/${product._id}`}
+            className={`product-card ${isOutOfStock(totalStock) ? 'out-of-stock' : ''}`}
+        >
             {/* Image */}
             <div className="product-image-wrapper">
                 <img
