@@ -32,6 +32,8 @@ Deploy backend to Render/Railway/Heroku, then update frontend to point to it.
      CLIENT_URL=https://richclub01.com
      ```
 
+# Deployment Guide
+*Last Deployment Trigger: 2026-01-17 17:52 IST*
 5. Deploy → Get URL like `https://richclub-api.onrender.com`
 
 #### Step 2: Update Frontend Environment
