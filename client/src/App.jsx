@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Application main route configuration with Thank You page and tagline updates
+// Application main route configuration - v2.0-tagline-final
 
 // Public Pages
 import HomePage from './pages/public/HomePage';
