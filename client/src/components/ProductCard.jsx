@@ -48,7 +48,7 @@ const ProductCard = ({ product }) => {
             to={`/product/${product._id}`}
             className={`product-card ${isOutOfStock(totalStock) ? 'out-of-stock' : ''}`}
         >
-            {/* Image */}
+            {/* Image Area - Clean & Premium */}
             <div className="product-image-wrapper">
                 <img
                     src={(product.images?.[0])
@@ -64,68 +64,53 @@ const ProductCard = ({ product }) => {
                     }}
                 />
 
-                {/* Badges */}
-                <div className="product-badges">
-                    {discountPercent > 0 && (
-                        <span className="product-badge badge-discount">
-                            -{discountPercent}%
-                        </span>
-                    )}
-                    {isOutOfStock(totalStock) && (
-                        <span className="product-badge badge-sold-out">
-                            Sold Out
-                        </span>
-                    )}
-                    {isLowStock(totalStock) && !isOutOfStock(totalStock) && (
-                        <span className="product-badge badge-low-stock">
-                            Low Stock
-                        </span>
-                    )}
-                </div>
-
-
+                {/* ONLY DISCOUNT ON IMAGE */}
+                {discountPercent > 0 && (
+                    <span className="product-badge badge-discount">-{discountPercent}%</span>
+                )}
             </div>
 
             {/* Product Info */}
             <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
 
-                <div className="product-pricing">
-                    {discountPercent > 0 ? (
-                        <>
-                            <span className="product-price-selling">
-                                {formatPrice(product.price?.selling)}
-                            </span>
+                <div className="product-pricing-row">
+                    <div className="product-pricing">
+                        <span className="product-price-selling">
+                            {formatPrice(product.price?.selling)}
+                        </span>
+                        {product.price?.original > product.price?.selling && (
                             <span className="product-price-original">
                                 {formatPrice(product.price?.original)}
                             </span>
-                        </>
-                    ) : (
-                        <span className="product-price-selling">
-                            {formatPrice(product.price?.selling || product.price?.original)}
-                        </span>
-                    )}
+                        )}
+                    </div>
+
+                    {/* LOW STOCK / OUT OF STOCK BADGE HERE */}
+                    {isOutOfStock(totalStock) ? (
+                        <span className="stock-badge out-of-stock" style={{ background: '#f5f5f5', color: '#999', padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}>Sold Out</span>
+                    ) : isLowStock(totalStock) ? (
+                        <span className="stock-badge low-stock">Low Stock</span>
+                    ) : null}
                 </div>
             </div>
 
-            {/* Dual Action Buttons (Pinned Bottom) */}
+            {/* Action Buttons - Locked to Bottom */}
             {!isOutOfStock(totalStock) && (
                 <div className="product-actions">
                     <button
-                        className="product-action-btn btn-add-to-cart"
+                        className="btn-add-to-cart"
                         onClick={handleAddToCart}
-                        aria-label={`Add ${product.name} to cart`}
+                        aria-label="Add to cart"
                     >
-                        <ShoppingCart size={18} />
-                        <span>Add to Cart</span>
+                        <ShoppingCart size={16} /> Add to Cart
                     </button>
                     <button
-                        className="product-action-btn btn-buy-now"
+                        className="btn-buy-now"
                         onClick={handleBuyNow}
-                        aria-label={`Buy ${product.name} now`}
+                        aria-label="Buy now"
                     >
-                        <Zap size={18} />
-                        <span>Buy Now</span>
+                        <Zap size={16} /> Buy Now
                     </button>
                 </div>
             )}
