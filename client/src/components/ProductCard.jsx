@@ -51,8 +51,10 @@ const ProductCard = ({ product }) => {
             {/* Image */}
             <div className="product-image-wrapper">
                 <img
-                    src={(product.images?.[0] && product.images[0].startsWith('http'))
-                        ? product.images[0]
+                    src={(product.images?.[0])
+                        ? (product.images[0].startsWith('http')
+                            ? product.images[0]
+                            : `${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}${product.images[0].startsWith('/') ? '' : '/'}${product.images[0]}`)
                         : 'https://via.placeholder.com/400x500?text=No+Image'}
                     alt={product.name}
                     className="product-image"

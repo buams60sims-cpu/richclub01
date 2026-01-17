@@ -157,7 +157,7 @@ const HomePage = () => {
                 </section>
             )}
 
-            {/* Product Categories */}
+            {/* Top Products / Shop All Preview */}
             <section className="categories-section py-48">
                 <div className="container">
                     <div className="section-header">
@@ -165,7 +165,19 @@ const HomePage = () => {
                         <h2 className="section-title">Shop All Products</h2>
                     </div>
 
-                    <div className="section-cta" style={{ textAlign: 'center' }}>
+                    <div className="products-grid">
+                        {featuredProducts.length > 0 ? (
+                            featuredProducts.slice(0, 4).map(product => (
+                                <ProductCard key={product._id} product={product} />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center text-gray-500 py-8">
+                                Loading products...
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="section-cta" style={{ textAlign: 'center', marginTop: '32px' }}>
                         <Link to="/shop" className="btn btn-gold btn-lg">
                             View All Products
                             <ArrowRight size={20} />
