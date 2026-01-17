@@ -81,27 +81,7 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
 
-                {/* Dual Action Buttons */}
-                {!isOutOfStock(totalStock) && (
-                    <div className="product-actions">
-                        <button
-                            className="product-action-btn btn-add-to-cart"
-                            onClick={handleAddToCart}
-                            aria-label={`Add ${product.name} to cart`}
-                        >
-                            <ShoppingCart size={18} />
-                            <span>Add to Cart</span>
-                        </button>
-                        <button
-                            className="product-action-btn btn-buy-now"
-                            onClick={handleBuyNow}
-                            aria-label={`Buy ${product.name} now`}
-                        >
-                            <Zap size={18} />
-                            <span>Buy Now</span>
-                        </button>
-                    </div>
-                )}
+
             </div>
 
             {/* Product Info */}
@@ -125,6 +105,28 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
             </div>
+
+            {/* Dual Action Buttons (Pinned Bottom) */}
+            {!isOutOfStock(totalStock) && (
+                <div className="product-actions">
+                    <button
+                        className="product-action-btn btn-add-to-cart"
+                        onClick={handleAddToCart}
+                        aria-label={`Add ${product.name} to cart`}
+                    >
+                        <ShoppingCart size={18} />
+                        <span>Add to Cart</span>
+                    </button>
+                    <button
+                        className="product-action-btn btn-buy-now"
+                        onClick={handleBuyNow}
+                        aria-label={`Buy ${product.name} now`}
+                    >
+                        <Zap size={18} />
+                        <span>Buy Now</span>
+                    </button>
+                </div>
+            )}
         </Link>
     );
 };

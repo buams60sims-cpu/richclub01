@@ -59,7 +59,8 @@ a {
   --gray-600: #777;
 
   /* Typography */
-  --font-heading: 'Playfair Display', Georgia, serif;
+  /* Typography - Unified to Inter as per Production Quality Bar */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Spacing (STRICT - only use these values) */

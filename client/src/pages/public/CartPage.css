@@ -129,8 +129,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     font-size: 1.25rem;
     background-color: var(--white);
     border: none;
@@ -171,6 +171,7 @@
 
 .qty-input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 /* Item Total */
