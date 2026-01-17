@@ -272,6 +272,12 @@
         gap: var(--space-8);
     }
 
+    /* Hide Cart/Admin icons on mobile - they're in hamburger menu */
+    .header-actions>.header-action-btn,
+    .header-actions>.user-menu {
+        display: none !important;
+    }
+
     .user-menu {
         gap: var(--space-8);
     }

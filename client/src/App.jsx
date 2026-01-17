@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 // Application main route configuration - v2.0-tagline-final
 
@@ -31,6 +32,7 @@ function App() {
         <AuthProvider>
             <CartProvider>
                 <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                    <ScrollToTop />
                     <Routes>
                         {/* Public Routes */}
                         <Route path="/" element={<HomePage />} />
@@ -72,3 +74,4 @@ function App() {
 }
 
 export default App;
+

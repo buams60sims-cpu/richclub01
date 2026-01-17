@@ -454,8 +454,28 @@
         margin-right: auto;
     }
 
+    /* Hero Banner Shrink for Tablet */
+    .hero-banner {
+        height: 55vh;
+        min-height: 450px;
+    }
+
+    .hero-content {
+        min-height: 55vh;
+        gap: var(--space-16);
+    }
+
+    .hero-headline {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
     .section-header {
-        margin-bottom: var(--space-32);
+        margin-bottom: var(--space-24);
     }
 
     .custom-design-text .section-title {
@@ -468,17 +488,60 @@
 }
 
 @media (max-width: 576px) {
+
+    /* Compact Hero for Mobile */
     .hero-banner {
-        height: 50vh;
-        min-height: 400px;
+        height: 45vh;
+        min-height: 350px;
     }
 
     .hero-content {
-        min-height: 50vh;
+        min-height: 45vh;
+        gap: var(--space-12);
+    }
+
+    .hero-headline {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .hero-badge {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+    }
+
+    .hero-indicators {
+        bottom: var(--space-16);
+    }
+
+    .hero-indicator {
+        width: 30px;
+        height: 3px;
+    }
+
+    /* Compact sections */
+    .section-header {
+        margin-bottom: var(--space-16);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-badge {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+        margin-bottom: 12px;
     }
 
     .products-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-16);
     }
 
     .categories-grid {
