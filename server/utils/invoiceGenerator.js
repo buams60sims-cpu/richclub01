@@ -11,51 +11,53 @@
  * @returns {string} Unique invoice number
  */
 const generateInvoiceNumber = () => {
+    // Legacy random generator (fallback)
     const date = new Date();
-
-    // Format: YYYYMMDD
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const dateStr = `${year}${month}${day}`;
-
-    // Generate random 5-digit number
     const randomNum = Math.floor(10000 + Math.random() * 90000);
-
     return `INV-${dateStr}-${randomNum}`;
 };
 
 /**
- * Generate invoice number with database check
- * Ensures uniqueness by checking against existing orders
+ * Generate invoice number with sequential increment
+ * Format: INV-YYYYMMDD-0001
+ * Checks database for the last order of the current day to determine sequence
  * 
  * @param {Model} OrderModel - Mongoose Order model
  * @returns {Promise<string>} Unique invoice number
  */
 const generateUniqueInvoiceNumber = async (OrderModel) => {
-    let invoiceNumber;
-    let isUnique = false;
-    let attempts = 0;
-    const maxAttempts = 10;
+    const date = new Date();
+    // Format: YYYYMMDD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const datePrefix = `INV-${year}${month}${day}`;
 
-    while (!isUnique && attempts < maxAttempts) {
-        invoiceNumber = generateInvoiceNumber();
+    // Find the latest invoice created TODAY (starts with prefix)
+    // Sort by invoiceNumber descending to get the highest suffix
+    const lastOrder = await OrderModel.findOne({
+        invoiceNumber: { $regex: `^${datePrefix}` }
+    }).sort({ invoiceNumber: -1 });
 
-        // Check if invoice number already exists
-        const existingOrder = await OrderModel.findOne({ invoiceNumber });
+    let nextSequence = 1;
 
-        if (!existingOrder) {
-            isUnique = true;
+    if (lastOrder && lastOrder.invoiceNumber) {
+        const parts = lastOrder.invoiceNumber.split('-');
+        const lastSuffix = parts[parts.length - 1];
+        const lastSeqInt = parseInt(lastSuffix, 10);
+
+        if (!isNaN(lastSeqInt)) {
+            nextSequence = lastSeqInt + 1;
         }
-
-        attempts++;
     }
 
-    if (!isUnique) {
-        throw new Error('Failed to generate unique invoice number after multiple attempts');
-    }
-
-    return invoiceNumber;
+    // Format sequence as 4 digits (e.g., 0001, 0012, 0123)
+    const nextSuffix = String(nextSequence).padStart(4, '0');
+    return `${datePrefix}-${nextSuffix}`;
 };
 
 module.exports = {
