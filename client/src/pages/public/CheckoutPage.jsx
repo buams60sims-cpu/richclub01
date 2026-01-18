@@ -192,7 +192,8 @@ const CheckoutPage = () => {
                             clearCart();
 
                             // Redirect with multiple fallbacks if state is lost
-                            const targetPath = `/order/${orderDetails.orderId || order._id}`;
+                            // Use Invoice Number for public access (Guest Checkout)
+                            const targetPath = `/order/${orderDetails.invoiceNumber || orderDetails.orderId || order._id}`;
                             console.log('🚚 Redirecting to:', targetPath);
 
                             navigate(targetPath, {
@@ -202,6 +203,7 @@ const CheckoutPage = () => {
                                 },
                                 replace: true
                             });
+
                         } else {
                             throw new Error(verifyResponse?.message || 'Payment verification failed');
                         }

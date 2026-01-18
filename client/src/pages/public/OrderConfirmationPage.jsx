@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, Package, MapPin, CreditCard, Calendar } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
-import { getOrderById } from '../../services/apiService';
+import { getOrderById, getOrderByInvoice } from '../../services/apiService';
 import { formatPrice, formatDateTime, getPaymentStatusLabel, getOrderStatusLabel, getStatusBadgeClass } from '../../utils/helpers';
 import './OrderConfirmationPage.css';
 
@@ -18,7 +18,17 @@ const OrderConfirmationPage = () => {
     const loadOrder = async () => {
         try {
             setLoading(true);
-            const response = await getOrderById(id);
+            let response;
+
+            // Determine if ID is MongoID or Invoice Number
+            // Invoice numbers start with INV- or strictly follow pattern
+            if (id?.startsWith('INV-')) {
+                // Public API for Guest Checkout
+                response = await getOrderByInvoice(id);
+            } else {
+                // Admin/Owner API (requires auth)
+                response = await getOrderById(id);
+            }
 
             if (response.success && response.data) {
                 setOrder(response.data);
@@ -29,6 +39,7 @@ const OrderConfirmationPage = () => {
             setLoading(false);
         }
     };
+
 
     if (loading) {
         return (
