@@ -49,7 +49,7 @@ const heroSlideSchema = new mongoose.Schema({
     alignment: {
         type: String,
         enum: ['left', 'center', 'right'],
-        default: function() {
+        default: function () {
             // Fixed alignment pattern: center, left, right, center
             const alignments = ['center', 'left', 'right', 'center'];
             return alignments[this.order] || 'center';
@@ -261,7 +261,7 @@ homeContentSchema.statics.getOrCreate = async function () {
                 {
                     badge: "A NEW ERA OF STYLE",
                     headline: "Luxury Fashion for the Modern Individual",
-                    description: "Curated collections that blend timeless elegance with contemporary design. Elevate your wardrobe with Rich Club.",
+                    description: "Luxury streetwear and premium fashion for the modern individual.",
                     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
                     ctaText: "Explore Collection",
                     ctaLink: "/shop",

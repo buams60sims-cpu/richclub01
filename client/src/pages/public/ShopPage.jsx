@@ -79,7 +79,7 @@ const ShopPage = () => {
                     <div className="shop-header">
                         <h1>Shop</h1>
                         <p className="shop-subtitle">
-                            Discover our curated collection of premium streetwear
+                            Luxury streetwear and premium fashion for the modern individual.
                         </p>
                     </div>
 
