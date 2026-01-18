@@ -106,13 +106,15 @@ const HomePage = () => {
                         <div className="hero-overlay"></div>
                         <div className="container">
                             <div className={`hero-content hero-${currentHeroSlide.alignment}`}>
-                                <span className="hero-badge">{currentHeroSlide.badge}</span>
-                                <h1 className="hero-headline">{currentHeroSlide.headline}</h1>
-                                <p className="hero-description">{currentHeroSlide.description}</p>
-                                <Link to={currentHeroSlide.ctaLink} className="btn btn-gold btn-lg">
-                                    {currentHeroSlide.ctaText}
-                                    <ArrowRight size={20} />
-                                </Link>
+                                {currentHeroSlide.badge && <span className="hero-badge">{currentHeroSlide.badge}</span>}
+                                {currentHeroSlide.headline && <h1 className="hero-headline">{currentHeroSlide.headline}</h1>}
+                                {currentHeroSlide.description && <p className="hero-description">{currentHeroSlide.description}</p>}
+                                {currentHeroSlide.ctaText && currentHeroSlide.ctaLink && (
+                                    <Link to={currentHeroSlide.ctaLink} className="btn btn-gold btn-lg">
+                                        {currentHeroSlide.ctaText}
+                                        <ArrowRight size={20} />
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -9,19 +9,19 @@ const mongoose = require('mongoose');
 const heroSlideSchema = new mongoose.Schema({
     badge: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
         maxlength: [100, 'Badge text cannot exceed 100 characters']
     },
     headline: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
         maxlength: [200, 'Headline cannot exceed 200 characters']
     },
     description: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
         maxlength: [500, 'Description cannot exceed 500 characters']
     },
@@ -37,13 +37,13 @@ const heroSlideSchema = new mongoose.Schema({
     },
     ctaText: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
         maxlength: [50, 'CTA text cannot exceed 50 characters']
     },
     ctaLink: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     alignment: {
