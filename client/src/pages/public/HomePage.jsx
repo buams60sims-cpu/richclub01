@@ -140,41 +140,32 @@ const HomePage = () => {
             )}
 
             {/* Editor's Picks (Featured Products) */}
-            {homeContent?.featuredSection?.isActive && featuredProducts.length > 0 && (
-                <section className="featured-section py-48">
-                    <div className="container">
-                        <div className="section-header">
-                            <span className="section-badge">{homeContent.featuredSection.badge}</span>
-                            <h2 className="section-title">{homeContent.featuredSection.title}</h2>
-                        </div>
-
-                        <div className="products-grid">
-                            {featuredProducts.map(product => (
-                                <ProductCard key={product._id} product={product} />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Top Products / Shop All Preview */}
+            {/* Top Products Showcase (Dynamic) */}
             <section className="categories-section py-48">
                 <div className="container">
                     <div className="section-header">
                         <span className="section-badge">Explore</span>
-                        <h2 className="section-title">Shop All Products</h2>
+                        <h2 className="section-title">
+                            {homeContent?.featuredSection?.title || "Shop All Products"}
+                        </h2>
                     </div>
 
                     <div className="products-grid">
-                        {featuredProducts.length > 0 ? (
-                            featuredProducts.slice(0, 4).map(product => (
-                                <ProductCard key={product._id} product={product} />
-                            ))
-                        ) : (
-                            <div className="col-span-full text-center text-gray-500 py-8">
-                                Loading products...
+                        {loading && (
+                            <div className="col-span-full flex justify-center py-12">
+                                <div className="loading-spinner"></div>
                             </div>
                         )}
+
+                        {!loading && featuredProducts.length === 0 && (
+                            <div className="col-span-full text-center text-gray-500 py-8">
+                                No featured products selected in Admin Panel.
+                            </div>
+                        )}
+
+                        {!loading && featuredProducts.map(product => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
                     </div>
 
                     <div className="section-cta" style={{ textAlign: 'center', marginTop: '32px' }}>
