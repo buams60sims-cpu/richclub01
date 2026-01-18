@@ -97,26 +97,27 @@
 /* Badges */
 .product-badges {
     position: absolute;
-    top: var(--space-16);
-    left: var(--space-16);
+    top: 6px;
+    left: 6px;
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: 4px;
     z-index: 10;
 }
 
 .product-badge {
     display: inline-block;
-    padding: 6px 14px;
-    font-size: 0.7rem;
+    padding: 2px 8px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    border-radius: 20px;
+    border-radius: 4px;
 }
 
 .badge-discount {
-    background-color: var(--gold);
-    color: var(--white);
+    background-color: #dc2626;
+    /* Red */
+    color: #fff;
 }
 
 .badge-sold-out {
