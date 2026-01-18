@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Truck, CreditCard, Award, Package } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import ProductCard from '../../components/ProductCard';
-import { getHomeContent, getAllProducts } from '../../services/apiService';
+import { getHomeContent } from '../../services/apiService';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -25,21 +25,15 @@ const HomePage = () => {
                 setHomeContent(contentResponse.data);
                 console.log('Home content:', contentResponse.data);
 
-                // Load featured products
-                if (contentResponse.data.featuredSection?.productIds?.length > 0) {
-                    const productsResponse = await getAllProducts({ isActive: true });
-                    console.log('All products:', productsResponse.data);
-                    console.log('Featured IDs:', contentResponse.data.featuredSection.productIds);
+                // Use the populated products from the backend directly
+                // The backend populates 'productIds' with full product objects
+                const populatedProducts = contentResponse.data.featuredSection?.productIds || [];
 
-                    if (productsResponse.success) {
-                        // Filter featured products
-                        const featured = productsResponse.data.filter(p =>
-                            contentResponse.data.featuredSection.productIds.includes(p._id)
-                        ).slice(0, contentResponse.data.featuredSection.maxProducts || 10);
-                        console.log('Featured products:', featured);
-                        setFeaturedProducts(featured);
-                    }
-                }
+                // Ensure we only use valid objects (sanity check)
+                const validProducts = populatedProducts.filter(p => p && p._id);
+
+                console.log('Featured products (from CMS):', validProducts);
+                setFeaturedProducts(validProducts);
             }
         } catch (error) {
             console.error('Failed to load home content:', error);
