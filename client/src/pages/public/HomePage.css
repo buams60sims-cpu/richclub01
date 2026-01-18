@@ -344,46 +344,53 @@
    TRUST SECTION (USP)
    ======================================== */
 
+/* Trust Section - Compact Professional Layout */
 .trust-section {
+    padding: 48px 0;
     background-color: #000;
 }
 
-/* Trust Section - Horizontal Grid Layout (The Real Fix) */
 .trust-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 16px;
     align-items: center;
 }
 
 .trust-item {
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
 }
 
 .trust-icon {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: #ffffff;
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    margin: 0 auto 8px;
     color: var(--gold);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all var(--transition-base);
+    /* Keep brand color */
+    transition: all 0.3s ease;
+}
+
+.trust-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 2;
 }
 
 .trust-item:hover .trust-icon {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .trust-title {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     margin-bottom: 4px;
     color: var(--white);
@@ -391,9 +398,9 @@
 }
 
 .trust-description {
-    font-size: 13px;
-    opacity: 0.8;
+    font-size: 11px;
     line-height: 1.4;
+    opacity: 0.85;
     color: var(--gray-300);
     margin: 0;
 }
@@ -429,10 +436,7 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .trust-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-32);
-    }
+    /* Trust Grid override removed to maintain 3-column layout */
 }
 
 @media (max-width: 768px) {
@@ -557,21 +561,9 @@
 }
 
 /* Mobile Override for Trust Section (Tighter Sizing) */
-@media (max-width: 480px) {
+/* Mobile Override: Just tighter padding */
+@media (max-width: 768px) {
     .trust-section {
-        padding: 48px 0;
-    }
-
-    .trust-icon {
-        width: 56px;
-        height: 56px;
-    }
-
-    .trust-title {
-        font-size: 14px;
-    }
-
-    .trust-description {
-        font-size: 12px;
+        padding: 40px 0;
     }
 }
