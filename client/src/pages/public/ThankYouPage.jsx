@@ -26,28 +26,26 @@ const ThankYouPage = () => {
                             <CheckCircle size={64} className="text-green-500" />
                         </div>
 
-                        <h1 className="thank-you-title">Thank You!</h1>
+                        <h1 className="thank-you-title">🎉 Order Confirmed!</h1>
                         <p className="thank-you-message">
                             Your order has been placed successfully.
                         </p>
 
-                        <div className="order-details-box">
-                            <div className="detail-row">
-                                <span className="label">Invoice Number</span>
-                                <span className="value font-mono">{invoiceNumber}</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="label">Payment Status</span>
-                                <span className="value status-paid">Paid</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="label">Payment Method</span>
-                                <span className="value">Razorpay</span>
-                            </div>
-                            <div className="detail-row">
-                                <span className="label">Date</span>
-                                <span className="value">{new Date().toLocaleDateString('en-IN')}</span>
-                            </div>
+                        <div className="order-id-highlight">
+                            <p className="order-id-label">Your Order ID</p>
+                            <h2 className="order-id-value">{invoiceNumber}</h2>
+                            <button 
+                                className="btn-copy-order-id"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(invoiceNumber);
+                                    alert('Order ID copied!');
+                                }}
+                            >
+                                Copy Order ID
+                            </button>
+                            <p className="order-id-note">
+                                ⚠️ Please save or screenshot this Order ID. You will need it to track your order.
+                            </p>
                         </div>
 
                         <p className="contact-info">

@@ -43,7 +43,13 @@ const CartPage = () => {
         );
     }
 
-    const subtotal = getCartTotal();
+    // Admin sets total (₹405), system breaks it down
+    const total = getCartTotal(); // ₹405
+    const deliveryCharge = 50;
+    const taxRate = 0.08;
+    const amountWithoutDelivery = total - deliveryCharge;
+    const productCost = Math.round(amountWithoutDelivery / (1 + taxRate));
+    const taxAmount = Math.round(amountWithoutDelivery - productCost);
 
     return (
         <PublicLayout>
@@ -126,20 +132,25 @@ const CartPage = () => {
                                 <h3 className="summary-title">Order Summary</h3>
 
                                 <div className="summary-row">
-                                    <span>Subtotal</span>
-                                    <span>{formatPrice(subtotal)}</span>
+                                    <span>Product Cost</span>
+                                    <span>{formatPrice(productCost)}</span>
                                 </div>
 
                                 <div className="summary-row">
-                                    <span>Shipping</span>
-                                    <span>Calculated at checkout</span>
+                                    <span>Tax (8%)</span>
+                                    <span>{formatPrice(taxAmount)}</span>
+                                </div>
+
+                                <div className="summary-row">
+                                    <span>Delivery Charges</span>
+                                    <span>{formatPrice(deliveryCharge)}</span>
                                 </div>
 
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row summary-total">
                                     <span>Total</span>
-                                    <span>{formatPrice(subtotal)}</span>
+                                    <span>{formatPrice(total)}</span>
                                 </div>
 
                                 <Link to="/checkout" className="btn btn-primary btn-lg checkout-btn">

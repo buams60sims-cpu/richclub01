@@ -4,6 +4,55 @@
  */
 
 /**
+ * Generate sequential order ID
+ * Format: RC-YYYYMMDD-XXXX
+ * Example: RC-20260120-0003
+ * 
+ * @param {Model} OrderModel - Mongoose Order model
+ * @returns {Promise<string>} Unique order ID
+ */
+const generateUniqueOrderId = async (OrderModel) => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const datePrefix = `RC-${year}${month}${day}`;
+
+    const lastOrder = await OrderModel.findOne({
+        invoiceNumber: { $regex: `^${datePrefix}` }
+    }).sort({ invoiceNumber: -1 });
+
+    let nextSequence = 1;
+
+    if (lastOrder && lastOrder.invoiceNumber) {
+        const parts = lastOrder.invoiceNumber.split('-');
+        const lastSuffix = parts[parts.length - 1];
+        const lastSeqInt = parseInt(lastSuffix, 10);
+
+        if (!isNaN(lastSeqInt)) {
+            nextSequence = lastSeqInt + 1;
+        }
+    }
+
+    const nextSuffix = String(nextSequence).padStart(4, '0');
+    return `${datePrefix}-${nextSuffix}`;
+};
+
+/**
+ * Generate branded order ID
+ * Format: RC-YYMMDD-XXXX
+ * Example: RC-260215-4821
+ */
+const generateOrderId = () => {
+    const date = new Date();
+    const year = date.getFullYear().toString().slice(-2);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `RC-${year}${month}${day}-${random}`;
+};
+
+/**
  * Generate a unique invoice number
  * Format: INV-YYYYMMDD-XXXXX
  * Example: INV-20260103-00001
@@ -61,6 +110,8 @@ const generateUniqueInvoiceNumber = async (OrderModel) => {
 };
 
 module.exports = {
+    generateUniqueOrderId,
+    generateOrderId,
     generateInvoiceNumber,
     generateUniqueInvoiceNumber
 };

@@ -57,6 +57,33 @@ const calculateTotal = (subtotal, discount = 0) => {
 };
 
 /**
+ * Calculate price breakdown with tax and delivery
+ * @param {number} total - Total amount to pay
+ * @param {number} deliveryCharge - Fixed delivery charge (default: 50)
+ * @param {number} taxRate - Tax rate as decimal (default: 0.08 for 8%)
+ * @returns {Object} Breakdown with productCost, tax, delivery, and total
+ */
+const calculatePriceBreakdown = (total, deliveryCharge = 50, taxRate = 0.08) => {
+    // Step 1: Remove delivery charge
+    const amountWithoutDelivery = total - deliveryCharge;
+    
+    // Step 2: Extract product cost (before tax)
+    // Formula: productCost = amountWithoutDelivery / (1 + taxRate)
+    const productCost = amountWithoutDelivery / (1 + taxRate);
+    
+    // Step 3: Calculate tax
+    const tax = amountWithoutDelivery - productCost;
+    
+    // Round values
+    return {
+        productCost: Math.round(productCost),
+        tax: Math.round(tax),
+        deliveryCharge: deliveryCharge,
+        total: Math.round(productCost) + Math.round(tax) + deliveryCharge
+    };
+};
+
+/**
  * Calculate complete order pricing
  * @param {Array} items - Array of order items
  * @param {Object} coupon - Optional coupon object
@@ -105,6 +132,7 @@ module.exports = {
     calculateSubtotal,
     calculateDiscount,
     calculateTotal,
+    calculatePriceBreakdown,
     calculateOrderPricing,
     validateItemPrices
 };

@@ -56,6 +56,55 @@
     margin-bottom: 2.5rem;
 }
 
+.order-id-highlight {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff4d6 100%);
+    border: 3px solid #caa54d;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.order-id-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.order-id-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #000;
+    font-family: 'Courier New', monospace;
+    margin: 0.5rem 0 1rem;
+    letter-spacing: 2px;
+}
+
+.btn-copy-order-id {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 1rem;
+}
+
+.btn-copy-order-id:hover {
+    opacity: 0.9;
+}
+
+.order-id-note {
+    font-size: 0.9rem;
+    color: #c46a00;
+    margin-top: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
 .order-details-box {
     background: var(--background);
     border-radius: 16px;

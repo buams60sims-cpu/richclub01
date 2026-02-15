@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Zap } from 'lucide-react';
+import { ShoppingCart, Zap, Share2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { formatPrice, calculateDiscountPercent, isLowStock, isOutOfStock } from '../utils/helpers';
 import './ProductCard.css';
@@ -40,6 +40,33 @@ const ProductCard = ({ product }) => {
             addToCart(product, availableSizes[0], 1);
             // Immediately redirect to checkout
             navigate('/checkout');
+        }
+    };
+
+    const handleShare = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const productUrl = `${window.location.origin}/product/${product._id}`;
+        const shareData = {
+            title: product.name,
+            text: `Check out ${product.name} for ${formatPrice(product.price?.selling)}`,
+            url: productUrl
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') console.log(err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(productUrl);
+                alert('Link copied to clipboard!');
+            } catch (err) {
+                console.log(err);
+            }
         }
     };
 
@@ -111,6 +138,13 @@ const ProductCard = ({ product }) => {
                         aria-label="Buy now"
                     >
                         <Zap size={16} /> Buy Now
+                    </button>
+                    <button
+                        className="btn-share"
+                        onClick={handleShare}
+                        aria-label="Share product"
+                    >
+                        <Share2 size={16} /> Share
                     </button>
                 </div>
             )}

@@ -1,7 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
-const { generateUniqueInvoiceNumber } = require('../utils/invoiceGenerator');
+const { generateUniqueOrderId } = require('../utils/invoiceGenerator');
 const { calculateOrderPricing, validateItemPrices } = require('../utils/priceCalculator');
 
 /**
@@ -115,8 +115,8 @@ const createOrder = async (req, res, next) => {
         // Calculate pricing server-side (NEVER trust client)
         const pricing = calculateOrderPricing(orderItems, coupon);
 
-        // Generate unique invoice number
-        const invoiceNumber = await generateUniqueInvoiceNumber(Order);
+        // Generate unique sequential order ID
+        const invoiceNumber = await generateUniqueOrderId(Order);
 
         // Create order
         const order = await Order.create({
