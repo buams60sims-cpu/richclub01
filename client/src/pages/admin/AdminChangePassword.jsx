@@ -69,8 +69,10 @@ const AdminChangePassword = () => {
 
             if (response.success) {
                 alert('Password changed successfully. Please login again.');
+                // clear auth token so user is effectively logged out
                 localStorage.removeItem('token');
-                navigate('/admin/login');
+                // redirect to the public login page (not nested under /admin)
+                navigate('/login');
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to change password');
