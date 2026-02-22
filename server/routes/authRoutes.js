@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { login, getMe } = require('../controllers/authController');
+const { login, getMe, changePassword } = require('../controllers/authController');
 const { verifyJWT, isAdmin } = require('../middlewares/auth');
 
 /**
@@ -28,5 +28,20 @@ router.post(
 // @desc    Get current logged-in admin details
 // @access  Private (Admin only)
 router.get('/me', verifyJWT, isAdmin, getMe);
+
+// @route   PUT /api/auth/change-password
+// @desc    Change admin password
+// @access  Private (Admin only)
+router.put(
+    '/change-password',
+    verifyJWT,
+    isAdmin,
+    [
+        body('currentPassword').notEmpty().withMessage('Current password is required').trim(),
+        body('newPassword').notEmpty().withMessage('New password is required').trim(),
+    ],
+    validate,
+    changePassword
+);
 
 module.exports = router;

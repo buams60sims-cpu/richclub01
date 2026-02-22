@@ -7,7 +7,8 @@ import {
     Image,
     LogOut,
     Menu,
-    X
+    X,
+    Lock
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -65,6 +66,14 @@ const AdminLayout = () => {
                 </nav>
 
                 <div className="admin-sidebar-footer">
+                    <Link
+                        to="/admin/change-password"
+                        className={`admin-nav-link ${isActive('/admin/change-password') ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <Lock size={20} />
+                        <span>Change Password</span>
+                    </Link>
                     <button onClick={logout} className="admin-logout-btn">
                         <LogOut size={20} />
                         <span>Logout</span>

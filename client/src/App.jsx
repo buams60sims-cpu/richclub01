@@ -26,6 +26,7 @@ import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminHomeContent from './pages/admin/AdminHomeContent';
+import AdminChangePassword from './pages/admin/AdminChangePassword';
 
 function App() {
     return (
@@ -62,6 +63,7 @@ function App() {
                             <Route path="orders" element={<AdminOrders />} />
                             <Route path="coupons" element={<AdminCoupons />} />
                             <Route path="home-content" element={<AdminHomeContent />} />
+                            <Route path="change-password" element={<AdminChangePassword />} />
                         </Route>
 
                         {/* Fallback */}

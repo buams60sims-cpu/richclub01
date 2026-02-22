@@ -248,9 +248,60 @@
     color: var(--black);
 }
 
+/* Action Buttons Container */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    width: 100%;
+}
+
 /* Add to Cart Button */
 .add-to-cart-btn {
     width: 100%;
+    background-color: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all var(--transition-fast);
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+    background-color: var(--white);
+    color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Buy Now Button */
+.buy-now-btn {
+    width: 100%;
+    background-color: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all var(--transition-fast);
+}
+
+.buy-now-btn:hover:not(:disabled) {
+    background-color: var(--black);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.buy-now-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Accordion */

@@ -60,8 +60,22 @@ const ProductDetailsPage = () => {
         }
 
         addToCart(product, selectedSize, quantity);
-        // Show success message (you could use a toast here)
         alert(`Added ${quantity} x ${product.name} (${selectedSize}) to cart`);
+    };
+
+    const handleBuyNow = () => {
+        if (!selectedSize) {
+            alert('Please select a size');
+            return;
+        }
+
+        if (quantity > (product.sizes?.[selectedSize] || 0)) {
+            alert('Not enough stock available');
+            return;
+        }
+
+        addToCart(product, selectedSize, quantity);
+        navigate('/checkout');
     };
 
     const handleQuantityChange = (delta) => {
@@ -228,14 +242,23 @@ const ProductDetailsPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Add to Cart Button */}
-                                <button
-                                    className="btn btn-primary btn-lg add-to-cart-btn"
-                                    onClick={handleAddToCart}
-                                    disabled={!selectedSize || isOutOfStock(totalStock)}
-                                >
-                                    {isOutOfStock(totalStock) ? 'Out of Stock' : 'Add to Cart'}
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="action-buttons">
+                                    <button
+                                        className="btn btn-primary btn-lg add-to-cart-btn"
+                                        onClick={handleAddToCart}
+                                        disabled={!selectedSize || isOutOfStock(totalStock)}
+                                    >
+                                        {isOutOfStock(totalStock) ? 'Out of Stock' : 'Add to Cart'}
+                                    </button>
+                                    <button
+                                        className="btn btn-secondary btn-lg buy-now-btn"
+                                        onClick={handleBuyNow}
+                                        disabled={!selectedSize || isOutOfStock(totalStock)}
+                                    >
+                                        Buy Now
+                                    </button>
+                                </div>
 
                                 {/* Description Accordion */}
                                 {product.description && (

@@ -118,6 +118,10 @@ export const getCurrentUser = () => {
     return api.get('/auth/me');
 };
 
+export const changePassword = (currentPassword, newPassword) => {
+    return api.put('/auth/change-password', { currentPassword, newPassword });
+};
+
 // ============================================
 // HOME CONTENT API (CMS)
 // ============================================
