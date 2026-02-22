@@ -72,7 +72,7 @@ const AdminChangePassword = () => {
                 // clear auth token so user is effectively logged out
                 localStorage.removeItem('token');
                 // redirect to the public login page (not nested under /admin)
-                navigate('/login');
+                navigate('/admin/login');
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to change password');
