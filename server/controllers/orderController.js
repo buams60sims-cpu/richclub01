@@ -118,7 +118,7 @@ const createOrder = async (req, res, next) => {
         // Generate unique sequential order ID
         const invoiceNumber = await generateUniqueOrderId(Order);
 
-        // Create order
+        // Create order with full pricing breakdown
         const order = await Order.create({
             invoiceNumber,
             customer: {
@@ -128,7 +128,11 @@ const createOrder = async (req, res, next) => {
             },
             items: orderItems,
             subtotal: pricing.subtotal,
+            productCost: pricing.productCost,
             discount: pricing.discount,
+            taxRate: pricing.taxRate,
+            taxAmount: pricing.taxAmount,
+            deliveryCharge: pricing.deliveryCharge,
             totalAmount: pricing.totalAmount,
             couponCode: couponCode ? couponCode.toUpperCase() : undefined,
             paymentMethod: paymentMethod || 'RAZORPAY',

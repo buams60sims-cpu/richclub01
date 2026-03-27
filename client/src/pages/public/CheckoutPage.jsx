@@ -33,22 +33,18 @@ const CheckoutPage = () => {
         }
     }, [cartItems, navigate]);
 
-    // Admin sets total (₹405), system breaks it down
-    const total = getCartTotal(); // ₹405 from admin
+    // Forward-calculate pricing from base product cost
+    const productCost = getCartTotal(); // sum of (basePrice × quantity)
     const deliveryCharge = 50;
     const taxRate = 0.08;
-    
-    // Calculate backwards from total
-    const amountWithoutDelivery = total - deliveryCharge; // 355
-    const productCost = Math.round(amountWithoutDelivery / (1 + taxRate)); // 329
-    const taxAmount = Math.round(amountWithoutDelivery - productCost); // 26
-    
-    // With coupon: discount reduces total, recalculate breakdown
+
+    // Apply coupon discount on product cost
     const discount = appliedCoupon?.discountAmount || 0;
-    const finalTotal = total - discount;
-    const finalAmountWithoutDelivery = finalTotal - deliveryCharge;
-    const finalProductCost = Math.round(finalAmountWithoutDelivery / (1 + taxRate));
-    const finalTaxAmount = Math.round(finalAmountWithoutDelivery - finalProductCost);
+    const afterDiscount = Math.max(0, productCost - discount);
+
+    // Forward-calculate: tax is calculated on after-discount product cost
+    const taxAmount = Math.round(afterDiscount * taxRate);
+    const total = afterDiscount + taxAmount + deliveryCharge;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -90,7 +86,7 @@ const CheckoutPage = () => {
             setCouponLoading(true);
             setCouponError('');
 
-            const response = await validateCoupon(couponCode.toUpperCase(), total);
+            const response = await validateCoupon(couponCode.toUpperCase(), productCost);
 
             if (response.success) {
                 setAppliedCoupon(response.data);
@@ -357,7 +353,7 @@ const CheckoutPage = () => {
                                 <div className="price-breakdown">
                                     <div className="price-row">
                                         <span>Product Cost</span>
-                                        <span>{formatPrice(appliedCoupon ? finalProductCost : productCost)}</span>
+                                        <span>{formatPrice(afterDiscount)}</span>
                                     </div>
                                     {appliedCoupon && (
                                         <div className="price-row discount-row">
@@ -367,7 +363,7 @@ const CheckoutPage = () => {
                                     )}
                                     <div className="price-row">
                                         <span>Tax (8%)</span>
-                                        <span>{formatPrice(appliedCoupon ? finalTaxAmount : taxAmount)}</span>
+                                        <span>{formatPrice(taxAmount)}</span>
                                     </div>
                                     <div className="price-row">
                                         <span>Delivery Charges</span>
@@ -376,7 +372,7 @@ const CheckoutPage = () => {
                                     <div className="price-divider"></div>
                                     <div className="price-row total-row">
                                         <span>Total</span>
-                                        <span>{formatPrice(finalTotal)}</span>
+                                        <span>{formatPrice(total)}</span>
                                     </div>
                                 </div>
 
@@ -392,7 +388,7 @@ const CheckoutPage = () => {
                                             Processing...
                                         </>
                                     ) : (
-                                        `Pay ${formatPrice(finalTotal)}`
+                                        `Pay ${formatPrice(total)}`
                                     )}
                                 </button>
 

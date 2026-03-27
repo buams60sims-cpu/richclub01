@@ -118,13 +118,25 @@ const OrderConfirmationPage = () => {
 
                             <div className="order-totals">
                                 <div className="total-row">
-                                    <span>Subtotal</span>
-                                    <span>{formatPrice(order.subtotal)}</span>
+                                    <span>Product Cost</span>
+                                    <span>{formatPrice(order.productCost || order.subtotal)}</span>
                                 </div>
                                 {order.discount > 0 && (
                                     <div className="total-row discount-row">
                                         <span>Discount {order.couponCode && `(${order.couponCode})`}</span>
                                         <span>-{formatPrice(order.discount)}</span>
+                                    </div>
+                                )}
+                                {order.taxAmount > 0 && (
+                                    <div className="total-row">
+                                        <span>Tax ({((order.taxRate || 0.08) * 100).toFixed(0)}%)</span>
+                                        <span>{formatPrice(order.taxAmount)}</span>
+                                    </div>
+                                )}
+                                {order.deliveryCharge > 0 && (
+                                    <div className="total-row">
+                                        <span>Delivery Charges</span>
+                                        <span>{formatPrice(order.deliveryCharge)}</span>
                                     </div>
                                 )}
                                 <div className="total-divider"></div>

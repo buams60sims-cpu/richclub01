@@ -80,10 +80,29 @@ const orderSchema = new mongoose.Schema(
             required: [true, 'Subtotal is required'],
             min: [0, 'Subtotal cannot be negative']
         },
+        productCost: {
+            type: Number,
+            min: [0, 'Product cost cannot be negative']
+        },
         discount: {
             type: Number,
             default: 0,
             min: [0, 'Discount cannot be negative']
+        },
+        taxRate: {
+            type: Number,
+            default: 0.08,
+            min: [0, 'Tax rate cannot be negative']
+        },
+        taxAmount: {
+            type: Number,
+            default: 0,
+            min: [0, 'Tax amount cannot be negative']
+        },
+        deliveryCharge: {
+            type: Number,
+            default: 0,
+            min: [0, 'Delivery charge cannot be negative']
         },
         totalAmount: {
             type: Number,
@@ -91,10 +110,17 @@ const orderSchema = new mongoose.Schema(
             min: [0, 'Total amount cannot be negative'],
             validate: {
                 validator: function (value) {
-                    // Total should equal subtotal - discount
+                    // Forward-compatible: total = (subtotal - discount) + taxAmount + deliveryCharge
+                    // For old orders without new fields, fall back to legacy: total = subtotal - discount
+                    const hasTaxAndDelivery = this.taxAmount > 0 || this.deliveryCharge > 0;
+                    if (hasTaxAndDelivery) {
+                        const expected = (this.subtotal - this.discount) + (this.taxAmount || 0) + (this.deliveryCharge || 0);
+                        return Math.abs(value - expected) < 0.01;
+                    }
+                    // Legacy validation for old orders
                     return Math.abs(value - (this.subtotal - this.discount)) < 0.01;
                 },
-                message: 'Total amount must equal subtotal minus discount'
+                message: 'Total amount must equal (subtotal - discount) + tax + delivery'
             }
         },
         couponCode: {

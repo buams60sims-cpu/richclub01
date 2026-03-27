@@ -190,13 +190,25 @@ const AdminOrders = () => {
                                 </div>
                                 <div className="admin-order-totals">
                                     <div className="total-row">
-                                        <span>Subtotal</span>
-                                        <span>{formatPrice(selectedOrder.subtotal)}</span>
+                                        <span>Product Cost</span>
+                                        <span>{formatPrice(selectedOrder.productCost || selectedOrder.subtotal)}</span>
                                     </div>
                                     {selectedOrder.discount > 0 && (
                                         <div className="total-row discount">
                                             <span>Discount ({selectedOrder.couponCode})</span>
                                             <span>-{formatPrice(selectedOrder.discount)}</span>
+                                        </div>
+                                    )}
+                                    {selectedOrder.taxAmount > 0 && (
+                                        <div className="total-row">
+                                            <span>Tax ({((selectedOrder.taxRate || 0.08) * 100).toFixed(0)}%)</span>
+                                            <span>{formatPrice(selectedOrder.taxAmount)}</span>
+                                        </div>
+                                    )}
+                                    {selectedOrder.deliveryCharge > 0 && (
+                                        <div className="total-row">
+                                            <span>Delivery Charges</span>
+                                            <span>{formatPrice(selectedOrder.deliveryCharge)}</span>
                                         </div>
                                     )}
                                     <div className="total-row final">

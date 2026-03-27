@@ -43,13 +43,8 @@ const CartPage = () => {
         );
     }
 
-    // Admin sets total (₹405), system breaks it down
-    const total = getCartTotal(); // ₹405
-    const deliveryCharge = 50;
-    const taxRate = 0.08;
-    const amountWithoutDelivery = total - deliveryCharge;
-    const productCost = Math.round(amountWithoutDelivery / (1 + taxRate));
-    const taxAmount = Math.round(amountWithoutDelivery - productCost);
+    // Cart shows only base product cost (selling price × quantity)
+    const subtotal = getCartTotal();
 
     return (
         <PublicLayout>
@@ -74,7 +69,12 @@ const CartPage = () => {
                                         </Link>
                                         <div className="cart-item-meta">
                                             <span className="cart-item-size">Size: {item.size}</span>
-                                            <span className="cart-item-price">{formatPrice(item.price)}</span>
+                                            <span className="cart-item-price">
+                                                {item.originalPrice && item.originalPrice > item.price && (
+                                                    <span className="cart-item-original-price">{formatPrice(item.originalPrice)}</span>
+                                                )}
+                                                {formatPrice(item.price)}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -132,26 +132,20 @@ const CartPage = () => {
                                 <h3 className="summary-title">Order Summary</h3>
 
                                 <div className="summary-row">
-                                    <span>Product Cost</span>
-                                    <span>{formatPrice(productCost)}</span>
-                                </div>
-
-                                <div className="summary-row">
-                                    <span>Tax (8%)</span>
-                                    <span>{formatPrice(taxAmount)}</span>
-                                </div>
-
-                                <div className="summary-row">
-                                    <span>Delivery Charges</span>
-                                    <span>{formatPrice(deliveryCharge)}</span>
+                                    <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                                    <span>{formatPrice(subtotal)}</span>
                                 </div>
 
                                 <div className="summary-divider"></div>
 
                                 <div className="summary-row summary-total">
-                                    <span>Total</span>
-                                    <span>{formatPrice(total)}</span>
+                                    <span>Estimated Total</span>
+                                    <span>{formatPrice(subtotal)}</span>
                                 </div>
+
+                                <p className="cart-checkout-note">
+                                    Shipping & taxes calculated at checkout
+                                </p>
 
                                 <Link to="/checkout" className="btn btn-primary btn-lg checkout-btn">
                                     Proceed to Checkout

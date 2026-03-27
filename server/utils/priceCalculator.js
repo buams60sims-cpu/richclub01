@@ -3,8 +3,11 @@
  * Reusable helpers for calculating order totals, discounts, and taxes
  */
 
+const TAX_RATE = 0.08; // 8% GST
+const DELIVERY_CHARGE = 50; // Fixed ₹50 delivery
+
 /**
- * Calculate subtotal from order items
+ * Calculate subtotal from order items (sum of base price × quantity)
  * @param {Array} items - Array of order items with price and quantity
  * @returns {number} Subtotal amount
  */
@@ -34,11 +37,10 @@ const calculateDiscount = (subtotal, coupon) => {
 
     if (discountType === 'percentage') {
         const discount = (subtotal * discountValue) / 100;
-        return Math.round(discount * 100) / 100; // Round to 2 decimal places
+        return Math.round(discount * 100) / 100;
     }
 
     if (discountType === 'flat') {
-        // Flat discount cannot exceed subtotal
         return Math.min(discountValue, subtotal);
     }
 
@@ -46,58 +48,37 @@ const calculateDiscount = (subtotal, coupon) => {
 };
 
 /**
- * Calculate final total amount
- * @param {number} subtotal - Subtotal amount
- * @param {number} discount - Discount amount
- * @returns {number} Final total amount
+ * Forward-calculate price breakdown from product cost
+ *
+ * Formula:
+ *   productCost = sum of (basePrice × quantity) for all items
+ *   discount = coupon discount on productCost
+ *   afterDiscount = productCost - discount
+ *   taxAmount = afterDiscount × taxRate
+ *   deliveryCharge = fixed ₹50
+ *   totalAmount = afterDiscount + taxAmount + deliveryCharge
+ *
+ * @param {Array} items - Order items with price and quantity
+ * @param {Object} coupon - Optional coupon object
+ * @param {number} deliveryChargeOverride - Optional delivery charge override
+ * @returns {Object} Complete pricing breakdown
  */
-const calculateTotal = (subtotal, discount = 0) => {
-    const total = subtotal - discount;
-    return Math.max(0, Math.round(total * 100) / 100); // Ensure non-negative and round to 2 decimals
-};
+const calculateOrderPricing = (items, coupon = null, deliveryChargeOverride) => {
+    const productCost = calculateSubtotal(items);
+    const discount = calculateDiscount(productCost, coupon);
+    const afterDiscount = Math.max(0, productCost - discount);
+    const taxAmount = Math.round(afterDiscount * TAX_RATE);
+    const deliveryCharge = deliveryChargeOverride !== undefined ? deliveryChargeOverride : DELIVERY_CHARGE;
+    const totalAmount = afterDiscount + taxAmount + deliveryCharge;
 
-/**
- * Calculate price breakdown with tax and delivery
- * @param {number} total - Total amount to pay
- * @param {number} deliveryCharge - Fixed delivery charge (default: 50)
- * @param {number} taxRate - Tax rate as decimal (default: 0.08 for 8%)
- * @returns {Object} Breakdown with productCost, tax, delivery, and total
- */
-const calculatePriceBreakdown = (total, deliveryCharge = 50, taxRate = 0.08) => {
-    // Step 1: Remove delivery charge
-    const amountWithoutDelivery = total - deliveryCharge;
-    
-    // Step 2: Extract product cost (before tax)
-    // Formula: productCost = amountWithoutDelivery / (1 + taxRate)
-    const productCost = amountWithoutDelivery / (1 + taxRate);
-    
-    // Step 3: Calculate tax
-    const tax = amountWithoutDelivery - productCost;
-    
-    // Round values
     return {
         productCost: Math.round(productCost),
-        tax: Math.round(tax),
-        deliveryCharge: deliveryCharge,
-        total: Math.round(productCost) + Math.round(tax) + deliveryCharge
-    };
-};
-
-/**
- * Calculate complete order pricing
- * @param {Array} items - Array of order items
- * @param {Object} coupon - Optional coupon object
- * @returns {Object} Object with subtotal, discount, and totalAmount
- */
-const calculateOrderPricing = (items, coupon = null) => {
-    const subtotal = calculateSubtotal(items);
-    const discount = calculateDiscount(subtotal, coupon);
-    const totalAmount = calculateTotal(subtotal, discount);
-
-    return {
-        subtotal: Math.round(subtotal * 100) / 100,
-        discount: Math.round(discount * 100) / 100,
-        totalAmount: Math.round(totalAmount * 100) / 100
+        subtotal: Math.round(productCost),
+        discount: Math.round(discount),
+        taxRate: TAX_RATE,
+        taxAmount: Math.round(taxAmount),
+        deliveryCharge: Math.round(deliveryCharge),
+        totalAmount: Math.round(totalAmount)
     };
 };
 
@@ -116,8 +97,6 @@ const validateItemPrices = async (items, ProductModel) => {
             throw new Error(`Product not found: ${item.productId}`);
         }
 
-        // Check if price matches (allow small floating point differences)
-        // Handle both old (number) and new (object) price structures for backward compatibility
         const productPrice = typeof product.price === 'object' ? product.price.selling : product.price;
 
         if (Math.abs(productPrice - item.price) > 0.01) {
@@ -129,10 +108,10 @@ const validateItemPrices = async (items, ProductModel) => {
 };
 
 module.exports = {
+    TAX_RATE,
+    DELIVERY_CHARGE,
     calculateSubtotal,
     calculateDiscount,
-    calculateTotal,
-    calculatePriceBreakdown,
     calculateOrderPricing,
     validateItemPrices
 };
