@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Save, AlertCircle, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
-import { getHomeContent, updateHomeContent, getAllProducts } from '../../services/apiService';
+import { getHomeContentAdmin, updateHomeContent, getAllProducts } from '../../services/apiService';
 import './AdminHomeContent.css';
 
 const AdminHomeContent = () => {
@@ -20,7 +20,7 @@ const AdminHomeContent = () => {
         try {
             setLoading(true);
             const [contentRes, productsRes] = await Promise.all([
-                getHomeContent(),
+                getHomeContentAdmin(),
                 getAllProducts({})
             ]);
 
@@ -155,9 +155,15 @@ const AdminHomeContent = () => {
     const handleFeaturedProductToggle = (productId) => {
         setContent(prev => {
             const currentIds = prev.featuredSection.productIds || [];
+            // Extract IDs string for comparison (handles both populated and unpopulated cases)
+            const idStrings = currentIds.map(id => typeof id === 'object' && id._id ? id._id.toString() : id.toString());
+            
             let newIds;
-            if (currentIds.includes(productId)) {
-                newIds = currentIds.filter(id => id !== productId);
+            if (idStrings.includes(productId.toString())) {
+                newIds = currentIds.filter(id => {
+                    const idStr = typeof id === 'object' && id._id ? id._id.toString() : id.toString();
+                    return idStr !== productId.toString();
+                });
             } else {
                 newIds = [...currentIds, productId];
             }
@@ -470,13 +476,19 @@ const AdminHomeContent = () => {
                             {products.map(product => (
                                 <div
                                     key={product._id}
-                                    className={`product-selector-card ${content.featuredSection.productIds.includes(product._id) ? 'selected' : ''}`}
+                                    className={`product-selector-card ${
+                                        content.featuredSection.productIds.some(id => 
+                                            (typeof id === 'object' && id._id ? id._id.toString() : id.toString()) === product._id.toString()
+                                        ) ? 'selected' : ''
+                                    }`}
                                     onClick={() => handleFeaturedProductToggle(product._id)}
                                 >
                                     <img src={product.images[0]} alt={product.name} />
                                     <div className="p-2">
                                         <p className="font-bold text-sm truncate">{product.name}</p>
-                                        {content.featuredSection.productIds.includes(product._id) && (
+                                        {content.featuredSection.productIds.some(id => 
+                                            (typeof id === 'object' && id._id ? id._id.toString() : id.toString()) === product._id.toString()
+                                        ) && (
                                             <div className="selected-badge">Featured</div>
                                         )}
                                     </div>

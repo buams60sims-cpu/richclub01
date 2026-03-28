@@ -130,6 +130,10 @@ export const getHomeContent = () => {
     return api.get('/home-content');
 };
 
+export const getHomeContentAdmin = () => {
+    return api.get('/home-content/admin');
+};
+
 export const updateHomeContent = (data) => {
     return api.put('/home-content/admin', data);
 };

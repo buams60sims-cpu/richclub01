@@ -29,11 +29,19 @@ const HomePage = () => {
                 // The backend populates 'productIds' with full product objects
                 const populatedProducts = contentResponse.data.featuredSection?.productIds || [];
 
-                // Ensure we only use valid objects (sanity check)
-                const validProducts = populatedProducts.filter(p => p && p._id);
+                // Ensure we only use valid objects and each product appears only once
+                const uniqueProducts = [];
+                const productIdsSeen = new Set();
 
-                console.log('Featured products (from CMS):', validProducts);
-                setFeaturedProducts(validProducts);
+                populatedProducts.forEach(p => {
+                    if (p && p._id && !productIdsSeen.has(p._id.toString())) {
+                        uniqueProducts.push(p);
+                        productIdsSeen.add(p._id.toString());
+                    }
+                });
+
+                console.log('Featured products (from CMS):', uniqueProducts);
+                setFeaturedProducts(uniqueProducts);
             }
         } catch (error) {
             console.error('Failed to load home content:', error);

@@ -18,8 +18,14 @@ const getHomeContent = async (req, res, next) => {
         // Populate featured products if they exist
         await content.populate('featuredSection.productIds', 'name price images category isActive sizes');
 
-        // Filter only active products
-        const activeProducts = content.featuredSection.productIds.filter(p => p && p.isActive);
+        // Ensure unique products and filter inactive ones
+        const uniqueProductMap = new Map();
+        content.featuredSection.productIds.forEach(p => {
+            if (p && p.isActive && !uniqueProductMap.has(p._id.toString())) {
+                uniqueProductMap.set(p._id.toString(), p);
+            }
+        });
+        const activeProducts = Array.from(uniqueProductMap.values());
 
         // Get active hero slides and lookbook items
         const activeHeroSlides = content.getActiveHeroSlides();
@@ -31,6 +37,7 @@ const getHomeContent = async (req, res, next) => {
             lookbookItems: activeLookbookItems,
             featuredSection: {
                 ...content.featuredSection.toObject(),
+                productIds: activeProducts, // Use the unique and active products
                 products: activeProducts.slice(0, content.featuredSection.maxProducts)
             },
             customDesignSection: content.customDesignSection,
@@ -57,6 +64,18 @@ const getHomeContentAdmin = async (req, res, next) => {
         await content.populate('featuredSection.productIds', 'name price images category isActive');
         await content.populate('lastUpdatedBy', 'name email');
 
+        // Clean up duplicates if they exist in the DB (on-the-fly correction)
+        if (content.featuredSection.productIds) {
+            const seen = new Set();
+            content.featuredSection.productIds = content.featuredSection.productIds.filter(p => {
+                if (!p) return false;
+                const id = p._id ? p._id.toString() : p.toString();
+                if (seen.has(id)) return false;
+                seen.add(id);
+                return true;
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: content
@@ -79,6 +98,14 @@ const updateHomeContent = async (req, res, next) => {
         // Partial update logic - only update provided sections
         Object.keys(updates).forEach(sectionKey => {
             if (updates[sectionKey] && typeof updates[sectionKey] === 'object') {
+                // Special handling for featuredSection to ensure unique productIds
+                if (sectionKey === 'featuredSection' && updates.featuredSection.productIds) {
+                    const rawIds = updates.featuredSection.productIds.map(id =>
+                        typeof id === 'object' && id._id ? id._id.toString() : id.toString()
+                    );
+                    updates.featuredSection.productIds = [...new Set(rawIds)];
+                }
+
                 // Deep merge for nested objects
                 if (content[sectionKey]) {
                     Object.assign(content[sectionKey], updates[sectionKey]);
