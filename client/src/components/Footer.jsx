@@ -7,23 +7,23 @@ const Footer = () => {
 
     return (
         <footer className="footer">
-            <div className="container">
-                <div className="footer-content">
-                    {/* Brand Section */}
-                    <div className="footer-section">
-                        <h3 className="footer-brand">Rich Club</h3>
-                        <p className="footer-tagline">
-                            Luxury streetwear and premium fashion for the modern individual.
+            <div className="footer-shell">
+                <div className="footer-grid">
+                    <div className="footer-intro">
+                        <h2 className="footer-brand">Rich Club</h2>
+                        <p className="footer-copy">
+                            Quietly elegant apparel for those who value calm confidence and considered style.
                         </p>
+
                         <div className="footer-contact">
-                            <div className="contact-item">
+                            <a className="contact-item" href="mailto:richclubcustomiseprinting@gmail.com">
                                 <Mail size={16} />
                                 <span>richclubcustomiseprinting@gmail.com</span>
-                            </div>
-                            <div className="contact-item">
+                            </a>
+                            <a className="contact-item" href="tel:+918660538107">
                                 <Phone size={16} />
-                                <span>+91 8660538107</span>
-                            </div>
+                                <span>+91 86605 38107</span>
+                            </a>
                             <div className="contact-item">
                                 <MapPin size={16} />
                                 <span>Bangalore, Karnataka, India</span>
@@ -31,36 +31,31 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="footer-section">
-                        <h4 className="footer-heading">Quick Links</h4>
-                        <ul className="footer-links">
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/shop">Shop</Link></li>
-                            <li><Link to="/cart">Cart</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Categories */}
-                    <div className="footer-section">
-                        <h4 className="footer-heading">Categories</h4>
-                        <ul className="footer-links">
-                            <li><Link to="/shop?category=normal-tshirts">Normal T-Shirts</Link></li>
-                            <li><Link to="/shop?category=oversize-tshirts">Oversize T-Shirts</Link></li>
-                            <li><Link to="/shop?category=collar-tshirts">Collar T-Shirts</Link></li>
-                            <li><Link to="/shop?category=hoodies">Hoodies</Link></li>
+                    <div className="footer-links-col">
+                        <h3 className="footer-heading">LINKS</h3>
+                        <ul className="footer-nav-list">
+                            <li>
+                                <Link to="/contact">Contact us</Link>
+                            </li>
+                            <li>
+                                <Link to="/refund-policy">Refund policy</Link>
+                            </li>
+                            <li>
+                                <Link to="/shipping-policy">Shipping Policy</Link>
+                            </li>
+                            <li>
+                                <Link to="/privacy-policy">Privacy Policy</Link>
+                            </li>
+                            <li>
+                                <Link to="/track-order">Track your order</Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
                 <div className="footer-bottom">
-                    <p className="footer-copyright">
-                        © {currentYear} Rich Club. All rights reserved.
-                    </p>
-                    <p className="footer-credit">
-                        Crafted with excellence for the modern individual.
-                    </p>
+                    <p className="footer-legal">© {currentYear} Rich Club. All rights reserved.</p>
+                    <p className="footer-legal footer-legal-meta">Bangalore, Karnataka · Premium everyday pieces.</p>
                 </div>
             </div>
         </footer>

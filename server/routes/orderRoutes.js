@@ -5,6 +5,7 @@ const {
     getAllOrders,
     getOrderById,
     getOrderByInvoice,
+    trackOrder,
     updateOrderStatus,
     cancelOrder,
     getOrderWhatsAppMessage
@@ -41,6 +42,19 @@ router.post(
 // @desc    Get all orders (with optional filters)
 // @access  Admin
 router.get('/', verifyJWT, isAdmin, getAllOrders);
+
+// @route   POST /api/orders/track
+// @desc    Track order as guest using Order ID and mobile number
+// @access  Public
+router.post(
+    '/track',
+    [
+        body('orderId').notEmpty().withMessage('Order ID is required').trim().escape(),
+        body('mobile').matches(/^[6-9][0-9]{9}$/).withMessage('Valid 10-digit mobile number is required')
+    ],
+    validate,
+    trackOrder
+);
 
 // @route   GET /api/orders/invoice/:invoiceNumber
 // @desc    Get order by invoice number

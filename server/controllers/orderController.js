@@ -119,13 +119,19 @@ const createOrder = async (req, res, next) => {
         const invoiceNumber = await generateUniqueOrderId(Order);
 
         // Create order with full pricing breakdown
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const formattedTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
         const order = await Order.create({
             invoiceNumber,
             customer: {
                 name: customer.name,
                 phone: customer.phone,
-                address: customer.address
+                address: customer.address,
+                pinCode: customer.pinCode || ''
             },
+            pinCode: customer.pinCode || '',
             items: orderItems,
             subtotal: pricing.subtotal,
             productCost: pricing.productCost,
@@ -136,7 +142,15 @@ const createOrder = async (req, res, next) => {
             totalAmount: pricing.totalAmount,
             couponCode: couponCode ? couponCode.toUpperCase() : undefined,
             paymentMethod: paymentMethod || 'RAZORPAY',
-            orderStatus: 'PAYMENT_PENDING'
+            orderStatus: 'PAYMENT_PENDING',
+            timeline: [
+                {
+                    status: 'Order Placed',
+                    date: formattedDate,
+                    time: formattedTime,
+                    remarks: 'Order received and awaiting payment.'
+                }
+            ]
         });
 
         // Increment coupon usage count if used
@@ -273,6 +287,81 @@ const getOrderByInvoice = async (req, res, next) => {
 };
 
 /**
+ * @desc    Track order as guest using Order ID and mobile number
+ * @route   POST /api/orders/track
+ * @access  Public
+ */
+const trackOrder = async (req, res, next) => {
+    try {
+        const { orderId, mobile } = req.body;
+
+        if (!orderId || !mobile) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order ID and mobile number are required.'
+            });
+        }
+
+        const order = await Order.findOne({ invoiceNumber: orderId.toUpperCase() });
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found.'
+            });
+        }
+
+        if (order.customer.phone !== mobile) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mobile number does not match this order.'
+            });
+        }
+
+        if (order.orderStatus === 'CANCELLED') {
+            return res.status(400).json({
+                success: false,
+                message: 'This order has been cancelled.'
+            });
+        }
+
+        const orderAgeDays = Math.floor((Date.now() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24));
+        if (orderAgeDays > 365) {
+            return res.status(410).json({
+                success: false,
+                message: 'Order archived.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            order: {
+                orderId: order.invoiceNumber,
+                createdAt: order.createdAt,
+                customer: {
+                    name: order.customer.name,
+                    phone: order.customer.phone,
+                    address: order.customer.address
+                },
+                paymentMethod: order.paymentMethod,
+                paymentStatus: order.paymentStatus,
+                orderStatus: order.orderStatus,
+                estimatedDelivery: order.estimatedDelivery,
+                courier: order.courier,
+                trackingNumber: order.trackingNumber,
+                shippingPartner: order.shippingPartner,
+                currentLocation: order.currentLocation,
+                totalAmount: order.totalAmount,
+                items: order.items,
+                timeline: order.timeline || []
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * @desc    Update order status
  * @route   PUT /api/orders/:id/status
  * @access  Admin
@@ -291,8 +380,16 @@ const updateOrderStatus = async (req, res, next) => {
         }
 
         // Update status (handle legacy "status" field from frontend if present)
-        if (orderStatus || status) {
-            order.orderStatus = orderStatus || status;
+        const newOrderStatus = orderStatus || status;
+        if (newOrderStatus && newOrderStatus !== order.orderStatus) {
+            order.orderStatus = newOrderStatus;
+            const now = new Date();
+            order.timeline.push({
+                status: newOrderStatus.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                date: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+                time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                remarks: `Order status updated to ${newOrderStatus.replace(/_/g, ' ').toLowerCase()}.`
+            });
         }
 
         if (paymentStatus) {
@@ -470,6 +567,7 @@ module.exports = {
     getAllOrders,
     getOrderById,
     getOrderByInvoice,
+    trackOrder,
     updateOrderStatus,
     cancelOrder,
     getOrderWhatsAppMessage,

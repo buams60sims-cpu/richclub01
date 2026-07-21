@@ -39,6 +39,11 @@ export const getOrderStatusLabel = (status) => {
     const labels = {
         PAYMENT_PENDING: 'Payment Pending',
         CONFIRMED: 'Confirmed',
+        PROCESSING: 'Processing',
+        PACKED: 'Packed',
+        SHIPPED: 'Shipped',
+        OUT_FOR_DELIVERY: 'Out for Delivery',
+        DELIVERED: 'Delivered',
         CANCELLED: 'Cancelled',
     };
     return labels[status] || status;
@@ -58,9 +63,14 @@ export const getPaymentStatusLabel = (status) => {
 export const getStatusBadgeClass = (status) => {
     const classes = {
         CONFIRMED: 'badge-success',
-        PAID: 'badge-success',
+        PROCESSING: 'badge-info',
+        PACKED: 'badge-info',
+        SHIPPED: 'badge-warning',
+        OUT_FOR_DELIVERY: 'badge-warning',
+        DELIVERED: 'badge-success',
         PAYMENT_PENDING: 'badge-warning',
         PENDING: 'badge-warning',
+        PAID: 'badge-success',
         CANCELLED: 'badge-danger',
         FAILED: 'badge-danger',
     };

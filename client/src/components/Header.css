@@ -7,8 +7,9 @@
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    background-color: var(--white);
-    border-bottom: 1px solid var(--gray-300);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(11,11,11,0.08);
     transition: box-shadow var(--transition-base);
 }
 
@@ -43,14 +44,15 @@
     font-weight: 700;
     color: var(--black);
     margin: 0;
-    letter-spacing: 1px;
+    letter-spacing: 0.04em;
+    font-style: italic;
 }
 
 .logo-tagline {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 2px;
-    color: #555;
+    letter-spacing: 0.24em;
+    color: #666;
     margin-top: 2px;
     text-transform: uppercase;
 }
@@ -133,141 +135,6 @@
     line-height: 1;
 }
 
-/* Mobile Menu Toggle - Hidden on Desktop */
-.mobile-menu-toggle {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: none;
-    border: none;
-    color: var(--black);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    border-radius: 4px;
-}
-
-.mobile-menu-toggle:hover {
-    background-color: var(--gray-100);
-}
-
-/* Mobile Menu Overlay */
-.mobile-menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-/* Mobile Menu */
-/* Mobile Menu - The Foundation */
-.mobile-menu {
-    display: block;
-    /* Always block, visibility controlled by transform */
-    position: fixed;
-    top: 64px;
-    /* Align with mobile header height */
-    right: 0;
-    width: 85%;
-    max-width: 320px;
-    height: calc(100vh - 64px);
-    background: #ffffff;
-    z-index: 1000;
-    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-}
-
-.mobile-menu-open {
-    transform: translateX(0);
-    right: 0;
-    /* Fallback/Ensure */
-}
-
-/* Menu Content Spacing */
-.mobile-menu-content {
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-/* Menu Links - Button Feel */
-.mobile-menu-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 12px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #111;
-    text-decoration: none;
-    border-radius: 8px;
-    border: none;
-    /* Reset existing borders */
-    transition: background-color 0.2s;
-    min-height: auto;
-    /* Reset min-height */
-}
-
-.mobile-menu-link:hover {
-    background: #f4f4f4;
-    color: #111;
-    /* Ensure color stays dark */
-}
-
-/* Divider for Last Item (Admin/Logout) */
-.mobile-menu-link:last-child {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e5e5e5;
-    font-weight: 600;
-    border-bottom: none;
-    border-radius: 0;
-    /* Optional: reset radius if it looks weird with border */
-}
-
-/* Fix for first child border removal */
-.mobile-menu-link:first-child {
-    border-top: none;
-}
-
-/* Cart Badge - Refined */
-.mobile-menu-badge {
-    background: var(--gold);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 999px;
-    min-width: auto;
-    height: auto;
-}
-
-.mobile-menu-button {
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
 
 /* Responsive */
 /* Responsive Optimizations */
@@ -306,56 +173,20 @@
         gap: 10px;
     }
 
-    .header-action-btn svg,
-    .mobile-menu-toggle svg {
+    .header-action-btn svg {
         width: 20px;
-        /* Properly sized for mobile */
         height: 20px;
     }
+}
 
-    .mobile-menu-toggle {
-        display: flex;
-        width: 32px;
-        /* Smaller touch target container */
-        height: 32px;
-    }
-
-    /* Mobile Nav Handling */
-    .header-nav {
-        display: none;
-        /* Hide desktop nav */
-    }
-
-    /* Hide specific desktop actions if needed, but keep Toggle/Cart if intended. 
-       Previous functionality hid Cart/User. 
-       If we want Cart VISIBLE on mobile (standard pattern): */
-    .header-actions>.user-menu {
-        display: none;
-        /* Hide User menu, keep Cart? */
-    }
-
-    /* Ensure Cart is visible if it was hidden before? 
-       Let's stick to the prompt's implied "User logic" or previous state.
-       Previous state HID EVERYTHING except toggle.
-       If we want "Elite Polish", Cart usually stays.
-       I will Un-hide Cart if it was hidden, or just respect previous "Hide Cart" logic but style symbols just in case.
-       Actually, common sense: Cart should be accessible.
-       But I will stick to "Previous logic" of hiding if not instructed to reveal on mobile.
-       Wait, previous code said: ".header-actions>.header-action-btn ... display: none !important;"
-       I will MAINTAIN that hiding for now to be safe, unless "Shrink icons (cart...)" implies they are visible.
-       I'll comment it out to be safe? No, safe is keeping existing behavior.
-       I will re-add the hiding rule.
-    */
-    .header-actions>.header-action-btn:not(.always-visible),
-    .header-actions>.user-menu {
-        display: none;
-    }
-
-    /* Exceptions can be added if we want Cart to show. */
-
-    .mobile-menu,
-    .mobile-menu-overlay {
-        display: block;
+@media (max-width: 992px) {
+    /* Hide top navigation and actions on mobile/tablet sizes */
+    .header-nav,
+    .header-actions {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
 

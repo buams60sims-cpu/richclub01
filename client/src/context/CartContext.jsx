@@ -23,10 +23,25 @@ export const CartProvider = ({ children }) => {
         }
     });
 
-    // Save cart to localStorage whenever it changes
+    const [wishlistItems, setWishlistItems] = useState(() => {
+        try {
+            const savedWishlist = localStorage.getItem('wishlist');
+            return savedWishlist ? JSON.parse(savedWishlist) : [];
+        } catch (error) {
+            console.error('Failed to parse wishlist data:', error);
+            localStorage.removeItem('wishlist');
+            return [];
+        }
+    });
+
+    // Save cart and wishlist to localStorage whenever they change
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
+
+    useEffect(() => {
+        localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+    }, [wishlistItems]);
 
     const addToCart = (product, size, quantity = 1) => {
         setCartItems((prevItems) => {
@@ -95,14 +110,51 @@ export const CartProvider = ({ children }) => {
         return cartItems.reduce((count, item) => count + item.quantity, 0);
     };
 
+    const addToWishlist = (product) => {
+        setWishlistItems((prevItems) => {
+            if (prevItems.find((item) => item.productId === product._id)) {
+                return prevItems;
+            }
+            return [
+                ...prevItems,
+                {
+                    productId: product._id,
+                    name: product.name,
+                    price: product.price?.selling,
+                    originalPrice: product.price?.original,
+                    image: product.images?.[0],
+                    category: product.category,
+                },
+            ];
+        });
+    };
+
+    const removeFromWishlist = (productId) => {
+        setWishlistItems((prevItems) => prevItems.filter((item) => item.productId !== productId));
+    };
+
+    const isInWishlist = (productId) => {
+        return wishlistItems.some((item) => item.productId === productId);
+    };
+
+    const clearWishlist = () => {
+        setWishlistItems([]);
+        localStorage.removeItem('wishlist');
+    };
+
     const value = {
         cartItems,
+        wishlistItems,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         getCartTotal,
         getCartCount,
+        addToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        clearWishlist,
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

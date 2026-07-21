@@ -6,7 +6,7 @@
   "scripts": {
     "client": "npm run dev --prefix client",
     "server": "npm run dev --prefix server",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run client\"",
     "install-all": "npm install && cd client && npm install && cd ../server && npm install"
   },
   "keywords": [
@@ -19,6 +19,7 @@
   "author": "Rich Club Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0"
   }
 }

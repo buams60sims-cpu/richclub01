@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Minus, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Heart, Minus, Plus, Share2 } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import { getProductById } from '../../services/apiService';
 import { useCart } from '../../context/CartContext';
@@ -10,7 +10,7 @@ import './ProductDetailsPage.css';
 const ProductDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart();
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,6 +18,7 @@ const ProductDetailsPage = () => {
     const [selectedSize, setSelectedSize] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [descriptionOpen, setDescriptionOpen] = useState(true);
+    const [saved, setSaved] = useState(false);
 
     useEffect(() => {
         loadProduct();
@@ -84,6 +85,40 @@ const ProductDetailsPage = () => {
 
         if (newQty >= 1 && newQty <= maxStock) {
             setQuantity(newQty);
+        }
+    };
+
+    const toggleFavorite = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (isInWishlist(product._id)) {
+            removeFromWishlist(product._id);
+        } else {
+            addToWishlist(product);
+        }
+    };
+
+    const handleShare = async () => {
+        const productUrl = `${window.location.origin}/product/${product._id}`;
+        const shareData = {
+            title: product.name,
+            text: `Check out ${product.name} for ${formatPrice(product.price?.selling)}`,
+            url: productUrl,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') console.error(err);
+            }
+        } else if (navigator.clipboard) {
+            try {
+                await navigator.clipboard.writeText(productUrl);
+                alert('Product link copied to clipboard');
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 
@@ -170,7 +205,27 @@ const ProductDetailsPage = () => {
                         {/* Right: Product Info (Sticky on desktop) */}
                         <div className="product-info-sticky">
                             <div className="product-info">
-                                <h1 className="product-title">{product.name}</h1>
+                                <div className="product-header-row">
+                                    <h1 className="product-title">{product.name}</h1>
+                                    <div className="product-header-actions">
+                                        <button
+                                            type="button"
+                                            className={`icon-btn fav-btn ${isInWishlist(product._id) ? 'active' : ''}`}
+                                            aria-label={isInWishlist(product._id) ? 'Remove from favorites' : 'Add to favorites'}
+                                            onClick={toggleFavorite}
+                                        >
+                                            <Heart size={18} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="icon-btn share-btn"
+                                            aria-label="Share product"
+                                            onClick={handleShare}
+                                        >
+                                            <Share2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {/* Pricing */}
                                 <div className="product-pricing">

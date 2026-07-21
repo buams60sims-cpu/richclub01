@@ -194,6 +194,15 @@ const verifyPayment = async (req, res, next) => {
         order.orderStatus = 'CONFIRMED';
         order.razorpayPaymentId = razorpayPaymentId;
         order.razorpaySignature = razorpaySignature;
+
+        const now = new Date();
+        order.timeline.push({
+            status: 'Payment Confirmed',
+            date: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+            remarks: 'Payment verified successfully and order is confirmed.'
+        });
+
         await order.save();
 
         // Reduce stock for each item now that payment is confirmed

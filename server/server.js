@@ -1,7 +1,16 @@
-require('dotenv').config();
+const path = require('path');
+// Temporary: override system DNS servers for Node's resolver to avoid SRV lookup timeouts
+// Useful in development when the default network DNS is unreliable.
+const dns = require('dns');
+try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+    // ignore if not supported in the environment
+}
+
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const connectDB = require('./config/db');
 
 const helmet = require('helmet');
@@ -112,6 +121,9 @@ const allowedOrigins = [
 if (process.env.NODE_ENV !== 'production') {
     allowedOrigins.push('http://localhost:3000');
     allowedOrigins.push('http://localhost:3001');
+    allowedOrigins.push('http://localhost:3002');
+    // Allow any localhost port during local development
+    allowedOrigins.push(/http:\/\/localhost:\d+/);
     allowedOrigins.push('http://localhost:5173');
     allowedOrigins.push('http://localhost:4173');
 }
@@ -254,23 +266,36 @@ app.use((err, req, res, next) => {
 // Start server
 // Start server only if run directly
 if (require.main === module) {
-    const PORT = process.env.PORT || 5000;
+    const DEFAULT_PORT = Number(process.env.PORT) || 5000;
+    const MAX_PORT_ATTEMPTS = 5;
 
-    const server = app.listen(PORT, () => {
-        console.log(`🚀 Server RESTARTED in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-        console.log(`✅ CMS ROUTES LOADED`);
-        console.log(`📡 API available at http://localhost:${PORT}`);
-        console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
-    });
+    const startApp = (port) => {
+        const server = app.listen(port, () => {
+            console.log(`🚀 Server RESTARTED in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+            console.log(`✅ CMS ROUTES LOADED`);
+            console.log(`📡 API available at http://localhost:${port}`);
+            console.log(`💚 Health check: http://localhost:${port}/api/health`);
+        });
 
-    server.on("error", (err) => {
-        if (err.code === "EADDRINUSE") {
-            console.error(`❌ Port ${PORT} already in use`);
-            console.error(`💡 Kill the process: Task Manager → Details → End node.exe`);
+        server.on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                const nextPort = port + 1;
+                if (nextPort <= DEFAULT_PORT + MAX_PORT_ATTEMPTS) {
+                    console.warn(`⚠️ Port ${port} already in use, trying port ${nextPort}...`);
+                    startApp(nextPort);
+                    return;
+                }
+                console.error(`❌ All ports between ${DEFAULT_PORT} and ${DEFAULT_PORT + MAX_PORT_ATTEMPTS} are in use.`);
+                console.error('💡 Free one of these ports or set PORT to an available port before starting the server.');
+                process.exit(1);
+            }
+
+            console.error('Server error:', err);
             process.exit(1);
-        }
-        console.error('Server error:', err);
-    });
+        });
+    };
+
+    startApp(DEFAULT_PORT);
 }
 
 module.exports = app;

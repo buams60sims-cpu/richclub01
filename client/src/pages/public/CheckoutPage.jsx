@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tag, Loader } from 'lucide-react';
+import { Tag, Loader, Trash2 } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import { useCart } from '../../context/CartContext';
 import { createOrder, validateCoupon, createRazorpayOrder, verifyPayment, getRazorpayKey } from '../../services/apiService';
@@ -9,13 +9,14 @@ import './CheckoutPage.css';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
-    const { cartItems, getCartTotal, clearCart } = useCart();
+    const { cartItems, getCartTotal, clearCart, removeFromCart } = useCart();
 
     // Form state
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
         address: '',
+        pinCode: '',
     });
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -55,6 +56,8 @@ const CheckoutPage = () => {
         }
     };
 
+    const validatePinCode = (value) => /^\d{6}$/.test(value);
+
     const validateForm = () => {
         const errors = {};
 
@@ -66,6 +69,12 @@ const CheckoutPage = () => {
             errors.phone = 'Phone number is required';
         } else if (!validatePhone(formData.phone)) {
             errors.phone = 'Please enter a valid 10-digit phone number';
+        }
+
+        if (!formData.pinCode.trim()) {
+            errors.pinCode = 'PIN code is required';
+        } else if (!validatePinCode(formData.pinCode)) {
+            errors.pinCode = 'Please enter a valid 6-digit PIN code';
         }
 
         if (!formData.address.trim()) {
@@ -124,6 +133,7 @@ const CheckoutPage = () => {
                     name: formData.name,
                     phone: formData.phone,
                     address: formData.address,
+                    pinCode: formData.pinCode,
                 },
                 items: cartItems.map(item => ({
                     productId: item.productId || item._id, // Fallback for legacy cart items
@@ -182,24 +192,19 @@ const CheckoutPage = () => {
                         if (verifyResponse && verifyResponse.success) {
                             // Extract order details
                             const orderDetails = verifyResponse.data;
+                            const invoiceQuery = orderDetails.invoiceNumber ? `?invoice=${encodeURIComponent(orderDetails.invoiceNumber)}` : '';
 
                             // Clear cart
                             console.log('🧹 Clearing cart...');
                             clearCart();
 
-                            // Redirect with multiple fallbacks if state is lost
-                            // Use Invoice Number for public access (Guest Checkout)
-                            const targetPath = `/order/${orderDetails.invoiceNumber || orderDetails.orderId || order._id}`;
-                            console.log('🚚 Redirecting to:', targetPath);
+                            const thankYouUrl = `/thank-you${invoiceQuery}`;
+                            console.log('➡️ Redirecting to thank-you page:', thankYouUrl);
 
-                            navigate(targetPath, {
-                                state: {
-                                    invoiceNumber: orderDetails.invoiceNumber,
-                                    justPaid: true
-                                },
-                                replace: true
-                            });
+                            // Use a hard redirect to ensure navigation works from the Razorpay callback context.
+                            window.location.href = thankYouUrl;
 
+                            return;
                         } else {
                             throw new Error(verifyResponse?.message || 'Payment verification failed');
                         }
@@ -278,13 +283,27 @@ const CheckoutPage = () => {
                                 </div>
 
                                 <div className="form-group">
+                                    <label className="form-label">PIN Code *</label>
+                                    <input
+                                        type="text"
+                                        name="pinCode"
+                                        className={`form-input ${formErrors.pinCode ? 'error' : ''}`}
+                                        value={formData.pinCode}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter 6-digit PIN code"
+                                        maxLength="6"
+                                    />
+                                    {formErrors.pinCode && <span className="form-error">{formErrors.pinCode}</span>}
+                                </div>
+
+                                <div className="form-group">
                                     <label className="form-label">Delivery Address *</label>
                                     <textarea
                                         name="address"
                                         className={`form-textarea ${formErrors.address ? 'error' : ''}`}
                                         value={formData.address}
                                         onChange={handleInputChange}
-                                        placeholder="House No., Street, Area, City, State, PIN Code"
+                                        placeholder="House No., Street, Area, City, State"
                                         rows="4"
                                     />
                                     {formErrors.address && <span className="form-error">{formErrors.address}</span>}
@@ -308,9 +327,19 @@ const CheckoutPage = () => {
                                                     Size: {item.size} | Qty: {item.quantity}
                                                 </p>
                                             </div>
-                                            <span className="summary-item-price">
-                                                {formatPrice(item.price * item.quantity)}
-                                            </span>
+                                            <div className="summary-item-actions">
+                                                <span className="summary-item-price">
+                                                    {formatPrice(item.price * item.quantity)}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="summary-item-remove"
+                                                    onClick={() => removeFromCart(item.productId, item.size)}
+                                                >
+                                                    <Trash2 size={14} />
+                                                    Remove
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, X, Save, Plus } from 'lucide-react';
+import {
+    ArrowLeft,
+    Upload,
+    X,
+    Save,
+    Plus,
+    Package,
+    Image as ImageIcon,
+    Tag,
+    Layers,
+    SlidersHorizontal,
+    Check
+} from 'lucide-react';
 import { createProduct, getProductById, updateProduct } from '../../services/apiService';
-import './AdminProducts.css';
+import { calculateDiscountPercent } from '../../utils/helpers';
+import './AdminProductForm.css';
 
 const CATEGORIES = [
     { value: 'normal-tshirts', label: 'Normal T-Shirts' },
@@ -126,7 +139,6 @@ const AdminProductForm = () => {
         setImageList(prev => {
             const newList = [...prev];
             const removed = newList[index];
-            // Clean up object URL to avoid memory leaks
             if (removed.type === 'file') {
                 URL.revokeObjectURL(removed.url);
             }
@@ -140,7 +152,6 @@ const AdminProductForm = () => {
         try {
             setLoading(true);
 
-            // Use FormData for file upload
             const data = new FormData();
             data.append('name', formData.name);
             data.append('description', formData.description);
@@ -150,7 +161,6 @@ const AdminProductForm = () => {
             data.append('price', JSON.stringify(formData.price));
             data.append('sizes', JSON.stringify(formData.sizes));
 
-            // Append Images
             imageList.forEach(img => {
                 if (img.type === 'file') {
                     data.append('images', img.file);
@@ -160,7 +170,7 @@ const AdminProductForm = () => {
             });
 
             if (isEditMode) {
-                await updateProduct(id, data); // API service needs to handle FormData
+                await updateProduct(id, data);
                 alert('Product updated successfully');
             } else {
                 await createProduct(data);
@@ -174,105 +184,149 @@ const AdminProductForm = () => {
         }
     };
 
-    if (loading && isEditMode && !formData.name) return <div className="p-8">Loading...</div>;
+    const totalStock = Object.values(formData.sizes || {}).reduce((sum, val) => sum + Number(val || 0), 0);
+    const discountPercent = calculateDiscountPercent(formData.price?.original, formData.price?.selling);
+
+    if (loading && isEditMode && !formData.name) return <div className="p-8">Loading product details...</div>;
 
     return (
-        <div className="admin-page">
-            <div className="admin-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className="icon-btn" onClick={() => navigate('/admin/products')}>
+        <div className="admin-product-form-page">
+            {/* Header Bar */}
+            <div className="form-header-bar">
+                <div className="header-left">
+                    <button type="button" className="back-icon-btn" onClick={() => navigate('/admin/products')} title="Back to Products">
                         <ArrowLeft size={20} />
                     </button>
-                    <h1 className="admin-title">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
+                    <div>
+                        <h1 className="form-page-title">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
+                        <p className="form-page-subtitle">
+                            {isEditMode ? `Updating ${formData.name || 'product'}` : 'Create a new catalog item'}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="header-actions">
+                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/products')}>
+                        Cancel
+                    </button>
+                    <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
+                        <Save size={18} />
+                        <span>{loading ? 'Saving...' : 'Save Product'}</span>
+                    </button>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="form-container">
-                {/* Left Column: Main Info */}
-                <div className="form-left">
-                    <div className="form-section">
-                        <h3 className="section-title">Basic Information</h3>
-                        <div className="form-group">
-                            <label className="form-label">Product Name</label>
+            <form onSubmit={handleSubmit} className="product-form-grid">
+                {/* Left Column: Core Product Info */}
+                <div className="form-column-left">
+                    {/* Basic Info Card */}
+                    <div className="form-card">
+                        <div className="card-header-title">
+                            <div className="title-with-icon">
+                                <Package size={20} className="card-icon" />
+                                <h3>Basic Information</h3>
+                            </div>
+                        </div>
+
+                        <div className="form-field-group">
+                            <label className="form-field-label">Product Name *</label>
                             <input
                                 type="text"
                                 name="name"
-                                className="form-input"
+                                className="form-field-input"
+                                placeholder="e.g. TOXIC HOODIE (1) BLCK"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
+                        <div className="form-field-group">
+                            <label className="form-field-label">Description</label>
                             <textarea
                                 name="description"
-                                className="form-textarea"
+                                className="form-field-textarea"
                                 rows="5"
+                                placeholder="Describe product material, fit, features, and care instructions..."
                                 value={formData.description}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
-                    <div className="form-section">
-                        <h3 className="section-title">Images (Max 8)</h3>
-                        <div className="image-action-bar" style={{ marginBottom: '1rem' }}>
-                            <label className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                <Upload size={16} />
-                                <span>Select Images from Computer</span>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleFileSelect}
-                                    style={{ display: 'none' }}
-                                />
-                            </label>
+                    {/* Media Gallery Card */}
+                    <div className="form-card">
+                        <div className="card-header-title">
+                            <div className="title-with-icon">
+                                <ImageIcon size={20} className="card-icon" />
+                                <h3>Product Media Gallery (Max 8)</h3>
+                            </div>
                         </div>
 
-                        <div className="image-upload-grid">
-                            {imageList.map((img, index) => (
-                                <div key={index} className="image-upload-box" style={{ border: 'none' }}>
-                                    <img src={img.url} alt={`Preview ${index}`} className="upload-preview" />
-                                    <button
-                                        type="button"
-                                        className="remove-image-btn"
-                                        onClick={() => handleImageRemove(index)}
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            ))}
+                        <label className="upload-dropzone">
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                style={{ display: 'none' }}
+                            />
+                            <Upload size={32} className="dropzone-icon" />
+                            <span className="dropzone-text">Click or drag images here to upload</span>
+                            <span className="dropzone-subtext">PNG, JPG, WEBP up to 10MB each</span>
+                        </label>
 
-                            {imageList.length < 8 && (
-                                <label className="image-upload-box" style={{ cursor: 'pointer' }}>
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={handleFileSelect}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <div className="upload-placeholder">
-                                        <Plus size={24} />
-                                        <span>Add</span>
+                        {imageList.length > 0 && (
+                            <div className="media-preview-grid">
+                                {imageList.map((img, index) => (
+                                    <div key={index} className="media-preview-box">
+                                        <img src={img.url} alt={`Preview ${index}`} className="preview-img" />
+                                        {index === 0 && <span className="main-image-badge">Main</span>}
+                                        <button
+                                            type="button"
+                                            className="btn-remove-media"
+                                            onClick={() => handleImageRemove(index)}
+                                            title="Remove image"
+                                        >
+                                            <X size={14} />
+                                        </button>
                                     </div>
-                                </label>
-                            )}
-                        </div>
+                                ))}
+
+                                {imageList.length < 8 && (
+                                    <label className="media-add-more-box">
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleFileSelect}
+                                            style={{ display: 'none' }}
+                                        />
+                                        <Plus size={20} />
+                                        <span>Add Image</span>
+                                    </label>
+                                )}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="form-section">
-                        <h3 className="section-title">Inventory & Stock</h3>
-                        <div className="stock-grid">
+                    {/* Inventory & Sizes Card */}
+                    <div className="form-card">
+                        <div className="card-header-title">
+                            <div className="title-with-icon">
+                                <Layers size={20} className="card-icon" />
+                                <h3>Inventory & Stock Levels</h3>
+                            </div>
+                            <span className="total-stock-badge">Total Stock: {totalStock} units</span>
+                        </div>
+
+                        <div className="stock-inputs-grid">
                             {SIZES.map(size => (
-                                <div key={size} className="stock-item">
-                                    <label>{size}</label>
+                                <div key={size} className="stock-input-item">
+                                    <span className="stock-size-label">{size}</span>
                                     <input
                                         type="number"
-                                        className="form-input"
+                                        className="form-field-input stock-number-input"
                                         value={formData.sizes[size]}
                                         onChange={(e) => handleStockChange(size, e.target.value)}
                                         min="0"
@@ -283,43 +337,64 @@ const AdminProductForm = () => {
                     </div>
                 </div>
 
-                {/* Right Column: Settings */}
-                <div className="form-right">
-                    <div className="form-section">
-                        <h3 className="section-title">Pricing</h3>
-                        <div className="form-group">
-                            <label className="form-label">Original Price (₹)</label>
-                            <input
-                                type="number"
-                                name="price.original"
-                                className="form-input"
-                                value={formData.price.original}
-                                onChange={handleChange}
-                                required
-                                min="0"
-                            />
+                {/* Right Column: Pricing & Organization Sidebar */}
+                <div className="form-column-right">
+                    {/* Pricing Card */}
+                    <div className="form-card">
+                        <div className="card-header-title">
+                            <div className="title-with-icon">
+                                <Tag size={20} className="card-icon" />
+                                <h3>Pricing</h3>
+                            </div>
+                            {discountPercent > 0 && (
+                                <span className="discount-calc-pill">-{discountPercent}% OFF</span>
+                            )}
                         </div>
-                        <div className="form-group">
-                            <label className="form-label">Selling Price (₹)</label>
-                            <input
-                                type="number"
-                                name="price.selling"
-                                className="form-input"
-                                value={formData.price.selling}
-                                onChange={handleChange}
-                                required
-                                min="0"
-                            />
+
+                        <div className="price-fields-grid">
+                            <div className="form-field-group">
+                                <label className="form-field-label">MRP Price (₹)</label>
+                                <input
+                                    type="number"
+                                    name="price.original"
+                                    className="form-field-input"
+                                    placeholder="999"
+                                    value={formData.price.original}
+                                    onChange={handleChange}
+                                    required
+                                    min="0"
+                                />
+                            </div>
+                            <div className="form-field-group">
+                                <label className="form-field-label">Selling Price (₹)</label>
+                                <input
+                                    type="number"
+                                    name="price.selling"
+                                    className="form-field-input"
+                                    placeholder="590"
+                                    value={formData.price.selling}
+                                    onChange={handleChange}
+                                    required
+                                    min="0"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="form-section">
-                        <h3 className="section-title">Organization</h3>
-                        <div className="form-group">
-                            <label className="form-label">Category</label>
+                    {/* Organization & Visibility Card */}
+                    <div className="form-card">
+                        <div className="card-header-title">
+                            <div className="title-with-icon">
+                                <SlidersHorizontal size={20} className="card-icon" />
+                                <h3>Organization</h3>
+                            </div>
+                        </div>
+
+                        <div className="form-field-group">
+                            <label className="form-field-label">Category *</label>
                             <select
                                 name="category"
-                                className="form-select"
+                                className="form-field-select"
                                 value={formData.category}
                                 onChange={handleChange}
                                 required
@@ -331,35 +406,42 @@ const AdminProductForm = () => {
                             </select>
                         </div>
 
-                        <div className="form-check-group" style={{ marginTop: '1rem' }}>
-                            <label className="form-check-label">
-                                <input
-                                    type="checkbox"
-                                    name="isActive"
-                                    checked={formData.isActive}
-                                    onChange={handleChange}
-                                />
-                                Active (Visible in shop)
-                            </label>
-                        </div>
+                        <label className="toggle-switch-field">
+                            <div className="toggle-label-text">
+                                <span className="toggle-title">Active Listing</span>
+                                <span className="toggle-subtitle">Visible in public storefront</span>
+                            </div>
+                            <input
+                                type="checkbox"
+                                name="isActive"
+                                className="switch-checkbox"
+                                checked={formData.isActive}
+                                onChange={handleChange}
+                            />
+                        </label>
 
-                        <div className="form-check-group">
-                            <label className="form-check-label">
-                                <input
-                                    type="checkbox"
-                                    name="isOnSale"
-                                    checked={formData.isOnSale}
-                                    onChange={handleChange}
-                                />
-                                On Sale Badge
-                            </label>
-                        </div>
+                        <label className="toggle-switch-field">
+                            <div className="toggle-label-text">
+                                <span className="toggle-title">On Sale Badge</span>
+                                <span className="toggle-subtitle">Highlight with sale badge</span>
+                            </div>
+                            <input
+                                type="checkbox"
+                                name="isOnSale"
+                                className="switch-checkbox"
+                                checked={formData.isOnSale}
+                                onChange={handleChange}
+                            />
+                        </label>
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
-                        <Save size={20} />
-                        {loading ? 'Saving...' : 'Save Product'}
-                    </button>
+                    {/* Actions Box */}
+                    <div className="form-card">
+                        <button type="submit" className="btn btn-primary btn-full-width" disabled={loading}>
+                            <Save size={20} />
+                            <span>{loading ? 'Saving Changes...' : isEditMode ? 'Update Product' : 'Publish Product'}</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

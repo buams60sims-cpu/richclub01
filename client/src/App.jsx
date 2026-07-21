@@ -11,9 +11,13 @@ import HomePage from './pages/public/HomePage';
 import ShopPage from './pages/public/ShopPage';
 import ProductDetailsPage from './pages/public/ProductDetailsPage';
 import CartPage from './pages/public/CartPage';
+import WishlistPage from './pages/public/WishlistPage';
 import CheckoutPage from './pages/public/CheckoutPage';
 import ThankYouPage from './pages/public/ThankYouPage';
+import TrackOrderPage from './pages/public/TrackOrderPage';
+import TrackOrderResultPage from './pages/public/TrackOrderResultPage';
 import OrderConfirmationPage from './pages/public/OrderConfirmationPage';
+import { ContactUsPage, RefundPolicyPage, ShippingPolicyPage, PrivacyPolicyPage } from './pages/public/PolicyPages';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -40,9 +44,16 @@ function App() {
                         <Route path="/shop" element={<ShopPage />} />
                         <Route path="/product/:id" element={<ProductDetailsPage />} />
                         <Route path="/cart" element={<CartPage />} />
+                        <Route path="/wishlist" element={<WishlistPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/thank-you" element={<ThankYouPage />} />
+                        <Route path="/track-order" element={<TrackOrderPage />} />
+                        <Route path="/track-order/result" element={<TrackOrderResultPage />} />
                         <Route path="/order/:id" element={<OrderConfirmationPage />} />
+                        <Route path="/contact" element={<ContactUsPage />} />
+                        <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                        <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
                         {/* Auth Routes */}
                         <Route path="/login" element={<LoginPage />} />

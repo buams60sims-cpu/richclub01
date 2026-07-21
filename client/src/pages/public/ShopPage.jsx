@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
 import ProductCard from '../../components/ProductCard';
 import { getAllProducts } from '../../services/apiService';
@@ -15,18 +14,39 @@ const CATEGORIES = [
     { value: 'hoodies', label: 'Hoodies' },
 ];
 
+const SORT_OPTIONS = [
+    { value: 'newest', label: 'Newest' },
+    { value: 'price-low-high', label: 'Price: Low to High' },
+    { value: 'price-high-low', label: 'Price: High to Low' },
+    { value: 'name-a-z', label: 'Name: A to Z' },
+    { value: 'name-z-a', label: 'Name: Z to A' },
+];
+
 const ShopPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [activeCategory, setActiveCategory] = useState(
-        searchParams.get('category') || 'all'
-    );
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
+    const [sortBy, setSortBy] = useState('newest');
 
     useEffect(() => {
         loadProducts();
     }, [activeCategory]);
+
+    useEffect(() => {
+        const params = {};
+
+        if (activeCategory !== 'all') {
+            params.category = activeCategory;
+        }
+
+        if (searchQuery.trim()) {
+            params.search = searchQuery.trim();
+        }
+
+        setSearchParams(params, { replace: true });
+    }, [activeCategory, searchQuery, setSearchParams]);
 
     const loadProducts = async () => {
         try {
@@ -52,119 +72,111 @@ const ShopPage = () => {
 
     const handleCategoryChange = (category) => {
         setActiveCategory(category);
-        setSearchQuery(''); // Clear search when changing category
-
-        if (category === 'all') {
-            setSearchParams({});
-        } else {
-            setSearchParams({ category });
-        }
+        setSearchQuery('');
     };
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
+    const filteredProducts = useMemo(() => {
+        const normalizedSearch = searchQuery.trim().toLowerCase();
 
-    // Filter products based on search query
-    const filteredProducts = products.filter((product) => {
-        if (!searchQuery.trim()) return true;
-        return product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+        return products
+            .filter((product) => {
+                if (!normalizedSearch) return true;
+                return (
+                    product.name?.toLowerCase().includes(normalizedSearch) ||
+                    product.category?.toLowerCase().includes(normalizedSearch) ||
+                    product.description?.toLowerCase().includes(normalizedSearch)
+                );
+            })
+            .sort((a, b) => {
+                switch (sortBy) {
+                    case 'price-low-high':
+                        return (a.price?.selling || a.price?.original || 0) - (b.price?.selling || b.price?.original || 0);
+                    case 'price-high-low':
+                        return (b.price?.selling || b.price?.original || 0) - (a.price?.selling || a.price?.original || 0);
+                    case 'name-a-z':
+                        return a.name.localeCompare(b.name);
+                    case 'name-z-a':
+                        return b.name.localeCompare(a.name);
+                    case 'newest':
+                    default:
+                        const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+                        const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+                        return dateB - dateA;
+                }
+            });
+    }, [products, searchQuery, sortBy]);
 
     return (
         <PublicLayout>
-            <div className="shop-page">
-                <div className="container py-48">
-                    {/* Page Header */}
-                    <div className="shop-header">
-                        <h1>Shop</h1>
-                        <p className="shop-subtitle">
-                            Luxury streetwear and premium fashion for the modern individual.
+            <div className="shop-page-shell">
+                <div className="shop-page-content container">
+                    <section className="shop-page-header">
+                        <p className="shop-page-label">Collection</p>
+                        <h1 className="shop-page-title">Shop</h1>
+                        <p className="shop-page-copy">
+                            Curated premium fashion for a modern lifestyle.
                         </p>
-                    </div>
-
-                    {/* Search Bar */}
-                    <div className="shop-search-wrapper">
-                        <div className="shop-search-container">
-                            <Search className="shop-search-icon" size={20} />
-                            <input
-                                type="text"
-                                className="shop-search-input"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                aria-label="Search products"
-                            />
-                            {searchQuery && (
-                                <button
-                                    className="shop-search-clear"
-                                    onClick={() => setSearchQuery('')}
-                                    aria-label="Clear search"
-                                >
-                                    ×
-                                </button>
+                        <div className="shop-page-meta">
+                            <span>{filteredProducts.length} products</span>
+                            {activeCategory !== 'all' && (
+                                <span className="shop-page-meta-divider">|</span>
+                            )}
+                            {activeCategory !== 'all' && (
+                                <span>{getCategoryName(activeCategory)}</span>
                             )}
                         </div>
-                    </div>
+                    </section>
 
-                    {/* Category Tabs */}
-                    <div className="category-tabs">
-                        {CATEGORIES.map((cat) => (
-                            <button
-                                key={cat.value}
-                                className={`category-tab ${activeCategory === cat.value ? 'active' : ''}`}
-                                onClick={() => handleCategoryChange(cat.value)}
-                            >
-                                {cat.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Products Grid */}
-                    {loading ? (
-                        <div className="loading-container">
-                            <div className="loading-spinner"></div>
+                    <section className="shop-page-filters">
+                        <div className="category-chip-row" role="tablist" aria-label="Shop categories">
+                            {CATEGORIES.map((category) => (
+                                <button
+                                    key={category.value}
+                                    className={`category-chip ${activeCategory === category.value ? 'active' : ''}`}
+                                    onClick={() => handleCategoryChange(category.value)}
+                                    aria-pressed={activeCategory === category.value}
+                                >
+                                    {category.label}
+                                </button>
+                            ))}
                         </div>
-                    ) : filteredProducts.length > 0 ? (
-                        <>
-                            <div className="products-count">
-                                {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
-                                {searchQuery && ` matching "${searchQuery}"`}
+                    </section>
+
+                    <section className="shop-results">
+                        {loading ? (
+                            <div className="results-loading">
+                                <div className="shop-spinner"></div>
                             </div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="products-grid">
                                 {filteredProducts.map((product) => (
-                                    <ProductCard key={product._id} product={product} />
+                                    <ProductCard key={`${product._id}-${product.name}`} product={product} />
                                 ))}
                             </div>
-                        </>
-                    ) : (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">
-                                {searchQuery ? '🔍' : '📦'}
-                            </div>
-                            <h3 className="empty-state-title">
-                                {searchQuery ? 'No Products Found' : 'No Products Available'}
-                            </h3>
-                            <p className="empty-state-description">
-                                {searchQuery
-                                    ? `No products match "${searchQuery}". Try a different search term.`
-                                    : activeCategory === 'all'
-                                        ? 'No products available at the moment. Check back soon!'
-                                        : `No products found in ${getCategoryName(activeCategory)}. Try another category.`}
-                            </p>
-                            {(searchQuery || activeCategory !== 'all') && (
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => {
+                        ) : (
+                            <div className="empty-state-panel">
+                                <p className="empty-state-icon">✨</p>
+                                <h2 className="empty-state-heading">No results found</h2>
+                                <p className="empty-state-copy">
+                                    Try a different keyword, reset filters, or browse the full collection.
+                                </p>
+                                <div className="empty-state-actions">
+                                    <button type="button" className="btn btn-primary" onClick={() => {
                                         setSearchQuery('');
-                                        handleCategoryChange('all');
-                                    }}
-                                >
-                                    View All Products
-                                </button>
-                            )}
-                        </div>
-                    )}
+                                        setActiveCategory('all');
+                                    }}>
+                                        Reset search
+                                    </button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => {
+                                        setActiveCategory('all');
+                                        setSearchQuery('');
+                                    }}>
+                                        View All Products
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </section>
                 </div>
             </div>
         </PublicLayout>

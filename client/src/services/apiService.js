@@ -74,6 +74,10 @@ export const getOrderByInvoice = (invoiceNumber) => {
     return api.get(`/orders/invoice/${invoiceNumber}`);
 };
 
+export const trackOrder = (payload) => {
+    return api.post('/orders/track', payload);
+};
+
 export const updateOrderStatus = (id, data) => {
     return api.put(`/orders/${id}/status`, data);
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Truck, CreditCard, Award, Package } from 'lucide-react';
 import PublicLayout from '../../layouts/PublicLayout';
@@ -11,6 +11,8 @@ const HomePage = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [featuredIndex, setFeaturedIndex] = useState(0);
+    const productsGridRef = useRef(null);
 
     useEffect(() => {
         loadHomeContent();
@@ -77,6 +79,27 @@ const HomePage = () => {
         return () => clearInterval(interval);
     }, [customDesignImages]);
 
+    // Auto-rotate featured products
+    useEffect(() => {
+        if (featuredProducts.length === 0) return;
+
+        const interval = setInterval(() => {
+            setFeaturedIndex(prev => (prev + 1) % featuredProducts.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [featuredProducts]);
+
+    useEffect(() => {
+        if (!productsGridRef.current || featuredProducts.length === 0) return;
+
+        const grid = productsGridRef.current;
+        const card = grid.children[featuredIndex];
+        if (card && card.scrollIntoView) {
+            card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    }, [featuredIndex, featuredProducts]);
+
     if (loading) {
         return (
             <PublicLayout>
@@ -95,9 +118,9 @@ const HomePage = () => {
     const getImageUrl = (img) => {
         if (!img) return '';
         if (img.startsWith('http')) return img;
-        // Strip /api/v1 from base if present to get root domain
-        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '');
-        // Ensure img starts with / if not present (backend usually stores /uploads/...)
+
+        const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        const baseUrl = rawBaseUrl.replace('/api/v1', '').replace(/\/$/, '');
         const path = img.startsWith('/') ? img : `/${img}`;
         return `${baseUrl}${path}`;
     };
@@ -154,7 +177,7 @@ const HomePage = () => {
                         </h2>
                     </div>
 
-                    <div className="products-grid">
+                    <div className="products-grid" ref={productsGridRef}>
                         {loading && (
                             <div className="col-span-full flex justify-center py-12">
                                 <div className="loading-spinner"></div>

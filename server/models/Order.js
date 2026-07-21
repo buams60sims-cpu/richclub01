@@ -35,7 +35,15 @@ const orderSchema = new mongoose.Schema(
                 required: [true, 'Customer address is required'],
                 trim: true,
                 maxlength: [500, 'Address cannot exceed 500 characters']
+            },
+            pinCode: {
+                type: String,
+                trim: true
             }
+        },
+        pinCode: {
+            type: String,
+            trim: true
         },
         items: [{
             productId: {
@@ -150,7 +158,7 @@ const orderSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: {
-                values: ['PAYMENT_PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+                values: ['PAYMENT_PENDING', 'CONFIRMED', 'PROCESSING', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],
                 message: '{VALUE} is not a valid order status'
             },
             default: 'PAYMENT_PENDING'
@@ -158,6 +166,61 @@ const orderSchema = new mongoose.Schema(
         adminRemarks: {
             type: String,
             default: ''
+        },
+        timeline: [
+            {
+                status: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                date: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                time: {
+                    type: String,
+                    required: true,
+                    trim: true
+                },
+                remarks: {
+                    type: String,
+                    trim: true
+                }
+            }
+        ],
+        courier: {
+            type: String,
+            trim: true
+        },
+        trackingNumber: {
+            type: String,
+            trim: true
+        },
+        shippingPartner: {
+            type: String,
+            trim: true
+        },
+        estimatedDelivery: {
+            type: String,
+            trim: true
+        },
+        currentLocation: {
+            type: String,
+            trim: true
+        },
+        cancellationReason: {
+            type: String,
+            trim: true
+        },
+        returnStatus: {
+            type: String,
+            trim: true
+        },
+        refundStatus: {
+            type: String,
+            trim: true
         },
         // Razorpay payment tracking fields
         razorpayOrderId: {

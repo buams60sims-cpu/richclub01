@@ -95,6 +95,21 @@ const AdminLayout = () => {
                     onClick={() => setMobileMenuOpen(false)}
                 />
             )}
+
+            {/* Mobile Bottom Navigation */}
+            <nav className="admin-mobile-bottom-nav">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`admin-mobile-nav-item ${isActive(item.path) ? 'active' : ''}`}
+                        title={item.label}
+                    >
+                        {item.icon}
+                        <span className="admin-mobile-nav-label">{item.label}</span>
+                    </Link>
+                ))}
+            </nav>
         </div>
     );
 };

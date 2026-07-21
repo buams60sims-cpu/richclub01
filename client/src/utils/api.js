@@ -1,15 +1,12 @@
 import axios from 'axios';
 
-// Get base URL from environment variable
-const envBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-if (!envBaseUrl) {
-    throw new Error('❌ VITE_API_BASE_URL is not defined');
-}
+// Get base URL from environment variable, with a local fallback for development
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const normalizedBaseUrl = envBaseUrl.endsWith('/') ? envBaseUrl.slice(0, -1) : envBaseUrl;
 
 // Create axios instance with /api/v1 suffix
 const api = axios.create({
-    baseURL: `${envBaseUrl}/api/v1`,
+    baseURL: `${normalizedBaseUrl}/api/v1`,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',

@@ -3,6 +3,8 @@ import { Save, AlertCircle, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-reac
 import { getHomeContentAdmin, updateHomeContent, getAllProducts } from '../../services/apiService';
 import './AdminHomeContent.css';
 
+const MAX_FEATURED_PRODUCTS = 8;
+
 const AdminHomeContent = () => {
     const [content, setContent] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -155,11 +157,16 @@ const AdminHomeContent = () => {
     const handleFeaturedProductToggle = (productId) => {
         setContent(prev => {
             const currentIds = prev.featuredSection.productIds || [];
-            // Extract IDs string for comparison (handles both populated and unpopulated cases)
             const idStrings = currentIds.map(id => typeof id === 'object' && id._id ? id._id.toString() : id.toString());
-            
+            const alreadySelected = idStrings.includes(productId.toString());
+
+            if (!alreadySelected && currentIds.length >= MAX_FEATURED_PRODUCTS) {
+                alert(`Maximum ${MAX_FEATURED_PRODUCTS} featured products allowed.`);
+                return prev;
+            }
+
             let newIds;
-            if (idStrings.includes(productId.toString())) {
+            if (alreadySelected) {
                 newIds = currentIds.filter(id => {
                     const idStr = typeof id === 'object' && id._id ? id._id.toString() : id.toString();
                     return idStr !== productId.toString();
@@ -167,6 +174,7 @@ const AdminHomeContent = () => {
             } else {
                 newIds = [...currentIds, productId];
             }
+
             return {
                 ...prev,
                 featuredSection: {
@@ -472,6 +480,7 @@ const AdminHomeContent = () => {
                         </div>
 
                         <h4 className="mt-4 mb-2">Select Products to Feature</h4>
+                        <p className="form-help">Choose up to 8 products for the featured section.</p>
                         <div className="product-selector-grid">
                             {products.map(product => (
                                 <div

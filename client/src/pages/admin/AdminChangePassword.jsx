@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock } from 'lucide-react';
-import AdminLayout from '../../layouts/AdminLayout';
 import { changePassword } from '../../services/apiService';
 import './AdminChangePassword.css';
 
@@ -69,13 +68,20 @@ const AdminChangePassword = () => {
 
             if (response.success) {
                 alert('Password changed successfully. Please login again.');
-                // clear auth token so user is effectively logged out
+                // clear auth state so user is effectively logged out
                 localStorage.removeItem('token');
-                // redirect to the public login page (not nested under /admin)
-                navigate('/admin/login');
+                localStorage.removeItem('user');
+                // redirect to the public login page
+                navigate('/login');
+                return;
             }
+
+            setError(response.message || 'Failed to change password');
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to change password');
+            const errorMessage = typeof err === 'string'
+                ? err
+                : err.response?.data?.message || err.message || 'Failed to change password';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -86,9 +92,8 @@ const AdminChangePassword = () => {
     };
 
     return (
-        <AdminLayout>
-            <div className="admin-change-password">
-                <div className="password-container">
+        <div className="admin-change-password">
+            <div className="password-container">
                     <div className="password-header">
                         <Lock size={32} />
                         <h1>Change Password</h1>
@@ -193,7 +198,6 @@ const AdminChangePassword = () => {
                     </form>
                 </div>
             </div>
-        </AdminLayout>
     );
 };
 

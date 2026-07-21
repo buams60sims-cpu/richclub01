@@ -1,5 +1,6 @@
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 const PublicLayout = ({ children }) => {
     return (
@@ -9,6 +10,7 @@ const PublicLayout = ({ children }) => {
                 {children}
             </main>
             <Footer />
+            <MobileBottomNav />
         </div>
     );
 };

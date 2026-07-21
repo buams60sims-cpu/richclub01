@@ -92,23 +92,25 @@
 
 .hero-badge {
     display: inline-block;
-    padding: var(--space-8) var(--space-16);
-    font-size: 0.75rem;
+    padding: 8px 14px;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--white);
-    background-color: var(--gold);
-    border-radius: 2px;
+    background-color: rgba(201, 164, 76, 0.95);
+    border-radius: 999px;
 }
 
 .hero-headline {
     font-family: var(--font-heading);
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 600;
-    line-height: 1.1;
+    line-height: 1.05;
     color: var(--white);
     margin: 0;
+    font-style: italic;
+    letter-spacing: -0.01em;
 }
 
 .hero-description {
@@ -169,14 +171,14 @@
 
 .section-badge {
     display: inline-block;
-    padding: var(--space-8) var(--space-16);
-    font-size: 0.75rem;
+    padding: 8px 14px;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--gold);
-    border: 1px solid var(--gold);
-    border-radius: 2px;
+    border: 1px solid rgba(201,164,76,0.45);
+    border-radius: 999px;
     margin-bottom: var(--space-16);
 }
 
@@ -196,10 +198,37 @@
     background-color: var(--white);
 }
 
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+.categories-section .products-grid {
+    display: flex;
     gap: var(--space-32);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: var(--space-24);
+    margin-bottom: calc(var(--space-24) * -1);
+}
+
+.categories-section .products-grid > * {
+    flex: 0 0 min(320px, 100%);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.categories-section .products-grid::-webkit-scrollbar {
+    height: 10px;
+}
+
+.categories-section .products-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.categories-section .products-grid::-webkit-scrollbar-thumb {
+    background: rgba(16, 16, 16, 0.2);
+    border-radius: 999px;
+}
+
+.categories-section .products-grid {
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ========================================

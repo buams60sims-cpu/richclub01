@@ -95,26 +95,30 @@ const updateHomeContent = async (req, res, next) => {
         const content = await HomeContent.getOrCreate();
         const updates = req.body;
 
+        const readOnlyFields = ['_id', '__v', 'createdAt', 'updatedAt', 'lastUpdatedBy', 'id'];
+
         // Partial update logic - only update provided sections
         Object.keys(updates).forEach(sectionKey => {
-            if (updates[sectionKey] && typeof updates[sectionKey] === 'object') {
-                // Special handling for featuredSection to ensure unique productIds
-                if (sectionKey === 'featuredSection' && updates.featuredSection.productIds) {
-                    const rawIds = updates.featuredSection.productIds.map(id =>
-                        typeof id === 'object' && id._id ? id._id.toString() : id.toString()
-                    );
-                    updates.featuredSection.productIds = [...new Set(rawIds)];
-                }
+            if (readOnlyFields.includes(sectionKey)) return;
+            const value = updates[sectionKey];
 
-                // Deep merge for nested objects
-                if (content[sectionKey]) {
-                    Object.assign(content[sectionKey], updates[sectionKey]);
-                } else {
-                    content[sectionKey] = updates[sectionKey];
-                }
-            } else if (updates[sectionKey] !== undefined) {
-                // Direct assignment for primitive values
-                content[sectionKey] = updates[sectionKey];
+            if (value === undefined) return;
+
+            // Special handling for featuredSection to ensure unique productIds and enforce an 8-product limit
+            if (sectionKey === 'featuredSection' && value && typeof value === 'object' && Array.isArray(value.productIds)) {
+                const rawIds = value.productIds.map(id =>
+                    typeof id === 'object' && id._id ? id._id.toString() : id.toString()
+                );
+                value.productIds = [...new Set(rawIds)].slice(0, 8);
+            }
+
+            // If the update value is a plain object and the existing content section is also an object,
+            // merge properties rather than replacing the entire subdocument.
+            if (value && typeof value === 'object' && !Array.isArray(value) && content[sectionKey] && typeof content[sectionKey] === 'object' && !Array.isArray(content[sectionKey])) {
+                Object.assign(content[sectionKey], value);
+            } else {
+                // For arrays and primitive values, replace directly.
+                content[sectionKey] = value;
             }
         });
 

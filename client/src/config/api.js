@@ -1,21 +1,13 @@
 // Centralized API Configuration
 // This file is the single source of truth for the API URL
 
-// 🚨 DO NOT USE localhost fallback in production
-let envBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-if (!envBaseUrl) {
-    throw new Error('❌ VITE_API_BASE_URL is not defined in environment variables');
-}
+const API_VERSION = 'v1';
+let envBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 // Remove trailing slash if present
 if (envBaseUrl.endsWith('/')) {
     envBaseUrl = envBaseUrl.slice(0, -1);
 }
-
-// Ensure URL ends with /api/v1
-// Ensure URL ends with /api/v1
-const API_VERSION = 'v1';
 
 // If the env var ALREADY includes /api/v1, we keep it (backward compatibility)
 // Otherwise we append it. This supports both:
