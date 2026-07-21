@@ -70,6 +70,8 @@ const AdminDashboard = () => {
 
             if (productsRes.success) {
                 const products = productsRes.data || [];
+                // Keep catalog size for reference; we'll compute sold products below
+                // totalProducts will be overridden by soldProductsCount when ordersRes is present
                 totalProducts = products.length;
                 lowStock = products
                     .filter(p => (p.totalStock || 0) <= 5)
@@ -82,22 +84,35 @@ const AdminDashboard = () => {
 
             if (ordersRes.success) {
                 const orders = ordersRes.data || [];
-                totalOrders = orders.length;
+                // Only count paid (and non-cancelled) orders for KPI totals
+                const paidOrders = orders.filter(
+                    o => (o.paymentStatus === 'PAID' || o.paymentStatus === 'Paid') && o.orderStatus !== 'CANCELLED'
+                );
 
-                // Count orders by status
+                totalOrders = paidOrders.length;
+
+                // Count orders by status (from all orders to show distribution)
                 orders.forEach(order => {
                     if (ordersByStatus.hasOwnProperty(order.orderStatus)) {
                         ordersByStatus[order.orderStatus]++;
                     }
                 });
 
-                const paidOrders = orders.filter(
-                    o => (o.paymentStatus === 'PAID' || o.paymentStatus === 'Paid') && o.orderStatus !== 'CANCELLED'
-                );
                 totalRevenue = paidOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
                 avgOrderValue = paidOrders.length > 0 ? totalRevenue / paidOrders.length : 0;
 
-                // Latest 5 orders sorted by creation date
+                // Compute distinct products sold in paid orders
+                const soldProductSet = new Set();
+                paidOrders.forEach(o => {
+                    (o.items || []).forEach(it => {
+                        const pid = it.productId && it.productId._id ? it.productId._id : it.productId;
+                        if (pid) soldProductSet.add(pid.toString());
+                    });
+                });
+                // Override totalProducts to show products sold count
+                totalProducts = soldProductSet.size;
+
+                // Latest 5 orders sorted by creation date (from all orders)
                 latestOrders = [...orders]
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .slice(0, 5);
@@ -225,7 +240,7 @@ const AdminDashboard = () => {
                     <div className="kpi-body">
                         <div className="kpi-value-block">
                             <span className="kpi-number">{stats.totalProducts}</span>
-                            <span className="kpi-subtext">Active catalog items</span>
+                            <span className="kpi-subtext">Distinct products sold (paid orders)</span>
                         </div>
                         <Link to="/admin/products" className="kpi-link">
                             Manage <ArrowUpRight size={14} />

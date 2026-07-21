@@ -12,12 +12,13 @@ const Coupon = require('../models/Coupon');
  */
 const createCoupon = async (req, res, next) => {
     try {
-        let { code, discountType, discountValue, discountAmount, expiryDate, isActive, minOrderAmount, minPurchaseAmount, maxDiscountAmount } = req.body;
+        let { code, discountType, discountValue, discountAmount, expiryDate, isActive, minOrderAmount, minPurchaseAmount, maxDiscountAmount, usageLimit, maxUses } = req.body;
 
         // Map frontend fields (if provided) to schema fields
         discountValue = discountValue || discountAmount;
         minPurchaseAmount = minPurchaseAmount || minOrderAmount || 0;
         maxDiscountAmount = maxDiscountAmount || 0;
+        const parsedUsageLimit = Number(usageLimit || maxUses || 0);
 
         // Normalize discountType
         if (discountType === 'PERCENTAGE' || discountType === 'Percentage') discountType = 'percentage';
@@ -48,7 +49,8 @@ const createCoupon = async (req, res, next) => {
             expiryDate,
             isActive: isActive !== undefined ? isActive : true,
             minPurchaseAmount,
-            maxDiscountAmount
+            maxDiscountAmount,
+            usageLimit: parsedUsageLimit
         });
 
         res.status(201).json({
@@ -118,6 +120,9 @@ const validateCoupon = async (req, res, next) => {
             let reason = 'Coupon is invalid';
             if (!coupon.isActive) reason = 'Coupon is inactive';
             else if (new Date() > coupon.expiryDate) reason = 'Coupon has expired';
+            else if (coupon.usageLimit && coupon.usageLimit > 0 && coupon.usageCount >= coupon.usageLimit) {
+                reason = `Coupon limit reached (${coupon.usageLimit} members limit).`;
+            }
             else if (subtotal && subtotal < coupon.minPurchaseAmount) reason = `Minimum purchase of ₹${coupon.minPurchaseAmount} required`;
 
             return res.status(400).json({
@@ -155,7 +160,7 @@ const validateCoupon = async (req, res, next) => {
  */
 const updateCoupon = async (req, res, next) => {
     try {
-        const { discountType, discountValue, expiryDate, isActive } = req.body;
+        const { discountType, discountValue, expiryDate, isActive, usageLimit, maxUses } = req.body;
 
         let coupon = await Coupon.findById(req.params.id);
 
@@ -171,6 +176,11 @@ const updateCoupon = async (req, res, next) => {
         if (discountValue !== undefined) coupon.discountValue = discountValue;
         if (expiryDate !== undefined) coupon.expiryDate = expiryDate;
         if (isActive !== undefined) coupon.isActive = isActive;
+        if (usageLimit !== undefined || maxUses !== undefined) {
+            coupon.usageLimit = Number(usageLimit || maxUses || 0);
+        }
+
+        await coupon.save();
 
         await coupon.save();
 

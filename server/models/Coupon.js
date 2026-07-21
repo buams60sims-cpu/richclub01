@@ -72,6 +72,11 @@ const couponSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: [0, 'Usage count cannot be negative']
+        },
+        usageLimit: {
+            type: Number,
+            default: 0,
+            min: [0, 'Usage limit cannot be negative']
         }
     },
     {
@@ -81,10 +86,16 @@ const couponSchema = new mongoose.Schema(
 
 // Method to check if coupon is valid
 couponSchema.methods.isValid = function (purchaseAmount) {
+    if (!this.isActive || this.expiryDate <= new Date()) {
+        return false;
+    }
+    if (this.usageLimit && this.usageLimit > 0 && this.usageCount >= this.usageLimit) {
+        return false;
+    }
     if (this.minPurchaseAmount && purchaseAmount !== undefined && purchaseAmount < this.minPurchaseAmount) {
         return false;
     }
-    return this.isActive && this.expiryDate > new Date();
+    return true;
 };
 
 // Method to calculate discount amount

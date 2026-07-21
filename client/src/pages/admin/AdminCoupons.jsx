@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Calendar } from 'lucide-react';
+import { Plus, Trash2, Calendar, Users } from 'lucide-react';
 import { getAllCoupons, createCoupon, deleteCoupon } from '../../services/apiService';
 import { formatPrice, formatDate } from '../../utils/helpers';
 import Modal from '../../components/Modal';
@@ -18,6 +18,7 @@ const AdminCoupons = () => {
         discountAmount: '',
         minOrderAmount: '',
         maxDiscountAmount: '',
+        usageLimit: '', // Member count limit (e.g. 10)
         expiryDate: '',
         isActive: true
     });
@@ -63,6 +64,7 @@ const AdminCoupons = () => {
                 discountValue: Number(formData.discountAmount),
                 minPurchaseAmount: Number(formData.minOrderAmount) || 0,
                 maxDiscountAmount: Number(formData.maxDiscountAmount) || 0,
+                usageLimit: Number(formData.usageLimit) || 0,
                 expiryDate: formData.expiryDate,
                 isActive: formData.isActive
             };
@@ -79,6 +81,7 @@ const AdminCoupons = () => {
                 discountAmount: '',
                 minOrderAmount: '',
                 maxDiscountAmount: '',
+                usageLimit: '',
                 expiryDate: '',
                 isActive: true
             });
@@ -118,55 +121,80 @@ const AdminCoupons = () => {
                                 <th>Discount</th>
                                 <th>Min Order</th>
                                 <th>Expiry</th>
+                                <th>Member Limit</th>
                                 <th>Status</th>
-                                <th>Results</th>
+                                <th>Usage</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {coupons.length > 0 ? (
-                                coupons.map(coupon => (
-                                    <tr key={coupon._id}>
-                                        <td>
-                                            <span className="coupon-code-badge">{coupon.code}</span>
-                                        </td>
-                                        <td>
-                                            {(coupon.discountType === 'PERCENTAGE' || coupon.discountType === 'percentage')
-                                                ? `${coupon.discountValue}% OFF`
-                                                : `₹${coupon.discountValue} OFF`}
-                                            {coupon.maxDiscountAmount > 0 && (
-                                                <div className="text-secondary text-xs">
-                                                    Max: {formatPrice(coupon.maxDiscountAmount)}
+                                coupons.map(coupon => {
+                                    const isExhausted = coupon.usageLimit > 0 && (coupon.usageCount || 0) >= coupon.usageLimit;
+                                    const isExpired = new Date(coupon.expiryDate) < new Date();
+
+                                    return (
+                                        <tr key={coupon._id}>
+                                            <td>
+                                                <span className="coupon-code-badge">{coupon.code}</span>
+                                            </td>
+                                            <td>
+                                                {(coupon.discountType === 'PERCENTAGE' || coupon.discountType === 'percentage')
+                                                    ? `${coupon.discountValue}% OFF`
+                                                    : `₹${coupon.discountValue} OFF`}
+                                                {coupon.maxDiscountAmount > 0 && (
+                                                    <div className="text-secondary text-xs">
+                                                        Max: {formatPrice(coupon.maxDiscountAmount)}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td>{formatPrice(coupon.minPurchaseAmount || coupon.minOrderAmount || 0)}</td>
+                                            <td>
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar size={14} />
+                                                    {formatDate(coupon.expiryDate)}
                                                 </div>
-                                            )}
-                                        </td>
-                                        <td>{formatPrice(coupon.minPurchaseAmount || coupon.minOrderAmount || 0)}</td>
-                                        <td>
-                                            <div className="flex items-center gap-2">
-                                                <Calendar size={14} />
-                                                {formatDate(coupon.expiryDate)}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span className={`badge ${coupon.isActive ? 'badge-success' : 'badge-danger'}`}>
-                                                {coupon.isActive ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td>{coupon.usageCount || 0} used</td>
-                                        <td>
-                                            <button
-                                                className="icon-btn btn-danger"
-                                                onClick={() => handleDelete(coupon._id)}
-                                                title="Delete"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                            <td>
+                                                <div className="flex items-center gap-1">
+                                                    <Users size={14} className="text-secondary" />
+                                                    <span>{coupon.usageLimit > 0 ? `${coupon.usageLimit} members` : 'Unlimited'}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {isExhausted ? (
+                                                    <span className="badge badge-danger">Exhausted</span>
+                                                ) : isExpired ? (
+                                                    <span className="badge badge-danger">Expired</span>
+                                                ) : (
+                                                    <span className={`badge ${coupon.isActive ? 'badge-success' : 'badge-danger'}`}>
+                                                        {coupon.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <span className="font-bold">
+                                                    {coupon.usageCount || 0}
+                                                </span>
+                                                {coupon.usageLimit > 0 && (
+                                                    <span className="text-secondary text-xs"> / {coupon.usageLimit}</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="icon-btn btn-danger"
+                                                    onClick={() => handleDelete(coupon._id)}
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="text-center p-32">
+                                    <td colSpan="8" className="text-center p-32">
                                         No coupons found
                                     </td>
                                 </tr>
@@ -250,16 +278,31 @@ const AdminCoupons = () => {
                         )}
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Expiry Date</label>
-                        <input
-                            type="date"
-                            name="expiryDate"
-                            className="form-input"
-                            value={formData.expiryDate}
-                            onChange={handleInputChange}
-                            required
-                        />
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label className="form-label">Expiry Date</label>
+                            <input
+                                type="date"
+                                name="expiryDate"
+                                className="form-input"
+                                value={formData.expiryDate}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Member Usage Limit</label>
+                            <input
+                                type="number"
+                                name="usageLimit"
+                                className="form-input"
+                                value={formData.usageLimit}
+                                onChange={handleInputChange}
+                                placeholder="e.g. 10 (0 for unlimited)"
+                                min="0"
+                            />
+                        </div>
                     </div>
 
                     <div className="form-check-group">
