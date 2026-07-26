@@ -137,7 +137,7 @@ const AdminProducts = () => {
                 </div>
                 <div className="header-actions">
                     <button
-                        className="btn btn-secondary btn-icon-desktop"
+                        className="btn btn-secondary"
                         onClick={() => setRefreshKey(prev => prev + 1)}
                         title="Reload Catalog"
                     >
@@ -265,6 +265,14 @@ const AdminProducts = () => {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* Mobile Add Product Button */}
+            <div className="mobile-add-product-button">
+                <Link to="/admin/products/new" className="btn btn-primary-action">
+                    <Plus size={20} />
+                    <span>Add Product</span>
+                </Link>
             </div>
 
             {/* Catalog List / Loading / Table */}

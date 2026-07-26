@@ -17,14 +17,44 @@ router.post('/cms', verifyJWT, isAdmin, upload.single('image'), async (req, res)
             });
         }
 
-        // CloudinaryStorage puts the URL in req.file.path
+        console.log('📤 CMS Upload - File received:', {
+            fieldname: req.file.fieldname,
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+            path: req.file.path,
+            url: req.file.url,
+            location: req.file.location
+        });
+
+        // Handle both Cloudinary and local storage responses
+        let imageUrl;
+        if (req.file.path && req.file.path.startsWith('http')) {
+            // Cloudinary upload - path is the URL
+            imageUrl = req.file.path;
+        } else if (req.file.url) {
+            // Some Cloudinary drivers use 'url' field
+            imageUrl = req.file.url;
+        } else if (req.file.location) {
+            // Alternative Cloudinary field
+            imageUrl = req.file.location;
+        } else if (req.file.filename) {
+            // Local storage fallback
+            imageUrl = `/uploads/${req.file.filename}`;
+        } else {
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to determine upload URL'
+            });
+        }
+
+        console.log('✅ CMS Upload Success:', imageUrl);
         res.status(200).json({
             success: true,
             message: 'Image uploaded successfully',
-            imageUrl: req.file.path
+            imageUrl
         });
     } catch (error) {
-        console.error('Upload Error:', error);
+        console.error('❌ Upload Error:', error);
         res.status(500).json({
             success: false,
             message: error.message || 'Error uploading image'
@@ -46,8 +76,13 @@ router.post('/product-images', verifyJWT, isAdmin, upload.array('images', 8), as
             });
         }
 
-        // CloudinaryStorage puts the URL in file.path for each file
-        const imageUrls = req.files.map(file => file.path);
+        // Convert local absolute paths to URL paths if local storage was used
+        const imageUrls = req.files.map(file => {
+            if (file.path && !file.path.startsWith('http://') && !file.path.startsWith('https://')) {
+                return `/uploads/${file.filename}`;
+            }
+            return file.path;
+        });
 
         res.status(200).json({
             success: true,

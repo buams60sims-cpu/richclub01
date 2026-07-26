@@ -1,3 +1,4 @@
+const path = require('path');
 const Product = require('../models/Product');
 
 /**
@@ -19,18 +20,46 @@ const createProduct = async (req, res, next) => {
     try {
         let { name, description, price, category, sizes, isActive, isOnSale } = req.body;
 
+        console.log('📝 Create Product Request:', { name, description, category, price, sizes, isActive, isOnSale });
+        console.log('📁 Files received:', req.files ? req.files.length : 0);
+
         // Parse JSON fields if they are strings (multipart/form-data)
         if (typeof price === 'string') {
-            try { price = JSON.parse(price); } catch (e) { console.error('Error parsing price', e); }
+            try { 
+                price = JSON.parse(price);
+                console.log('✅ Parsed price:', price);
+            } catch (e) { 
+                console.error('❌ Error parsing price', e);
+                throw new Error(`Invalid price format: ${e.message}`);
+            }
         }
         if (typeof sizes === 'string') {
-            try { sizes = JSON.parse(sizes); } catch (e) { console.error('Error parsing sizes', e); }
+            try { 
+                sizes = JSON.parse(sizes);
+                console.log('✅ Parsed sizes:', sizes);
+            } catch (e) { 
+                console.error('❌ Error parsing sizes', e);
+                throw new Error(`Invalid sizes format: ${e.message}`);
+            }
         }
 
-        // Handle Images (Multer-Cloudinary puts URL in file.path)
+        // Ensure price is an object with original and selling
+        if (!price || !price.original || !price.selling) {
+            throw new Error('Price must have both original and selling values');
+        }
+
+        // Handle Images (Multer-Cloudinary puts URL in file.path, Local storage puts absolute path)
         let imageUrls = [];
         if (req.files && req.files.length > 0) {
-            imageUrls = req.files.map(file => file.path);
+            imageUrls = req.files.map(file => {
+                // If it's a local storage upload (filesystem path instead of a URL)
+                if (file.path && !file.path.startsWith('http://') && !file.path.startsWith('https://')) {
+                    const filename = path.basename(file.path);
+                    return `/uploads/${filename}`;
+                }
+                return file.path;
+            });
+            console.log('✅ Image URLs from upload:', imageUrls);
         } else if (req.body.images && Array.isArray(req.body.images)) {
             // Fallback for URL-only mode
             imageUrls = req.body.images;
@@ -38,10 +67,11 @@ const createProduct = async (req, res, next) => {
 
         // Validate required fields
         if (!name || !price || !category) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide name, price, and category'
-            });
+            throw new Error('Please provide name, price, and category');
+        }
+
+        if (imageUrls.length === 0) {
+            throw new Error('At least one product image is required');
         }
 
         // Create product
@@ -56,12 +86,16 @@ const createProduct = async (req, res, next) => {
             isOnSale: isOnSale === 'true' || isOnSale === true
         });
 
+        console.log('✅ Product created:', product._id);
+
         res.status(201).json({
             success: true,
             message: 'Product created successfully',
             data: product
         });
     } catch (error) {
+        console.error('❌ Error in createProduct:', error.message);
+        console.error('Stack:', error.stack);
         next(error);
     }
 };
@@ -195,10 +229,17 @@ const updateProduct = async (req, res, next) => {
         if (isOnSale !== undefined) product.isOnSale = isOnSale === 'true' || isOnSale === true;
 
         // Handle Image Updates
-        // 1. New files (CloudinaryStorage puts URL in file.path)
+        // 1. New files (CloudinaryStorage puts URL in file.path, Local storage puts absolute path)
         let newImageUrls = [];
         if (req.files && req.files.length > 0) {
-            newImageUrls = req.files.map(file => file.path);
+            newImageUrls = req.files.map(file => {
+                // If it's a local storage upload (filesystem path instead of a URL)
+                if (file.path && !file.path.startsWith('http://') && !file.path.startsWith('https://')) {
+                    const filename = path.basename(file.path);
+                    return `/uploads/${filename}`;
+                }
+                return file.path;
+            });
         }
 
         // 2. Combine with existing images that were kept

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Save, AlertCircle, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import api from '../../utils/api';
 import { getHomeContentAdmin, updateHomeContent, getAllProducts } from '../../services/apiService';
 import './AdminHomeContent.css';
 
@@ -75,24 +76,16 @@ const AdminHomeContent = () => {
 
         try {
             setUploadingSlide(index);
-            const token = localStorage.getItem('token');
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/upload/cms`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
+            const data = await api.post('/upload/cms', formData);
 
-            const data = await response.json();
             if (data.success) {
                 handleSlideChange(index, 'image', data.imageUrl);
             } else {
                 alert(data.message || 'Failed to upload image');
             }
         } catch (error) {
-            alert('Failed to upload image');
+            console.error('Slide image upload error:', error);
+            alert(error?.message || 'Failed to upload image');
         } finally {
             setUploadingSlide(null);
         }
@@ -195,24 +188,16 @@ const AdminHomeContent = () => {
 
         try {
             setUploadingCustom(index);
-            const token = localStorage.getItem('token');
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/upload/cms`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
+            const data = await api.post('/upload/cms', formData);
 
-            const data = await response.json();
             if (data.success) {
                 handleCustomImageChange(index, data.imageUrl);
             } else {
                 alert(data.message || 'Failed to upload image');
             }
         } catch (error) {
-            alert('Failed to upload image');
+            console.error('Custom image upload error:', error);
+            alert(error?.message || 'Failed to upload image');
         } finally {
             setUploadingCustom(null);
         }

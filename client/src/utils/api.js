@@ -1,12 +1,28 @@
 import axios from 'axios';
 
-// Get base URL from environment variable, with a local fallback for development
-const envBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// Get base URL from environment variable, with a local fallback for development.
+// In development, prefer the Vite proxy so we don't depend on a specific backend port.
+const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL;
+    }
+
+    if (import.meta.env.DEV) {
+        return '';
+    }
+
+    return 'http://localhost:5000';
+};
+
+const envBaseUrl = getBaseUrl();
 const normalizedBaseUrl = envBaseUrl.endsWith('/') ? envBaseUrl.slice(0, -1) : envBaseUrl;
+const apiBaseUrl = import.meta.env.DEV
+    ? '/api/v1'
+    : `${normalizedBaseUrl}/api/v1`;
 
 // Create axios instance with /api/v1 suffix
 const api = axios.create({
-    baseURL: `${normalizedBaseUrl}/api/v1`,
+    baseURL: apiBaseUrl,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',

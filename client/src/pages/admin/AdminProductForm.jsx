@@ -152,13 +152,33 @@ const AdminProductForm = () => {
         try {
             setLoading(true);
 
+            // Validation
+            if (!formData.name?.trim()) {
+                throw new Error('Product name is required');
+            }
+            if (!formData.category) {
+                throw new Error('Category is required');
+            }
+            if (!formData.price?.original || isNaN(formData.price.original) || Number(formData.price.original) <= 0) {
+                throw new Error('Original price must be a valid number greater than 0');
+            }
+            if (!formData.price?.selling || isNaN(formData.price.selling) || Number(formData.price.selling) <= 0) {
+                throw new Error('Selling price must be a valid number greater than 0');
+            }
+            if (imageList.length === 0) {
+                throw new Error('At least one product image is required');
+            }
+
             const data = new FormData();
             data.append('name', formData.name);
             data.append('description', formData.description);
             data.append('category', formData.category);
             data.append('isActive', formData.isActive);
             data.append('isOnSale', formData.isOnSale);
-            data.append('price', JSON.stringify(formData.price));
+            data.append('price', JSON.stringify({
+                original: Number(formData.price.original),
+                selling: Number(formData.price.selling)
+            }));
             data.append('sizes', JSON.stringify(formData.sizes));
 
             imageList.forEach(img => {

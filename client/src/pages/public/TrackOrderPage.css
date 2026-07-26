@@ -47,7 +47,7 @@
     font-weight: 600;
 }
 
-.btn-primary {
+.track-order-page .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -64,7 +64,7 @@
     cursor: pointer;
 }
 
-.btn-primary:disabled {
+.track-order-page .btn-primary:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
