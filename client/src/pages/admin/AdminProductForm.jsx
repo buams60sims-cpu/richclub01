@@ -126,7 +126,30 @@ const AdminProductForm = () => {
             return;
         }
 
-        const newImages = files.map(file => ({
+        // Validate file sizes (1KB to 10MB)
+        const minSize = 1024; // 1KB
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const invalidFiles = [];
+
+        const validFiles = files.filter(file => {
+            if (file.size < minSize) {
+                invalidFiles.push(`${file.name} (too small, must be at least 1KB)`);
+                return false;
+            }
+            if (file.size > maxSize) {
+                invalidFiles.push(`${file.name} (too large, must be under 10MB)`);
+                return false;
+            }
+            return true;
+        });
+
+        if (invalidFiles.length > 0) {
+            alert(`Some files were rejected:\n${invalidFiles.join('\n')}`);
+        }
+
+        if (validFiles.length === 0) return;
+
+        const newImages = validFiles.map(file => ({
             type: 'file',
             file: file,
             url: URL.createObjectURL(file)
@@ -293,7 +316,7 @@ const AdminProductForm = () => {
                             />
                             <Upload size={32} className="dropzone-icon" />
                             <span className="dropzone-text">Click or drag images here to upload</span>
-                            <span className="dropzone-subtext">PNG, JPG, WEBP up to 10MB each</span>
+                            <span className="dropzone-subtext">PNG, JPG, WEBP (1KB to 10MB each)</span>
                         </label>
 
                         {imageList.length > 0 && (

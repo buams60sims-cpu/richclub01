@@ -298,4 +298,5 @@ if (require.main === module) {
     startApp(DEFAULT_PORT);
 }
 
+// Export app for testing and server initialization
 module.exports = app;

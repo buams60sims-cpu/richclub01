@@ -70,6 +70,18 @@ const AdminHomeContent = () => {
     const handleSlideImageUpload = async (index, file) => {
         if (!file) return;
 
+        // Validate file size (1KB to 10MB)
+        const minSize = 1024; // 1KB
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size < minSize) {
+            alert(`File "${file.name}" is too small. It must be at least 1KB.`);
+            return;
+        }
+        if (file.size > maxSize) {
+            alert(`File "${file.name}" is too large. It must be under 10MB.`);
+            return;
+        }
+
         const formData = new FormData();
         formData.append('image', file);
         formData.append('section', 'hero');
@@ -181,6 +193,18 @@ const AdminHomeContent = () => {
     /* ==================== CUSTOM DESIGN IMAGES HANDLERS ==================== */
     const handleCustomImageUpload = async (index, file) => {
         if (!file) return;
+
+        // Validate file size (1KB to 10MB)
+        const minSize = 1024; // 1KB
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size < minSize) {
+            alert(`File "${file.name}" is too small. It must be at least 1KB.`);
+            return;
+        }
+        if (file.size > maxSize) {
+            alert(`File "${file.name}" is too large. It must be under 10MB.`);
+            return;
+        }
 
         const formData = new FormData();
         formData.append('image', file);
@@ -318,7 +342,7 @@ const AdminHomeContent = () => {
                                                         disabled={uploadingSlide === index}
                                                     />
                                                     <p className="form-help">
-                                                        Recommended: 1920×1080 • JPG / PNG / WebP • Max 2MB
+                                                        Recommended: 1920×1080 • JPG / PNG / WebP • 1KB to 10MB
                                                     </p>
                                                     {uploadingSlide === index && <p className="text-sm text-secondary">Uploading...</p>}
                                                 </>
